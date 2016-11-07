@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package gitea
+package api
 
 import (
 	"bytes"
@@ -10,12 +10,12 @@ import (
 	"fmt"
 )
 
-func (c *Client) AdminCreateOrg(user string, opt CreateOrgOption) (*Organization, error) {
+func (c *Client) AdminCreateRepo(user string, opt CreateRepoOption) (*Repository, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
 	}
-	org := new(Organization)
-	return org, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/orgs", user),
-		jsonHeader, bytes.NewReader(body), org)
+	repo := new(Repository)
+	return repo, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/repos", user),
+		jsonHeader, bytes.NewReader(body), repo)
 }
