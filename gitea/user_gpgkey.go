@@ -29,8 +29,8 @@ type GPGKey struct {
 
 // GPGKeyEmail a email attache to a GPGKey
 type GPGKeyEmail struct {
-	Email string `json:"email"`
-	//Verified bool   `json:"verified"`
+	Email    string `json:"email"`
+	Verified bool   `json:"verified"`
 }
 
 // CreateGPGKeyOption options create user GPG key
