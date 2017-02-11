@@ -342,7 +342,7 @@ type PullRequestPayload struct {
 	PullRequest *PullRequest    `json:"pull_request"`
 }
 
-// SetSecret modifies the secret of the IssuePayload.
+// SetSecret modifies the secret of the PullRequestPayload.
 func (p *PullRequestPayload) SetSecret(secret string) {
 	p.Secret = secret
 }
