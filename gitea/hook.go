@@ -307,7 +307,7 @@ func (p *IssuePayload) SetSecret(secret string) {
 	p.Secret = secret
 }
 
-// JSONPayload FIXME
+// JSONPayload encodes the IssuePayload to JSON, with an indentation of two spaces.
 func (p *IssuePayload) JSONPayload() ([]byte, error) {
 	return json.MarshalIndent(p, "", "  ")
 }
