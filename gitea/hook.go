@@ -297,9 +297,9 @@ type IssuePayload struct {
 	Action     HookIssueAction `json:"action"`
 	Index      int64           `json:"number"`
 	Changes    *ChangesPayload `json:"changes,omitempty"`
+	Issue      *Issue          `json:"issue"`
 	Repository *Repository     `json:"repository"`
 	Sender     *User           `json:"sender"`
-	Issue      *Issue          `json:"issue"`
 }
 
 // SetSecret modifies the secret of the IssuePayload.
@@ -337,9 +337,9 @@ type PullRequestPayload struct {
 	Action      HookIssueAction `json:"action"`
 	Index       int64           `json:"number"`
 	Changes     *ChangesPayload `json:"changes,omitempty"`
+	PullRequest *PullRequest    `json:"pull_request"`
 	Repository  *Repository     `json:"repository"`
 	Sender      *User           `json:"sender"`
-	PullRequest *PullRequest    `json:"pull_request"`
 }
 
 // SetSecret modifies the secret of the PullRequestPayload.
