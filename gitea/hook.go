@@ -279,10 +279,10 @@ const (
 	HookIssueLabelCleared HookIssueAction = "label_cleared"
 	// HookIssueSynchronized synchronized
 	HookIssueSynchronized HookIssueAction = "synchronized"
-	// HookIssueMilestoneSet is an issue action for when a milestone is set on an issue.
-	HookIssueMilestoneSet HookIssueAction = "milestoned"
-	// HookIssueMilestoneCleared is an issue action for when a milestone is cleared on an issue.
-	HookIssueMilestoneCleared HookIssueAction = "demilestoned"
+	// HookIssueMilestoned is an issue action for when a milestone is set on an issue.
+	HookIssueMilestoned HookIssueAction = "milestoned"
+	// HookIssueDemilestoned is an issue action for when a milestone is cleared on an issue.
+	HookIssueDemilestoned HookIssueAction = "demilestoned"
 )
 
 // IssuePayload represents the payload information that is sent along with an issue event.
