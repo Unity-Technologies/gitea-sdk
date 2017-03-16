@@ -16,7 +16,7 @@ type Release struct {
 	ID           int64     `json:"id"`
 	TagName      string    `json:"name"`
 	Target       string    `json:"target_commitish"`
-	Title        string    `json:"name"`
+	Title        string    `json:"title"`
 	Note         string    `json:"body"`
 	URL          string    `json:"url"`
 	TarURL       string    `json:"tarball_url"`
