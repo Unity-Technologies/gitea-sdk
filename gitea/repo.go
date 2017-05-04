@@ -30,6 +30,7 @@ type Repository struct {
 	Private       bool        `json:"private"`
 	Fork          bool        `json:"fork"`
 	Mirror        bool        `json:"mirror"`
+	Size          int         `json:"size"`
 	HTMLURL       string      `json:"html_url"`
 	SSHURL        string      `json:"ssh_url"`
 	CloneURL      string      `json:"clone_url"`
