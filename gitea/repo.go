@@ -26,7 +26,7 @@ type Repository struct {
 	Name          string      `json:"name"`
 	FullName      string      `json:"full_name"`
 	Description   string      `json:"description"`
-	Empty         string      `json:"empty"`
+	Empty         bool        `json:"empty"`
 	Private       bool        `json:"private"`
 	Fork          bool        `json:"fork"`
 	Mirror        bool        `json:"mirror"`
