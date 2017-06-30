@@ -57,10 +57,10 @@ func (c *Client) ListReleaseAssets(user, repo string, id int64) (*Release, error
 }
 
 // GetReleaseAsset gets all the assets of a release in a repository
-func (c *Client) GetReleaseAsset(user, repo string, releaseId int64, assetId int64) (*Release, error) {
+func (c *Client) GetReleaseAsset(user, repo string, releaseID int64, assetID int64) (*Release, error) {
 	r := new(Release)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, releaseId, assetId),
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, releaseID, assetID),
 		nil, nil, &r)
 	return r, err
 }

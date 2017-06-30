@@ -5,7 +5,7 @@
 package gitea // import "code.gitea.io/sdk/gitea"
 import "time"
 
-// a generic attachment
+// Attachment a generic attachment
 type Attachment struct {
 	ID            int64     `json:"id"`
 	Name          string    `json:"name"`
