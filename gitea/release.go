@@ -65,6 +65,15 @@ func (c *Client) GetReleaseAsset(user, repo string, releaseID int64, assetID int
 	return r, err
 }
 
+// GetLatestRelease gets the latest release in a repository
+func (c *Client) GetLatestRelease(user, repo string, id int64) (*Release, error) {
+	r := new(Release)
+	err := c.getParsedResponse("GET",
+		fmt.Sprintf("/repos/%s/%s/releases/latest", user, repo, id),
+		nil, nil, &r)
+	return r, err
+}
+
 // CreateReleaseOption options when creating a release
 type CreateReleaseOption struct {
 	TagName      string `json:"tag_name" binding:"Required"`
