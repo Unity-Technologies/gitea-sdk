@@ -66,10 +66,10 @@ func (c *Client) GetReleaseAsset(user, repo string, releaseID int64, assetID int
 }
 
 // GetLatestRelease gets the latest release in a repository
-func (c *Client) GetLatestRelease(user, repo string, id int64) (*Release, error) {
+func (c *Client) GetLatestRelease(user, repo string) (*Release, error) {
 	r := new(Release)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases/latest", user, repo, id),
+		fmt.Sprintf("/repos/%s/%s/releases/latest", user, repo),
 		nil, nil, &r)
 	return r, err
 }
