@@ -47,8 +47,8 @@ func (c *Client) GetRelease(user, repo string, id int64) (*Release, error) {
 	return r, err
 }
 
-// ListReleaseAssets gets all the assets of a release in a repository
-func (c *Client) ListReleaseAssets(user, repo string, id int64) (*Release, error) {
+// ListReleaseAttachments gets all the assets of a release in a repository
+func (c *Client) ListReleaseAttachments(user, repo string, id int64) (*Release, error) {
 	r := new(Release)
 	err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/releases/%d/assets", user, repo, id),
@@ -56,11 +56,11 @@ func (c *Client) ListReleaseAssets(user, repo string, id int64) (*Release, error
 	return r, err
 }
 
-// GetReleaseAsset gets all the assets of a release in a repository
-func (c *Client) GetReleaseAsset(user, repo string, releaseID int64, assetID int64) (*Release, error) {
+// GetReleaseAttachment gets all the assets of a release in a repository
+func (c *Client) GetReleaseAttachment(user, repo string, releaseID int64, attachmentID int64) (*Release, error) {
 	r := new(Release)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, releaseID, assetID),
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, releaseID, attachmentID),
 		nil, nil, &r)
 	return r, err
 }
