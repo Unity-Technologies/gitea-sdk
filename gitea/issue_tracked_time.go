@@ -12,8 +12,9 @@ import (
 )
 
 // TrackedTime worked time for an issue / pr
+// swagger:response TrackedTime
 type TrackedTime struct {
-	ID      int64  `json:"id"`
+	ID      int64     `json:"id"`
 	Created time.Time `json:"created"`
 	// Time in seconds
 	Time    int64 `json:"time"`
@@ -21,11 +22,9 @@ type TrackedTime struct {
 	IssueID int64 `json:"issue_id"`
 }
 
-// ListTrackedTimes list tracked times of one reppsitory
-func (c *Client) ListTrackedTimes(owner, repo string) ([]*TrackedTime, error) {
-	times := make([]*TrackedTime, 0, 10)
-	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/times", owner, repo), nil, nil, &times)
-}
+// TrackedTimes represent a list of tracked times
+// swagger:response TrackedTimes
+type TrackedTimes []*TrackedTime
 
 // ListTrackedTimes list tracked times of a user
 func (c *Client) GetUserTrackedTimes(user string) ([]*TrackedTime, error) {
@@ -33,7 +32,14 @@ func (c *Client) GetUserTrackedTimes(user string) ([]*TrackedTime, error) {
 	return times, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/times", user), nil, nil, &times)
 }
 
+// ListTrackedTimes list tracked times of a user
+func (c *Client) GetMyTrackedTimes() ([]*TrackedTime, error) {
+	times := make([]*TrackedTime, 0, 10)
+	return times, c.getParsedResponse("GET", "/user/times", nil, nil, &times)
+}
+
 // AddTimeOption adds time manually to an issue
+// swagger:response AddTimeOption
 type AddTimeOption struct {
 	Time int64 `json:"time" binding:"Required"`
 }
@@ -49,8 +55,8 @@ func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*T
 		jsonHeader, bytes.NewReader(body), time)
 }
 
-// GetIssueTrackedTimes get tracked times of one issue via issue id
-func (c *Client) GetIssueTrackedTimes(owner, repo string, index int64) ([]*TrackedTime, error) {
+// ListTrackedTimes get tracked times of one issue via issue id
+func (c *Client) ListTrackedTimes(owner, repo string, index int64) ([]*TrackedTime, error) {
 	times := make([]*TrackedTime, 0, 5)
 	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index), nil, nil, &times)
 }
