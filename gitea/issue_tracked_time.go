@@ -26,13 +26,13 @@ type TrackedTime struct {
 // swagger:response TrackedTimes
 type TrackedTimes []*TrackedTime
 
-// ListTrackedTimes list tracked times of a user
+// GetUserTrackedTimes list tracked times of a user
 func (c *Client) GetUserTrackedTimes(user string) ([]*TrackedTime, error) {
 	times := make([]*TrackedTime, 0, 10)
 	return times, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/times", user), nil, nil, &times)
 }
 
-// ListTrackedTimes list tracked times of a user
+// GetMyTrackedTimes list tracked times of the current user user
 func (c *Client) GetMyTrackedTimes() ([]*TrackedTime, error) {
 	times := make([]*TrackedTime, 0, 10)
 	return times, c.getParsedResponse("GET", "/user/times", nil, nil, &times)
@@ -50,9 +50,9 @@ func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*T
 	if err != nil {
 		return nil, err
 	}
-	time := new(TrackedTime)
-	return time, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index),
-		jsonHeader, bytes.NewReader(body), time)
+	t := new(TrackedTime)
+	return t, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index),
+		jsonHeader, bytes.NewReader(body), t)
 }
 
 // ListTrackedTimes get tracked times of one issue via issue id
