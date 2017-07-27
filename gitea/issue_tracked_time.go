@@ -27,9 +27,15 @@ type TrackedTime struct {
 type TrackedTimes []*TrackedTime
 
 // GetUserTrackedTimes list tracked times of a user
-func (c *Client) GetUserTrackedTimes(user string) (TrackedTimes, error) {
+func (c *Client) GetUserTrackedTimes(owner, repo, user string) (TrackedTimes, error) {
 	times := make(TrackedTimes, 0, 10)
-	return times, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/times", user), nil, nil, &times)
+	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/times/%s", owner, repo, user), nil, nil, &times)
+}
+
+// GetRepoTrackedTimes list tracked times of a repository
+func (c *Client) GetRepoTrackedTimes(owner, repo string) (TrackedTimes, error) {
+	times := make(TrackedTimes, 0, 10)
+	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/times", owner, repo), nil, nil, &times)
 }
 
 // GetMyTrackedTimes list tracked times of the current user
