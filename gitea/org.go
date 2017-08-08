@@ -41,12 +41,18 @@ func (c *Client) GetOrg(orgname string) (*Organization, error) {
 }
 
 // CreateOrgOption create one organization options
+// swagger:parameters adminCreateOrg
 type CreateOrgOption struct {
-	UserName    string `json:"username" binding:"Required"`
-	FullName    string `json:"full_name"`
+	// in: body
+	UserName string `json:"username" binding:"Required"`
+	// in: body
+	FullName string `json:"full_name"`
+	// in: body
 	Description string `json:"description"`
-	Website     string `json:"website"`
-	Location    string `json:"location"`
+	// in: body
+	Website string `json:"website"`
+	// in: body
+	Location string `json:"location"`
 }
 
 // EditOrgOption edit one organization options

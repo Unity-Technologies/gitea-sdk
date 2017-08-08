@@ -69,7 +69,7 @@ func (c *Client) ListOrgRepos(org string) ([]*Repository, error) {
 }
 
 // CreateRepoOption options when creating repository
-//swagger:parameters createOrgRepo
+//swagger:parameters createOrgRepo adminCreateRepo
 type CreateRepoOption struct {
 	// Name of the repository to create
 	//
