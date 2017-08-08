@@ -61,11 +61,16 @@ func (c *Client) GetRepoHook(user, repo string, id int64) (*Hook, error) {
 }
 
 // CreateHookOption options when create a hook
+// swagger:parameters orgCreateHook repoCreateHook
 type CreateHookOption struct {
-	Type   string            `json:"type" binding:"Required"`
+	// in: body
+	Type string `json:"type" binding:"Required"`
+	// in: body
 	Config map[string]string `json:"config" binding:"Required"`
-	Events []string          `json:"events"`
-	Active bool              `json:"active"`
+	// in: body
+	Events []string `json:"events"`
+	// in: body
+	Active bool `json:"active"`
 }
 
 // CreateOrgHook create one hook for an organization, with options
@@ -89,10 +94,14 @@ func (c *Client) CreateRepoHook(user, repo string, opt CreateHookOption) (*Hook,
 }
 
 // EditHookOption options when modify one hook
+// swagger:parameters orgEditHook repoEditHook
 type EditHookOption struct {
+	// in: body
 	Config map[string]string `json:"config"`
-	Events []string          `json:"events"`
-	Active *bool             `json:"active"`
+	// in: body
+	Events []string `json:"events"`
+	// in: body
+	Active *bool `json:"active"`
 }
 
 // EditOrgHook modify one hook of an organization, with hook id and options
