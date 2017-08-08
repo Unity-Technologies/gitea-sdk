@@ -11,6 +11,7 @@ import (
 )
 
 // Organization a group of some repositories, users and teams
+// swagger:response Organization
 type Organization struct {
 	ID          int64  `json:"id"`
 	UserName    string `json:"username"`

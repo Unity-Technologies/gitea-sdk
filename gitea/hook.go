@@ -20,6 +20,7 @@ var (
 )
 
 // Hook a hook is a web hook when one repository changed
+// swagger:response Hook
 type Hook struct {
 	ID      int64             `json:"id"`
 	Type    string            `json:"type"`
@@ -30,6 +31,10 @@ type Hook struct {
 	Updated time.Time         `json:"updated_at"`
 	Created time.Time         `json:"created_at"`
 }
+
+// HookList represents a list of API hook.
+// swagger:response HookList
+type HookList []*Hook
 
 // ListOrgHooks list all the hooks of one organization
 func (c *Client) ListOrgHooks(org string) ([]*Hook, error) {
