@@ -37,13 +37,13 @@ type Hook struct {
 type HookList []*Hook
 
 // ListOrgHooks list all the hooks of one organization
-func (c *Client) ListOrgHooks(org string) ([]*Hook, error) {
+func (c *Client) ListOrgHooks(org string) (HookList, error) {
 	hooks := make([]*Hook, 0, 10)
 	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/hooks", org), nil, nil, &hooks)
 }
 
 // ListRepoHooks list all the hooks of one repository
-func (c *Client) ListRepoHooks(user, repo string) ([]*Hook, error) {
+func (c *Client) ListRepoHooks(user, repo string) (HookList, error) {
 	hooks := make([]*Hook, 0, 10)
 	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks", user, repo), nil, nil, &hooks)
 }
