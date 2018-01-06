@@ -28,6 +28,7 @@ type Release struct {
 	// swagger:strfmt date-time
 	PublishedAt  time.Time `json:"published_at"`
 	Publisher    *User     `json:"author"`
+	Attachments  []*Attachment `json:"assets"`
 }
 
 // ListReleases list releases of a repository
@@ -44,6 +45,33 @@ func (c *Client) GetRelease(user, repo string, id int64) (*Release, error) {
 	r := new(Release)
 	err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/releases/%d", user, repo, id),
+		nil, nil, &r)
+	return r, err
+}
+
+// ListReleaseAttachments gets all the assets of a release in a repository
+func (c *Client) ListReleaseAttachments(user, repo string, id int64) ([]*Attachment, error) {
+	attachments := make([]*Attachment, 0, 10)
+	err := c.getParsedResponse("GET",
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets", user, repo, id),
+		nil, nil, &attachments)
+	return attachments, err
+}
+
+// GetReleaseAttachment gets a single attachment of a release in a repository
+func (c *Client) GetReleaseAttachment(user, repo string, releaseID int64, attachmentID int64) (*Attachment, error) {
+	attachment := new(Attachment)
+	err := c.getParsedResponse("GET",
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, releaseID, attachmentID),
+		nil, nil, &attachment)
+	return attachment, err
+}
+
+// GetLatestRelease gets the latest release in a repository. This cannot be a draft or prerelease
+func (c *Client) GetLatestRelease(user, repo string) (*Release, error) {
+	r := new(Release)
+	err := c.getParsedResponse("GET",
+		fmt.Sprintf("/repos/%s/%s/releases/latest", user, repo),
 		nil, nil, &r)
 	return r, err
 }
