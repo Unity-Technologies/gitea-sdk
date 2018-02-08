@@ -26,9 +26,9 @@ type Release struct {
 	// swagger:strfmt date-time
 	CreatedAt time.Time `json:"created_at"`
 	// swagger:strfmt date-time
-	PublishedAt time.Time    `json:"published_at"`
-	Publisher   *User        `json:"author"`
-	Assets      []Attachment `json:"assets"`
+	PublishedAt time.Time     `json:"published_at"`
+	Publisher   *User         `json:"author"`
+	Assets      []*Attachment `json:"assets"`
 }
 
 // ListReleases list releases of a repository
