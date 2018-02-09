@@ -5,6 +5,7 @@
 package gitea // import "code.gitea.io/sdk/gitea"
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -78,7 +79,24 @@ func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file 
 	return attachment, err
 }
 
+// EditReleaseAttachment updates the given attachment with the given options
+func (c *Client) EditReleaseAttachment(user, repo string, release int64, attachment int64, form EditAttachmentOptions) (*Attachment, error) {
+	body, err := json.Marshal(&form)
+	if err != nil {
+		return nil, err
+	}
+	attach := new(Attachment)
+	return attach, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/releases/%d/attachments/%d", user, repo, release, attachment), jsonHeader, bytes.NewReader(body), attach)
+}
+
+// DeleteReleaseAttachment deletes the given attachment including the uploaded file
+func (c *Client) DeleteReleaseAttachment(user, repo string, release int64, id int64) error {
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/releases/%d/attachments/%d", user, repo, release, id), nil, nil)
+	return err
+}
+
 // EditAttachmentOptions options for editing attachments
+// swagger:model
 type EditAttachmentOptions struct {
 	Name string `json:"name"`
 }
