@@ -4,7 +4,11 @@
 
 package gitea // import "code.gitea.io/sdk/gitea"
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"mime/multipart"
+	"os"
 	"time"
 )
 
@@ -37,4 +41,44 @@ func (c *Client) GetReleaseAttachment(user, repo string, release int64, id int64
 		fmt.Sprintf("/repos/%s/%s/releases/%d/attachments/%d", user, repo, release, id),
 		nil, nil, &a)
 	return a, err
+}
+
+// CreateReleaseAttachment creates an attachment for the given release
+func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file *os.File) (*Attachment, error) {
+	// Read file to upload
+	fileContents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	fi, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	file.Close()
+
+	// Write file to body
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("attachment", fi.Name())
+	if err != nil {
+		return nil, err
+	}
+	part.Write(fileContents)
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	// Send request
+	attachment := new(Attachment)
+	err = c.getParsedResponse("POST",
+		fmt.Sprintf("/repos/%s/%s/releases/%d/attachments", user, repo, release),
+		nil, body, &attachment)
+	return attachment, err
+}
+
+// EditAttachmentOptions options for editing attachments
+type EditAttachmentOptions struct {
+	Name string `json:"name"`
 }
