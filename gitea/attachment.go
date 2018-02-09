@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"time"
 )
@@ -75,7 +76,7 @@ func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file 
 	attachment := new(Attachment)
 	err = c.getParsedResponse("POST",
 		fmt.Sprintf("/repos/%s/%s/releases/%d/attachments", user, repo, release),
-		nil, body, &attachment)
+		http.Header{"Content-Type": {writer.FormDataContentType()}}, body, &attachment)
 	return attachment, err
 }
 
