@@ -7,10 +7,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -46,23 +46,17 @@ func (c *Client) GetReleaseAttachment(user, repo string, release int64, id int64
 }
 
 // CreateReleaseAttachment creates an attachment for the given release
-func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file *os.File) (*Attachment, error) {
+func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file *io.Reader, filename string) (*Attachment, error) {
 	// Read file to upload
 	fileContents, err := ioutil.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
 
-	fi, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-	file.Close()
-
 	// Write file to body
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("attachment", fi.Name())
+	part, err := writer.CreateFormFile("attachment", filename)
 	if err != nil {
 		return nil, err
 	}
