@@ -54,9 +54,11 @@ func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file 
 	if err != nil {
 		return nil, err
 	}
-	io.Copy(part, file)
-	err = writer.Close()
-	if err != nil {
+
+	if _, err = io.Copy(part, file); err != nil {
+		return nil, err
+	}
+	if err = writer.Close(); err != nil {
 		return nil, err
 	}
 
