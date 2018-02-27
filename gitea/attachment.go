@@ -31,7 +31,7 @@ type Attachment struct {
 func (c *Client) ListReleaseAttachments(user, repo string, release int64) ([]*Attachment, error) {
 	attachments := make([]*Attachment, 0, 10)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases/%d/attachments", user, repo, release),
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets", user, repo, release),
 		nil, nil, &attachments)
 	return attachments, err
 }
@@ -40,7 +40,7 @@ func (c *Client) ListReleaseAttachments(user, repo string, release int64) ([]*At
 func (c *Client) GetReleaseAttachment(user, repo string, release int64, id int64) (*Attachment, error) {
 	a := new(Attachment)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases/%d/attachments/%d", user, repo, release, id),
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, id),
 		nil, nil, &a)
 	return a, err
 }
@@ -65,7 +65,7 @@ func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file 
 	// Send request
 	attachment := new(Attachment)
 	err = c.getParsedResponse("POST",
-		fmt.Sprintf("/repos/%s/%s/releases/%d/attachments", user, repo, release),
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets", user, repo, release),
 		http.Header{"Content-Type": {writer.FormDataContentType()}}, body, &attachment)
 	return attachment, err
 }
@@ -77,12 +77,12 @@ func (c *Client) EditReleaseAttachment(user, repo string, release int64, attachm
 		return nil, err
 	}
 	attach := new(Attachment)
-	return attach, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/releases/%d/attachments/%d", user, repo, release, attachment), jsonHeader, bytes.NewReader(body), attach)
+	return attach, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, attachment), jsonHeader, bytes.NewReader(body), attach)
 }
 
 // DeleteReleaseAttachment deletes the given attachment including the uploaded file
 func (c *Client) DeleteReleaseAttachment(user, repo string, release int64, id int64) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/releases/%d/attachments/%d", user, repo, release, id), nil, nil)
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, id), nil, nil)
 	return err
 }
 
