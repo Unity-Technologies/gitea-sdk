@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"time"
@@ -55,7 +54,7 @@ func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file 
 		return nil, err
 	}
 
-	if _, err = io.Copy(part, file); err != nil {
+	if _, err = io.Copy(part, *file); err != nil {
 		return nil, err
 	}
 	if err = writer.Close(); err != nil {
