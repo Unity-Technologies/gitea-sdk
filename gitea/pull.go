@@ -85,6 +85,7 @@ type CreatePullRequestOption struct {
 	Title     string  `json:"title" binding:"Required"`
 	Body      string  `json:"body"`
 	Assignee  string  `json:"assignee"`
+	Assignees []string  `json:"assignees"`
 	Milestone int64   `json:"milestone"`
 	Labels    []int64 `json:"labels"`
 }
@@ -105,6 +106,7 @@ type EditPullRequestOption struct {
 	Title     string  `json:"title"`
 	Body      string  `json:"body"`
 	Assignee  string  `json:"assignee"`
+	Assignees []string  `json:"assignees"`
 	Milestone int64   `json:"milestone"`
 	Labels    []int64 `json:"labels"`
 	State     *string `json:"state"`
