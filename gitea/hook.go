@@ -172,6 +172,7 @@ type PayloadCommitVerification struct {
 
 var (
 	_ Payloader = &CreatePayload{}
+	_ Payloader = &DeletePayload{}
 	_ Payloader = &PushPayload{}
 	_ Payloader = &IssuePayload{}
 	_ Payloader = &PullRequestPayload{}
@@ -215,6 +216,57 @@ func ParseCreateHook(raw []byte) (*CreatePayload, error) {
 	// was not from Gogs (maybe was from Bitbucket)
 	// So we'll check to be sure certain key fields
 	// were populated
+	switch {
+	case hook.Repo == nil:
+		return nil, ErrInvalidReceiveHook
+	case len(hook.Ref) == 0:
+		return nil, ErrInvalidReceiveHook
+	}
+	return hook, nil
+}
+
+// ________         .__          __
+// \______ \   ____ |  |   _____/  |_  ____
+//  |    |  \_/ __ \|  | _/ __ \   __\/ __ \
+//  |    `   \  ___/|  |_\  ___/|  | \  ___/
+// /_______  /\___  >____/\___  >__|  \___  >
+//         \/     \/          \/          \/
+
+// PusherType represents the pusher type
+type PusherType string
+
+const (
+	// PusherTypeUser represents the user pusher type
+	PusherTypeUser PusherType = "user"
+)
+
+// DeletePayload represents a payload information of a delete event.
+type DeletePayload struct {
+	Secret     string      `json:"secret"`
+	Ref        string      `json:"ref"`
+	RefType    string      `json:"ref_type"`
+	PusherType PusherType  `json:"pusher_type"`
+	Repo       *Repository `json:"repository"`
+	Sender     *User       `json:"sender"`
+}
+
+// SetSecret FIXME
+func (p *DeletePayload) SetSecret(secret string) {
+	p.Secret = secret
+}
+
+// JSONPayload return payload information
+func (p *DeletePayload) JSONPayload() ([]byte, error) {
+	return json.MarshalIndent(p, "", "  ")
+}
+
+// ParseDeleteHook parses push event hook content.
+func ParseDeleteHook(raw []byte) (*DeletePayload, error) {
+	hook := new(DeletePayload)
+	if err := json.Unmarshal(raw, hook); err != nil {
+		return nil, err
+	}
+
 	switch {
 	case hook.Repo == nil:
 		return nil, ErrInvalidReceiveHook
