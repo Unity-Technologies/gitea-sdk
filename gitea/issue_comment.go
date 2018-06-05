@@ -18,9 +18,7 @@ type Comment struct {
 	PRURL    string `json:"pull_request_url"`
 	IssueURL string `json:"issue_url"`
 	Poster   *User  `json:"user"`
-	// GhostName will be used if poster is not existing on Gitea. Requires admin permissions.
-	GhostName string `json:"ghost_name" binding:"AlphaDashDot;MaxSize(35)"`
-	Body      string `json:"body"`
+	Body     string `json:"body"`
 	// swagger:strfmt date-time
 	Created time.Time `json:"created_at"`
 	// swagger:strfmt date-time
@@ -43,6 +41,8 @@ func (c *Client) ListRepoIssueComments(owner, repo string) ([]*Comment, error) {
 type CreateIssueCommentOption struct {
 	// required:true
 	Body string `json:"body" binding:"Required"`
+	// GhostName will be used if poster is not existing on Gitea. Requires admin permissions.
+	GhostName string `json:"ghost_name" binding:"AlphaDashDot;MaxSize(35)"`
 }
 
 // CreateIssueComment create comment on an issue.
