@@ -43,6 +43,9 @@ type CreateIssueCommentOption struct {
 	Body string `json:"body" binding:"Required"`
 	// GhostName will be used if poster is not existing on Gitea. Requires admin permissions.
 	GhostName string `json:"ghost_name" binding:"AlphaDashDot;MaxSize(35)"`
+	// Created will be used as creation date. This is used for migration. Requires admin permissions.
+	// swagger:strfmt date-time
+	Created time.Time `json:"created_at"`
 }
 
 // CreateIssueComment create comment on an issue.

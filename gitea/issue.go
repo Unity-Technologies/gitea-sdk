@@ -106,8 +106,11 @@ type CreateIssueOption struct {
 	// GhostName is used if user is not existing on the gitea instance. Requires admin permissions.
 	GhostName string `json:"ghost_name" binding:"AlphaDashDot;MaxSize(35)"`
 	// Index is former index of the issue. If the index is already taken, an error will be returned.
-	Index                 int64
-	SuppressNotifications bool `json:"-"`
+	Index int64
+	// Created will be used as creation date. This is used for migration. Requires admin permissions.
+	// swagger:strfmt date-time
+	Created               time.Time `json:"created_at"`
+	SuppressNotifications bool      `json:"-"`
 }
 
 // CreateIssue create a new issue for a given repository
