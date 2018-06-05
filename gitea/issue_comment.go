@@ -19,7 +19,7 @@ type Comment struct {
 	IssueURL string `json:"issue_url"`
 	Poster   *User  `json:"user"`
 	// GhostName will be used if poster is not existing on Gitea. Requires admin permissions.
-	GhostName string `json:"ghost_name"`
+	GhostName string `json:"ghost_name" binding:"AlphaDashDot;MaxSize(35)"`
 	Body      string `json:"body"`
 	// swagger:strfmt date-time
 	Created time.Time `json:"created_at"`

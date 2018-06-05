@@ -104,7 +104,7 @@ type CreateIssueOption struct {
 	Labels []int64 `json:"labels"`
 	Closed bool    `json:"closed"`
 	// GhostName is used if user is not existing on the gitea instance. Requires admin permissions.
-	GhostName string `json:"ghost_name"`
+	GhostName string `json:"ghost_name" binding:"AlphaDashDot;MaxSize(35)"`
 	// Index is former index of the issue. If the index is already taken, an error will be returned.
 	Index                 int64
 	SuppressNotifications bool `json:"-"`
