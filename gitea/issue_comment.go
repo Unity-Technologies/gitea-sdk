@@ -18,7 +18,9 @@ type Comment struct {
 	PRURL    string `json:"pull_request_url"`
 	IssueURL string `json:"issue_url"`
 	Poster   *User  `json:"user"`
-	Body     string `json:"body"`
+	// GhostName will be used if poster is not existing on Gitea. Requires admin permissions.
+	GhostName string `json:"ghost_name"`
+	Body      string `json:"body"`
 	// swagger:strfmt date-time
 	Created time.Time `json:"created_at"`
 	// swagger:strfmt date-time
@@ -51,6 +53,16 @@ func (c *Client) CreateIssueComment(owner, repo string, index int64, opt CreateI
 	}
 	comment := new(Comment)
 	return comment, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index), jsonHeader, bytes.NewReader(body), comment)
+}
+
+// CreateSuppressedIssueComment create comment on an issue without sending notifications if suppressed is true. Requires admin permissions for the repo.
+func (c *Client) CreateSuppressedIssueComment(owner, repo string, index int64, suppressed bool, opt CreateIssueCommentOption) (*Comment, error) {
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	comment := new(Comment)
+	return comment, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/comments?surpress_notifications=%t", owner, repo, index, suppressed), jsonHeader, bytes.NewReader(body), comment)
 }
 
 // EditIssueCommentOption options for editing a comment
