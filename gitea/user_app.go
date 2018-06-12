@@ -55,3 +55,9 @@ func (c *Client) CreateAccessToken(user, pass string, opt CreateAccessTokenOptio
 			"Authorization": []string{"Basic " + BasicAuthEncode(user, pass)}},
 		bytes.NewReader(body), t)
 }
+
+// DeleteAccessToken delete token with key id
+func (c *Client) DeleteAccessToken(user string, keyID int64) error {
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/user/%s/tokens/%d", user, keyID), nil, nil)
+	return err
+}
