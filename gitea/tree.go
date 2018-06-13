@@ -9,7 +9,7 @@ import (
 )
 
 // TreeEntry represents the subtree structure within a tree.
-type TreeEntry struct {
+type GitTreeEntry struct {
 	Path		string 		`json:"path"`
 	Mode		string 		`json:"mode"`
 	Type		string 		`json:"type"`
@@ -19,16 +19,16 @@ type TreeEntry struct {
 }
 
 // Tree represents the tree structure.
-type Tree struct {
+type GitTreeResponse struct {
 	SHA		string		`json:"sha"`
 	URL		string		`json:"url"`
-	Entries		[]TreeEntry	`json:"tree,omitempty"`
+	Entries		[]GitTreeEntry	`json:"tree,omitempty"`
 	Truncated 	bool		`json:"truncated"`
 }
 
 // GetTree gets information on a tree given the owner, repo, and sha or ref.
-func (c *Client) GetTree(user string, repo string, tree string, recursive bool) (*Tree, error) {
-	t := new(Tree)
+func (c *Client) GetTree(user string, repo string, tree string, recursive bool) (*GitTreeResponse, error) {
+	t := new(GitTreeResponse)
 	var Path = fmt.Sprintf("/repos/%s/%s/trees/%s", user, repo, tree)
 	if recursive {
 		Path += "?recursive=1"
@@ -36,4 +36,3 @@ func (c *Client) GetTree(user string, repo string, tree string, recursive bool) 
 	err := c.getParsedResponse("GET", Path, nil, nil, t)
 	return t, err
 }
-
