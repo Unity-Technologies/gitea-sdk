@@ -43,15 +43,16 @@ type CreateAccessTokenOption struct {
 	Name string `json:"name" binding:"Required"`
 	MatchOwner []string `json:"match_owner,omitempty"`
 	MatchRepo []string `json:"match_repo,omitempty"`
-	RegexMatchBranch []string `json:"regex_match_branch,omitempty"`
-	RegexMatchRoute []string `json:"regex_match_route,omitempty"`
+	WildcardMatchBranch []string `json:"wildcard_match_branch,omitempty"`
+	WildcardMatchRoute []string `json:"wildcard_match_route,omitempty"`
 	MatchMethod []string `json:"match_method,omitempty"`
-	Expires int64 `json:"expires,omitempty"`
+	ExpiresAt int64 `json:"expires_at,omitempty"`
 	// allow integrated server app to authenticate by pre-generated token
 	// and to deprecate basic auth by username and password.
 	// this will also give server app the option to generate user access token
 	// on the fly without storing token.
 	GiteaServerAccessToken string `json:"-"`
+	UserName 		string `json:"user_name,omitempty"`
 }
 
 // CreateAccessToken create one access token with options
