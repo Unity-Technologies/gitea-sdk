@@ -60,7 +60,6 @@ type CreateAccessTokenOption struct {
 	// this will also give server app the option to generate user access token
 	// on the fly without storing token.
 	GiteaServerAccessToken string `json:"-"`
-	UserName 		string `json:"user_name,omitempty"`
 }
 
 // CreateAccessToken create one access token with options
