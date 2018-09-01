@@ -39,10 +39,10 @@ func (c *Client) ListAccessTokens(user, pass string) ([]*AccessToken, error) {
 
 // AdminListAccessTokens lista all the access tokens of user, authenticate with pre-generated server token.
 // this allows server app to list and generate access token for a user already authenticated through other means.
-func (c *Client) AdminListAccessTokens(user, server_token string) ([]*AccessToken, error) {
+func (c *Client) AdminListAccessTokens(user, serverToken string) ([]*AccessToken, error) {
 	tokens := make([]*AccessToken, 0, 10)
 	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens", user),
-		http.Header{"X-Gitea-Server-Access-Token": []string{server_token}}, nil, &tokens)
+		http.Header{"X-Gitea-Server-Access-Token": []string{serverToken}}, nil, &tokens)
 }
 
 // CreateAccessTokenOption options when create access token
