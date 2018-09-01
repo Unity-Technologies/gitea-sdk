@@ -42,7 +42,7 @@ func (c *Client) ListAccessTokens(user, pass string) ([]*AccessToken, error) {
 func (c *Client) AdminListAccessTokens(user, serverToken string) ([]*AccessToken, error) {
 	tokens := make([]*AccessToken, 0, 10)
 	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens", user),
-		http.Header{"X-Gitea-Server-Access-Token": []string{serverToken}}, nil, &tokens)
+		http.Header{"X-Gitea-Server-Access-Token": []string{serverToken} }, nil, &tokens)
 }
 
 // CreateAccessTokenOption options when create access token
