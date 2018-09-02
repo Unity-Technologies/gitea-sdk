@@ -2,13 +2,15 @@ package gitea
 
 import "fmt"
 
-type searchUsersResponse struct {
-	Users []*User `json:"data"`
+// UserSearchResults results of a succesful user search
+type UserSearchResults struct {
+	OK   bool    `json:"ok"`
+	Data []*User `json:"data"`
 }
 
 // SearchUsers finds users by query
 func (c *Client) SearchUsers(query string, limit int) ([]*User, error) {
-	resp := new(searchUsersResponse)
+	resp := new(UserSearchResults)
 	err := c.getParsedResponse("GET", fmt.Sprintf("/users/search?q=%s&limit=%d", query, limit), nil, nil, &resp)
-	return resp.Users, err
+	return resp.Data, err
 }
