@@ -48,7 +48,7 @@ func (c *Client) GetRepoRefs(user, repo, ref string) ([]*Reference, error) {
 		return nil, err
 	}
 
-	// Aattemt to unmarshal single returned ref.
+	// Attempt to unmarshal single returned ref.
 	r := new(Reference)
 	refErr := json.Unmarshal(resp, r)
 	if refErr == nil {
