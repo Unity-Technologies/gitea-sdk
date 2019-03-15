@@ -14,20 +14,13 @@ func (c *Client) GetFile(user, repo, ref, tree string) ([]byte, error) {
 	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s/%s", user, repo, ref, tree), nil, nil)
 }
 
-// IdentityOptions for a person's identity like an author or committer
-type IdentityOptions struct {
-	Name string `json:"name" binding:"MaxSize(100)"`
-	// swagger:strfmt email
-	Email string `json:"email" binding:"MaxSize(254)"`
-}
-
 // FileOptions options for all file APIs
 type FileOptions struct {
-	Message       string          `json:"message"" binding:"Required"`
+	Message       string          `json:"message" binding:"Required"`
 	BranchName    string          `json:"branch"`
 	NewBranchName string          `json:"new_branch"`
-	Author        IdentityOptions `json:"author"`
-	Committer     IdentityOptions `json:"committer"`
+	Author        Identity        `json:"author"`
+	Committer     Identity        `json:"committer"`
 }
 
 // CreateFileOptions options for creating files
