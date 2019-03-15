@@ -39,7 +39,7 @@ type DeleteFileOptions struct {
 type UpdateFileOptions struct {
 	*DeleteFileOptions
 	Content  string `json:"content"`
-	FromPath string `json:"from_path binding:"MaxSize(500)`
+	FromPath string `json:"from_path" binding:"MaxSize(500)"`
 }
 
 // FileLinksResponse contains the links for a repo's file
