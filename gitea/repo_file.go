@@ -16,11 +16,11 @@ func (c *Client) GetFile(user, repo, ref, tree string) ([]byte, error) {
 
 // FileOptions options for all file APIs
 type FileOptions struct {
-	Message       string          `json:"message" binding:"Required"`
-	BranchName    string          `json:"branch"`
-	NewBranchName string          `json:"new_branch"`
-	Author        Identity        `json:"author"`
-	Committer     Identity        `json:"committer"`
+	Message       string   `json:"message" binding:"Required"`
+	BranchName    string   `json:"branch"`
+	NewBranchName string   `json:"new_branch"`
+	Author        Identity `json:"author"`
+	Committer     Identity `json:"committer"`
 }
 
 // CreateFileOptions options for creating files
