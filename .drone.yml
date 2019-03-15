@@ -1,5 +1,5 @@
 workspace:
-  base: /srv/app
+  base: /go
   path: src/code.gitea.io/sdk
 
 clone:
