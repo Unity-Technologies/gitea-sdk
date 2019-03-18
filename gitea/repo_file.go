@@ -49,7 +49,7 @@ type FileLinksResponse struct {
 	HTMLURL string `json:"html_url"`
 }
 
-// FileContent contains information about a repo's file stats and content
+// FileContentResponse contains information about a repo's file stats and content
 type FileContentResponse struct {
 	Name        string             `json:"name"`
 	Path        string             `json:"path"`
@@ -63,7 +63,7 @@ type FileContentResponse struct {
 	Links       *FileLinksResponse `json:"_links"`
 }
 
-// FileCommit contains information generated from a Git commit for a repo's file.
+// FileCommitResponse contains information generated from a Git commit for a repo's file.
 type FileCommitResponse struct {
 	*CommitMeta
 	HTMLURL   string        `json:"html_url"`
@@ -88,7 +88,8 @@ type FileDeleteResponse struct {
 	Verification *PayloadCommitVerification `json:"verification"`
 }
 
+// FileError contains informatoin on the error working with a file and the URL to the API documentation for correct syntax
 type FileError struct {
 	Message          string `json:"message"`
-	DocumentationUrl string `json:"documentation_url"`
+	DocumentationURL string `json:"documentation_url"`
 }
