@@ -88,9 +88,3 @@ type FileDeleteResponse struct {
 	Commit       *FileCommitResponse        `json:"commit"`
 	Verification *PayloadCommitVerification `json:"verification"`
 }
-
-// FileError contains informatoin on the error working with a file and the URL to the API documentation for correct syntax
-type FileError struct {
-	Message          string `json:"message"`
-	DocumentationURL string `json:"documentation_url"`
-}
