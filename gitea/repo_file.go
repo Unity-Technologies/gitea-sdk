@@ -26,19 +26,19 @@ type FileOptions struct {
 
 // CreateFileOptions options for creating files
 type CreateFileOptions struct {
-	*FileOptions
+	FileOptions
 	Content string `json:"content"`
 }
 
 // DeleteFileOptions options for deleting files (used for other File structs below)
 type DeleteFileOptions struct {
-	*FileOptions
+	FileOptions
 	SHA string `json:"sha" binding:"Required"`
 }
 
 // UpdateFileOptions options for updating files
 type UpdateFileOptions struct {
-	*DeleteFileOptions
+	DeleteFileOptions
 	Content  string `json:"content"`
 	FromPath string `json:"from_path" binding:"MaxSize(500)"`
 }
@@ -66,7 +66,7 @@ type FileContentResponse struct {
 
 // FileCommitResponse contains information generated from a Git commit for a repo's file.
 type FileCommitResponse struct {
-	*CommitMeta
+	CommitMeta
 	HTMLURL   string        `json:"html_url"`
 	Author    *CommitUser   `json:"author"`
 	Committer *CommitUser   `json:"committer"`
