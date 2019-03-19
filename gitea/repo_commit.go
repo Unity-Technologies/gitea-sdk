@@ -24,7 +24,7 @@ type CommitMeta struct {
 
 // CommitUser contains information of a user in the context of a commit.
 type CommitUser struct {
-	*Identity
+	Identity
 	Date string `json:"date"`
 }
 
