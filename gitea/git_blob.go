@@ -6,8 +6,9 @@ package gitea
 
 import (
 	"bytes"
-	"code.gitea.io/gitea/modules/git"
 	"encoding/json"
+
+	"code.gitea.io/gitea/modules/git"
 )
 
 // GitBlobResponse represents a git blob
