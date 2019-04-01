@@ -25,7 +25,7 @@ type BlobContentResponse struct {
 }
 
 func (bc *BlobContentResponse) MarshalJSON() ([]byte, error) {
-	reader, err := bc.Blob.DataAsync()
+	reader, err := bc.DataAsync()
 	if err != nil {
 		return nil, err
 	}
