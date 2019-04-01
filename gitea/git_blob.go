@@ -20,7 +20,7 @@ type BlobResponse struct {
 	Size     int64  `json:"size"`
 }
 
-// BlobContentReponse is a wrapper for a git.Blob to be serializable
+// BlobContentResponse is a wrapper for a git.Blob to be serializable
 type BlobContentResponse struct {
 	*git.Blob
 }
