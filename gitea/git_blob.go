@@ -21,7 +21,7 @@ type BlobResponse struct {
 }
 
 type BlobContentResponse struct {
-	Blob *git.Blob
+	*git.Blob
 }
 
 func (bc *BlobContentResponse) MarshalJSON() ([]byte, error) {
