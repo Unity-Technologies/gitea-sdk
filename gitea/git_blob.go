@@ -11,7 +11,7 @@ import (
 	"code.gitea.io/gitea/modules/git"
 )
 
-// GitBlobResponse represents a git blob
+// BlobResponse represents a git blob
 type BlobResponse struct {
 	Content  *BlobContentResponse `json:"content"`
 	Encoding string `json:"encoding"`
