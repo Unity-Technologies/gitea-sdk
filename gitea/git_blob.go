@@ -25,6 +25,7 @@ type BlobContentResponse struct {
 	*git.Blob
 }
 
+// MarshalJSON Marshals the BlobContentResponse by reading the blob so it can be encoded to base64
 func (bc *BlobContentResponse) MarshalJSON() ([]byte, error) {
 	reader, err := bc.DataAsync()
 	if err != nil {
