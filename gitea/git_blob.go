@@ -14,10 +14,10 @@ import (
 // BlobResponse represents a git blob
 type BlobResponse struct {
 	Content  *BlobContentResponse `json:"content"`
-	Encoding string `json:"encoding"`
-	URL      string `json:"url"`
-	SHA      string `json:"sha"`
-	Size     int64  `json:"size"`
+	Encoding string               `json:"encoding"`
+	URL      string               `json:"url"`
+	SHA      string               `json:"sha"`
+	Size     int64                `json:"size"`
 }
 
 // BlobContentResponse is a wrapper for a git.Blob to be serializable

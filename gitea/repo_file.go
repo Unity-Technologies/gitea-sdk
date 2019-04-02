@@ -33,7 +33,7 @@ type CreateFileOptions struct {
 // UpdateFileOptions options for updating files
 type UpdateFileOptions struct {
 	FileOptions
-	SHA string `json:"sha" binding:"Required"`
+	SHA      string `json:"sha" binding:"Required"`
 	Content  string `json:"content"`
 	FromPath string `json:"from_path" binding:"MaxSize(500)"`
 }
