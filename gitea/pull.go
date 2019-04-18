@@ -63,18 +63,14 @@ type PRBranchInfo struct {
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	Page  int    `json:"page"`
-	State string `json:"state"`
+	Page  int    `url:"page"`
+	State string `url:"state"`
 }
 
 // ListRepoPullRequests list PRs of one repository
-func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
+func (c *Client) ListRepoPullRequests(owner, repo string, opt *ListPullRequestsOptions) ([]*PullRequest, error) {
 	prs := make([]*PullRequest, 0, 10)
-	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo), jsonHeader, bytes.NewReader(body), &prs)
+	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo), jsonHeader, opt, &prs)
 }
 
 // GetPullRequest get information of one PR
