@@ -5,13 +5,17 @@
 package gitea
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
+
+	"github.com/google/go-querystring/query"
 )
 
 // Version return the library version
@@ -52,11 +56,57 @@ func (c *Client) SetSudo(sudo string) {
 	c.sudo = sudo
 }
 
-func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, c.url+"/api/v1"+path, body)
+func (c *Client) doRequest(method, path string, header http.Header, body interface{}) (*http.Response, error) {
+	u, err := url.Parse(c.url)
 	if err != nil {
 		return nil, err
 	}
+
+	unescaped, err := url.PathUnescape(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set the encoded path data
+	u.RawPath = "/api/v1" + path
+	u.Path = "/api/v1" + unescaped
+
+	if body != nil {
+		q, err := query.Values(body)
+		if err != nil {
+			return nil, err
+		}
+		u.RawQuery = q.Encode()
+	}
+
+	req := &http.Request{
+		Method:     method,
+		URL:        u,
+		Proto:      "HTTP/1.1",
+		ProtoMajor: 1,
+		ProtoMinor: 1,
+		Header:     make(http.Header),
+		Host:       u.Host,
+	}
+
+	if method == "POST" || method == "PUT" {
+		bodyBytes, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+		bodyReader := bytes.NewReader(bodyBytes)
+
+		u.RawQuery = ""
+		req.Body = ioutil.NopCloser(bodyReader)
+		req.GetBody = func() (io.ReadCloser, error) {
+			return ioutil.NopCloser(bodyReader), nil
+		}
+		req.ContentLength = int64(bodyReader.Len())
+		req.Header.Set("Content-Type", "application/json")
+	}
+
+	req.Header.Set("Accept", "application/json")
+
 	if len(c.accessToken) != 0 {
 		req.Header.Set("Authorization", "token "+c.accessToken)
 	}
@@ -70,7 +120,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	return c.client.Do(req)
 }
 
-func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, error) {
+func (c *Client) getResponse(method, path string, header http.Header, body interface{}) ([]byte, error) {
 	resp, err := c.doRequest(method, path, header, body)
 	if err != nil {
 		return nil, err
@@ -106,7 +156,7 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 	return data, nil
 }
 
-func (c *Client) getParsedResponse(method, path string, header http.Header, body io.Reader, obj interface{}) error {
+func (c *Client) getParsedResponse(method, path string, header http.Header, body interface{}, obj interface{}) error {
 	data, err := c.getResponse(method, path, header, body)
 	if err != nil {
 		return err
