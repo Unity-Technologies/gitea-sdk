@@ -71,12 +71,14 @@ func (c *Client) doRequest(method, path string, header http.Header, body interfa
 	u.RawPath = "/api/v1" + path
 	u.Path = "/api/v1" + unescaped
 
-	if body != nil {
-		q, err := query.Values(body)
-		if err != nil {
-			return nil, err
+	if method == "GET" {
+		if body != nil {
+			q, err := query.Values(body)
+			if err != nil {
+				return nil, err
+			}
+			u.RawQuery = q.Encode()
 		}
-		u.RawQuery = q.Encode()
 	}
 
 	req := &http.Request{
