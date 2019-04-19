@@ -130,13 +130,9 @@ type EditIssueOption struct {
 
 // EditIssue modify an existing issue for a given repository
 func (c *Client) EditIssue(owner, repo string, index int64, opt EditIssueOption) (*Issue, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	issue := new(Issue)
 	return issue, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index),
-		jsonHeader, bytes.NewReader(body), issue)
+		jsonHeader, opt, issue)
 }
 
 // StartIssueStopWatch starts a stopwatch for an existing issue for a given

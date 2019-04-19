@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 )
 
@@ -44,13 +42,9 @@ type CreateLabelOption struct {
 
 // CreateLabel create one label of repository
 func (c *Client) CreateLabel(owner, repo string, opt CreateLabelOption) (*Label, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	label := new(Label)
 	return label, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/labels", owner, repo),
-		jsonHeader, bytes.NewReader(body), label)
+		jsonHeader, opt, label)
 }
 
 // EditLabelOption options for editing a label
@@ -61,12 +55,8 @@ type EditLabelOption struct {
 
 // EditLabel modify one label with options
 func (c *Client) EditLabel(owner, repo string, id int64, opt EditLabelOption) (*Label, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	label := new(Label)
-	return label, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id), jsonHeader, bytes.NewReader(body), label)
+	return label, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id), jsonHeader, opt, label)
 }
 
 // DeleteLabel delete one label of repository by id
@@ -90,22 +80,14 @@ func (c *Client) GetIssueLabels(owner, repo string, index int64) ([]*Label, erro
 
 // AddIssueLabels add one or more labels to one issue
 func (c *Client) AddIssueLabels(owner, repo string, index int64, opt IssueLabelsOption) ([]*Label, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	var labels []*Label
-	return labels, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index), jsonHeader, bytes.NewReader(body), &labels)
+	return labels, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index), jsonHeader, opt, &labels)
 }
 
 // ReplaceIssueLabels replace old labels of issue with new labels
 func (c *Client) ReplaceIssueLabels(owner, repo string, index int64, opt IssueLabelsOption) ([]*Label, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	var labels []*Label
-	return labels, c.getParsedResponse("PUT", fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index), jsonHeader, bytes.NewReader(body), &labels)
+	return labels, c.getParsedResponse("PUT", fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index), jsonHeader, opt, &labels)
 }
 
 // DeleteIssueLabel delete one label of one issue by issue id and label id

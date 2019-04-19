@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -57,12 +55,8 @@ type CreateKeyOption struct {
 
 // CreateDeployKey options when create one deploy key
 func (c *Client) CreateDeployKey(user, repo string, opt CreateKeyOption) (*DeployKey, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	key := new(DeployKey)
-	return key, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/keys", user, repo), jsonHeader, bytes.NewReader(body), key)
+	return key, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/keys", user, repo), jsonHeader, opt, key)
 }
 
 // DeleteDeployKey delete deploy key with key id

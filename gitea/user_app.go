@@ -6,9 +6,7 @@
 package gitea
 
 import (
-	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -47,16 +45,12 @@ type CreateAccessTokenOption struct {
 
 // CreateAccessToken create one access token with options
 func (c *Client) CreateAccessToken(user, pass string, opt CreateAccessTokenOption) (*AccessToken, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	t := new(AccessToken)
 	return t, c.getParsedResponse("POST", fmt.Sprintf("/users/%s/tokens", user),
 		http.Header{
 			"content-type":  []string{"application/json"},
 			"Authorization": []string{"Basic " + BasicAuthEncode(user, pass)}},
-		bytes.NewReader(body), t)
+		opt, t)
 }
 
 // DeleteAccessToken delete token with key id

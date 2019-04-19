@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 )
 
@@ -27,13 +25,9 @@ type CreateForkOption struct {
 
 // CreateFork create a fork of a repository
 func (c *Client) CreateFork(user, repo string, form CreateForkOption) (*Repository, error) {
-	body, err := json.Marshal(form)
-	if err != nil {
-		return nil, err
-	}
 	fork := new(Repository)
 	err = c.getParsedResponse("POST",
 		fmt.Sprintf("/repos/%s/%s/forks", user, repo),
-		jsonHeader, bytes.NewReader(body), &fork)
+		jsonHeader, form, &fork)
 	return fork, err
 }

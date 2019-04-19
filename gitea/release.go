@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -62,14 +60,10 @@ type CreateReleaseOption struct {
 
 // CreateRelease create a release
 func (c *Client) CreateRelease(user, repo string, form CreateReleaseOption) (*Release, error) {
-	body, err := json.Marshal(form)
-	if err != nil {
-		return nil, err
-	}
 	r := new(Release)
 	err = c.getParsedResponse("POST",
 		fmt.Sprintf("/repos/%s/%s/releases", user, repo),
-		jsonHeader, bytes.NewReader(body), r)
+		jsonHeader, form, r)
 	return r, err
 }
 
@@ -85,14 +79,10 @@ type EditReleaseOption struct {
 
 // EditRelease edit a release
 func (c *Client) EditRelease(user, repo string, id int64, form EditReleaseOption) (*Release, error) {
-	body, err := json.Marshal(form)
-	if err != nil {
-		return nil, err
-	}
 	r := new(Release)
 	err = c.getParsedResponse("PATCH",
 		fmt.Sprintf("/repos/%s/%s/releases/%d", user, repo, id),
-		jsonHeader, bytes.NewReader(body), r)
+		jsonHeader, form, r)
 	return r, err
 }
 

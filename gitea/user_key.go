@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -45,12 +43,8 @@ func (c *Client) GetPublicKey(keyID int64) (*PublicKey, error) {
 
 // CreatePublicKey create public key with options
 func (c *Client) CreatePublicKey(opt CreateKeyOption) (*PublicKey, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	key := new(PublicKey)
-	return key, c.getParsedResponse("POST", "/user/keys", jsonHeader, bytes.NewReader(body), key)
+	return key, c.getParsedResponse("POST", "/user/keys", jsonHeader, opt, key)
 }
 
 // DeletePublicKey delete public key with key id
