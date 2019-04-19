@@ -95,13 +95,9 @@ type CreatePullRequestOption struct {
 
 // CreatePullRequest create pull request with options
 func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOption) (*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	pr := new(PullRequest)
 	return pr, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo),
-		jsonHeader, bytes.NewReader(body), pr)
+		jsonHeader, opt, pr)
 }
 
 // EditPullRequestOption options when modify pull request
