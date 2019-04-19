@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -70,14 +68,10 @@ type ListStatusesOption struct {
 // CreateStatus creates a new Status for a given Commit
 //
 // POST /repos/:owner/:repo/statuses/:sha
-func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) (*Status, error) {
-	body, err := json.Marshal(&opts)
-	if err != nil {
-		return nil, err
-	}
+func (c *Client) CreateStatus(owner, repo, sha string, opt CreateStatusOption) (*Status, error) {
 	status := &Status{}
 	return status, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/statuses/%s", owner, repo, sha),
-		jsonHeader, bytes.NewReader(body), status)
+		jsonHeader, opt, status)
 }
 
 // ListStatuses returns all statuses for a given Commit

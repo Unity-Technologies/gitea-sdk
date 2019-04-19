@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -52,13 +50,9 @@ type AddTimeOption struct {
 
 // AddTime adds time to issue with the given index
 func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*TrackedTime, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	t := new(TrackedTime)
 	return t, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index),
-		jsonHeader, bytes.NewReader(body), t)
+		jsonHeader, opt, t)
 }
 
 // ListTrackedTimes get tracked times of one issue via issue id

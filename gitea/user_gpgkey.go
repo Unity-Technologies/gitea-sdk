@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -65,12 +63,8 @@ func (c *Client) GetGPGKey(keyID int64) (*GPGKey, error) {
 
 // CreateGPGKey create GPG key with options
 func (c *Client) CreateGPGKey(opt CreateGPGKeyOption) (*GPGKey, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	key := new(GPGKey)
-	return key, c.getParsedResponse("POST", "/user/gpg_keys", jsonHeader, bytes.NewReader(body), key)
+	return key, c.getParsedResponse("POST", "/user/gpg_keys", jsonHeader, opt, key)
 }
 
 // DeleteGPGKey delete GPG key with key id

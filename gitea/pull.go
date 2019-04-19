@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -115,13 +113,9 @@ type EditPullRequestOption struct {
 
 // EditPullRequest modify pull request with PR id and options
 func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRequestOption) (*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	pr := new(PullRequest)
 	return pr, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index),
-		jsonHeader, bytes.NewReader(body), pr)
+		jsonHeader, opt, pr)
 }
 
 // MergePullRequest merge a PR to repository by PR id
