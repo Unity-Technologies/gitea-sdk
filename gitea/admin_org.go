@@ -5,18 +5,12 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 )
 
 // AdminCreateOrg create an organization
 func (c *Client) AdminCreateOrg(user string, opt CreateOrgOption) (*Organization, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	org := new(Organization)
 	return org, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/orgs", user),
-		jsonHeader, bytes.NewReader(body), org)
+		jsonHeader, opt, org)
 }

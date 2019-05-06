@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -63,18 +61,14 @@ type PRBranchInfo struct {
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	Page  int    `json:"page"`
-	State string `json:"state"`
+	Page  int    `url:"page"`
+	State string `url:"state"`
 }
 
 // ListRepoPullRequests list PRs of one repository
-func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
+func (c *Client) ListRepoPullRequests(owner, repo string, opt *ListPullRequestsOptions) ([]*PullRequest, error) {
 	prs := make([]*PullRequest, 0, 10)
-	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo), jsonHeader, bytes.NewReader(body), &prs)
+	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo), jsonHeader, opt, &prs)
 }
 
 // GetPullRequest get information of one PR
@@ -99,13 +93,9 @@ type CreatePullRequestOption struct {
 
 // CreatePullRequest create pull request with options
 func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOption) (*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	pr := new(PullRequest)
 	return pr, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo),
-		jsonHeader, bytes.NewReader(body), pr)
+		jsonHeader, opt, pr)
 }
 
 // EditPullRequestOption options when modify pull request
@@ -123,13 +113,9 @@ type EditPullRequestOption struct {
 
 // EditPullRequest modify pull request with PR id and options
 func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRequestOption) (*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	pr := new(PullRequest)
 	return pr, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index),
-		jsonHeader, bytes.NewReader(body), pr)
+		jsonHeader, opt, pr)
 }
 
 // MergePullRequest merge a PR to repository by PR id

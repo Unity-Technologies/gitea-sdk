@@ -29,12 +29,8 @@ type CreateUserOption struct {
 
 // AdminCreateUser create a user
 func (c *Client) AdminCreateUser(opt CreateUserOption) (*User, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	user := new(User)
-	return user, c.getParsedResponse("POST", "/admin/users", jsonHeader, bytes.NewReader(body), user)
+	return user, c.getParsedResponse("POST", "/admin/users", jsonHeader, opt, user)
 }
 
 // EditUserOption edit user options
@@ -76,10 +72,6 @@ func (c *Client) AdminDeleteUser(user string) error {
 
 // AdminCreateUserPublicKey create one user with options
 func (c *Client) AdminCreateUserPublicKey(user string, opt CreateKeyOption) (*PublicKey, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	key := new(PublicKey)
-	return key, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/keys", user), jsonHeader, bytes.NewReader(body), key)
+	return key, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/keys", user), jsonHeader, opt, key)
 }

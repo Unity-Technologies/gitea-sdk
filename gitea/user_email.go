@@ -31,12 +31,8 @@ type CreateEmailOption struct {
 
 // AddEmail add one email to current user with options
 func (c *Client) AddEmail(opt CreateEmailOption) ([]*Email, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	emails := make([]*Email, 0, 3)
-	return emails, c.getParsedResponse("POST", "/user/emails", jsonHeader, bytes.NewReader(body), emails)
+	return emails, c.getParsedResponse("POST", "/user/emails", jsonHeader, opt, emails)
 }
 
 // DeleteEmailOption options when deleting email addresses

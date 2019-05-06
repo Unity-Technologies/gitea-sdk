@@ -74,22 +74,14 @@ type CreateHookOption struct {
 
 // CreateOrgHook create one hook for an organization, with options
 func (c *Client) CreateOrgHook(org string, opt CreateHookOption) (*Hook, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	h := new(Hook)
-	return h, c.getParsedResponse("POST", fmt.Sprintf("/orgs/%s/hooks", org), jsonHeader, bytes.NewReader(body), h)
+	return h, c.getParsedResponse("POST", fmt.Sprintf("/orgs/%s/hooks", org), jsonHeader, opt, h)
 }
 
 // CreateRepoHook create one hook for a repository, with options
 func (c *Client) CreateRepoHook(user, repo string, opt CreateHookOption) (*Hook, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	h := new(Hook)
-	return h, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/hooks", user, repo), jsonHeader, bytes.NewReader(body), h)
+	return h, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/hooks", user, repo), jsonHeader, opt, h)
 }
 
 // EditHookOption options when modify one hook

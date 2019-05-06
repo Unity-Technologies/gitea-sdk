@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -90,22 +88,14 @@ type CreateRepoOption struct {
 
 // CreateRepo creates a repository for authenticated user.
 func (c *Client) CreateRepo(opt CreateRepoOption) (*Repository, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	repo := new(Repository)
-	return repo, c.getParsedResponse("POST", "/user/repos", jsonHeader, bytes.NewReader(body), repo)
+	return repo, c.getParsedResponse("POST", "/user/repos", jsonHeader, opt, repo)
 }
 
 // CreateOrgRepo creates an organization repository for authenticated user.
 func (c *Client) CreateOrgRepo(org string, opt CreateRepoOption) (*Repository, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	repo := new(Repository)
-	return repo, c.getParsedResponse("POST", fmt.Sprintf("/org/%s/repos", org), jsonHeader, bytes.NewReader(body), repo)
+	return repo, c.getParsedResponse("POST", fmt.Sprintf("/org/%s/repos", org), jsonHeader, opt, repo)
 }
 
 // GetRepo returns information of a repository of given owner.
@@ -141,12 +131,8 @@ type MigrateRepoOption struct {
 // To migrate a repository for a organization, the authenticated user must be a
 // owner of the specified organization.
 func (c *Client) MigrateRepo(opt MigrateRepoOption) (*Repository, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	repo := new(Repository)
-	return repo, c.getParsedResponse("POST", "/repos/migrate", jsonHeader, bytes.NewReader(body), repo)
+	return repo, c.getParsedResponse("POST", "/repos/migrate", jsonHeader, opt, repo)
 }
 
 // MirrorSync adds a mirrored repository to the mirror sync queue.

@@ -5,8 +5,6 @@
 package gitea
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -45,12 +43,8 @@ type CreateIssueCommentOption struct {
 
 // CreateIssueComment create comment on an issue.
 func (c *Client) CreateIssueComment(owner, repo string, index int64, opt CreateIssueCommentOption) (*Comment, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	comment := new(Comment)
-	return comment, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index), jsonHeader, bytes.NewReader(body), comment)
+	return comment, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index), jsonHeader, opt, comment)
 }
 
 // EditIssueCommentOption options for editing a comment
@@ -61,12 +55,8 @@ type EditIssueCommentOption struct {
 
 // EditIssueComment edits an issue comment.
 func (c *Client) EditIssueComment(owner, repo string, index, commentID int64, opt EditIssueCommentOption) (*Comment, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
 	comment := new(Comment)
-	return comment, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/:%s/:%s/issues/%d/comments/%d", owner, repo, index, commentID), jsonHeader, bytes.NewReader(body), comment)
+	return comment, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/:%s/:%s/issues/%d/comments/%d", owner, repo, index, commentID), jsonHeader, opt, comment)
 }
 
 // DeleteIssueComment deletes an issue comment.
