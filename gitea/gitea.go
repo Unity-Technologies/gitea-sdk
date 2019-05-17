@@ -57,19 +57,10 @@ func (c *Client) SetSudo(sudo string) {
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body interface{}) (*http.Response, error) {
-	u, err := url.Parse(c.url)
+	u, err := url.Parse(c.url + "/api/v1" + path)
 	if err != nil {
 		return nil, err
 	}
-
-	unescaped, err := url.PathUnescape(path)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set the encoded path data
-	u.RawPath = "/api/v1" + path
-	u.Path = "/api/v1" + unescaped
 
 	if method == "GET" {
 		if body != nil {
