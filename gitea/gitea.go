@@ -82,7 +82,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body interfa
 		Host:       u.Host,
 	}
 
-	if method == "POST" || method == "PUT" {
+	if method == "POST" || method == "PUT" || method == "PATCH" {
 		bodyBytes, err := json.Marshal(body)
 		if err != nil {
 			return nil, err
