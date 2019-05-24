@@ -8,6 +8,12 @@ import (
 	"fmt"
 )
 
+// AdminListOrgs list all organizations
+func (c *Client) AdminListOrgs() ([]*Organization, error) {
+	orgs := make([]*Organization, 0, 5)
+	return orgs, c.getParsedResponse("GET", "/admin/orgs", nil, nil, &orgs)
+}
+
 // AdminCreateOrg create an organization
 func (c *Client) AdminCreateOrg(user string, opt CreateOrgOption) (*Organization, error) {
 	org := new(Organization)
