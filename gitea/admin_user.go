@@ -13,6 +13,12 @@ import (
 	"code.gitea.io/gitea/modules/structs"
 )
 
+// AdminListUsers lists all users
+func (c *Client) AdminListUsers() ([]*User, error) {
+	users := make([]*User, 0, 10)
+	return users, c.getParsedResponse("GET", "/admin/users", nil, nil, &users)
+}
+
 // AdminCreateUser create a user
 func (c *Client) AdminCreateUser(opt structs.CreateUserOption) (*User, error) {
 	body, err := json.Marshal(&opt)
