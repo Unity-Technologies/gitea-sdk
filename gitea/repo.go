@@ -15,6 +15,7 @@ import (
 // Repository is equal to structs.Repository
 type Repository = structs.Repository
 
+// CreateRepoOption is equal to structs.CreateRepoOption
 type CreateRepoOption = structs.CreateRepoOption
 
 // ListMyRepos lists all repositories for the authenticated user that has access to.
