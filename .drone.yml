@@ -23,7 +23,7 @@ steps:
 
 - name: testing
   pull: always
-  image: golang:1.12
+  image: golang:1.13
   environment:
     GOPROXY: https://goproxy.cn 
   commands:
@@ -49,5 +49,3 @@ steps:
     status:
     - changed
     - failure
-
-...

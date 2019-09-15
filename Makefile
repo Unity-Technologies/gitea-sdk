@@ -31,4 +31,4 @@ bench:
 
 .PHONY: build
 build:
-	cd gitea && GO111MODULE=on go build
+	cd gitea && go build
