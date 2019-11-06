@@ -67,6 +67,16 @@ To honor the past owners, here's the history of the owners and the time they ser
   * [Thomas Boerger](https://github.com/tboerger) <thomas@webhippie.de>
   * [Kim Carlbäcker](https://github.com/bkcsoft) <kim.carlbacker@gmail.com>
 
+* 2018-01-01 ~ 2018-12-31
+  * [Lunny Xiao](https://github.com/lunny) <xiaolunwen@gmail.com>
+  * [Lauris Bukšis-Haberkorns](https://github.com/lafriks) <lauris@nix.lv>
+  * [Kim Carlbäcker](https://github.com/bkcsoft) <kim.carlbacker@gmail.com>
+
+* 2019-01-01 ~ 2019-12-31
+  * [Lunny Xiao](https://github.com/lunny) <xiaolunwen@gmail.com>
+  * [Lauris Bukšis-Haberkorns](https://github.com/lafriks) <lauris@nix.lv>
+  * [Matti Ranta](https://github.com/techknowlogick) <matti@mdranta.net>
+
 ## Versions
 
 Gitea has the `master` branch as a tip branch and has version branches such as `v0.9`. `v0.9` is a release branch and we will tag `v0.9.0` for binary download. If `v0.9.0` has bugs, we will accept pull requests on the `v0.9` branch and publish a `v0.9.1` tag, after bringing the bug fix also to the master branch.
@@ -78,7 +88,7 @@ Since the `master` branch is a tip version, if you wish to use Gitea in producti
 Code that you contribute should use the standard copyright header:
 
 ```
-// Copyright 2017 The Gitea Authors. All rights reserved.
+// Copyright 2019 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 ```
