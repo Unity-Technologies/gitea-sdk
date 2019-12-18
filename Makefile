@@ -1,8 +1,3 @@
-IMPORT := code.gitea.io/sdk
-
-PACKAGES ?= $(shell go list ./... | grep -v /vendor/)
-GENERATE ?= code.gitea.io/sdk/gitea
-
 .PHONY: all
 all: clean test build
 
@@ -10,31 +5,29 @@ all: clean test build
 clean:
 	go clean -i ./...
 
-generate:
-	@which mockery > /dev/null; if [ $$? -ne 0 ]; then \
-		go get -u github.com/vektra/mockery/...; \
-	fi
-	go generate $(GENERATE)
-
 .PHONY: fmt
 fmt:
-	find . -name "*.go" -type f -not -path "./vendor/*" | xargs gofmt -s -w
+	find . -name "*.go" -type f ! -path "./vendor/*" ! -path "./benchmark/*" | xargs gofmt -s -w
 
 .PHONY: vet
 vet:
-	go vet $(PACKAGES)
+	cd gitea && go vet ./...
 
 .PHONY: lint
 lint:
 	@which golint > /dev/null; if [ $$? -ne 0 ]; then \
-		go get -u github.com/golang/lint/golint; \
+		go get -u golang.org/x/lint/golint; \
 	fi
-	for PKG in $(PACKAGES); do golint -set_exit_status $$PKG || exit 1; done;
+	cd gitea && golint -set_exit_status
 
 .PHONY: test
 test:
-	for PKG in $(PACKAGES); do go test -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+	cd gitea && go test -cover -coverprofile coverage.out
+
+.PHONY: bench
+bench:
+	cd gitea && go test -run=XXXXXX -benchtime=10s -bench=. || exit 1
 
 .PHONY: build
 build:
-	go build ./gitea
+	cd gitea && go build

@@ -7,11 +7,14 @@ package gitea
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
+
+var jsonHeader = http.Header{"content-type": []string{"application/json"}}
 
 // Version return the library version
 func Version() string {
@@ -22,6 +25,7 @@ func Version() string {
 type Client struct {
 	url         string
 	accessToken string
+	sudo        string
 	client      *http.Client
 }
 
@@ -34,9 +38,21 @@ func NewClient(url, token string) *Client {
 	}
 }
 
+// NewClientWithHTTP creates an API client with a custom http client
+func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
+	client := NewClient(url, "")
+	client.client = httpClient
+	return client
+}
+
 // SetHTTPClient replaces default http.Client with user given one.
 func (c *Client) SetHTTPClient(client *http.Client) {
 	c.client = client
+}
+
+// SetSudo sets username to impersonate.
+func (c *Client) SetSudo(sudo string) {
+	c.sudo = sudo
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*http.Response, error) {
@@ -44,7 +60,12 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "token "+c.accessToken)
+	if len(c.accessToken) != 0 {
+		req.Header.Set("Authorization", "token "+c.accessToken)
+	}
+	if c.sudo != "" {
+		req.Header.Set("Sudo", c.sudo)
+	}
 	for k, v := range header {
 		req.Header[k] = v
 	}
@@ -69,12 +90,18 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 		return nil, errors.New("403 Forbidden")
 	case 404:
 		return nil, errors.New("404 Not Found")
+	case 409:
+		return nil, errors.New("409 Conflict")
+	case 422:
+		return nil, fmt.Errorf("422 Unprocessable Entity: %s", string(data))
 	}
 
 	if resp.StatusCode/100 != 2 {
 		errMap := make(map[string]interface{})
 		if err = json.Unmarshal(data, &errMap); err != nil {
-			return nil, err
+			// when the JSON can't be parsed, data was probably empty or a plain string,
+			// so we try to return a helpful error anyway
+			return nil, fmt.Errorf("Unknown API Error: %d %s", resp.StatusCode, string(data))
 		}
 		return nil, errors.New(errMap["message"].(string))
 	}

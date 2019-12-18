@@ -11,44 +11,50 @@ import (
 	"time"
 )
 
-// Permission represents a API permission.
+// Permission represents a set of permissions
 type Permission struct {
 	Admin bool `json:"admin"`
 	Push  bool `json:"push"`
 	Pull  bool `json:"pull"`
 }
 
-// Repository represents a API repository.
-// swagger:response Repository
+// Repository represents a repository
 type Repository struct {
-	ID            int64       `json:"id"`
-	Owner         *User       `json:"owner"`
-	Name          string      `json:"name"`
-	FullName      string      `json:"full_name"`
-	Description   string      `json:"description"`
-	Empty         bool        `json:"empty"`
-	Private       bool        `json:"private"`
-	Fork          bool        `json:"fork"`
-	Parent        *Repository `json:"parent"`
-	Mirror        bool        `json:"mirror"`
-	Size          int         `json:"size"`
-	HTMLURL       string      `json:"html_url"`
-	SSHURL        string      `json:"ssh_url"`
-	CloneURL      string      `json:"clone_url"`
-	Website       string      `json:"website"`
-	Stars         int         `json:"stars_count"`
-	Forks         int         `json:"forks_count"`
-	Watchers      int         `json:"watchers_count"`
-	OpenIssues    int         `json:"open_issues_count"`
-	DefaultBranch string      `json:"default_branch"`
-	Created       time.Time   `json:"created_at"`
-	Updated       time.Time   `json:"updated_at"`
-	Permissions   *Permission `json:"permissions,omitempty"`
+	ID                        int64       `json:"id"`
+	Owner                     *User       `json:"owner"`
+	Name                      string      `json:"name"`
+	FullName                  string      `json:"full_name"`
+	Description               string      `json:"description"`
+	Empty                     bool        `json:"empty"`
+	Private                   bool        `json:"private"`
+	Fork                      bool        `json:"fork"`
+	Parent                    *Repository `json:"parent"`
+	Mirror                    bool        `json:"mirror"`
+	Size                      int         `json:"size"`
+	HTMLURL                   string      `json:"html_url"`
+	SSHURL                    string      `json:"ssh_url"`
+	CloneURL                  string      `json:"clone_url"`
+	OriginalURL               string      `json:"original_url"`
+	Website                   string      `json:"website"`
+	Stars                     int         `json:"stars_count"`
+	Forks                     int         `json:"forks_count"`
+	Watchers                  int         `json:"watchers_count"`
+	OpenIssues                int         `json:"open_issues_count"`
+	DefaultBranch             string      `json:"default_branch"`
+	Archived                  bool        `json:"archived"`
+	Created                   time.Time   `json:"created_at"`
+	Updated                   time.Time   `json:"updated_at"`
+	Permissions               *Permission `json:"permissions,omitempty"`
+	HasIssues                 bool        `json:"has_issues"`
+	HasWiki                   bool        `json:"has_wiki"`
+	HasPullRequests           bool        `json:"has_pull_requests"`
+	IgnoreWhitespaceConflicts bool        `json:"ignore_whitespace_conflicts"`
+	AllowMerge                bool        `json:"allow_merge_commits"`
+	AllowRebase               bool        `json:"allow_rebase"`
+	AllowRebaseMerge          bool        `json:"allow_rebase_explicit"`
+	AllowSquash               bool        `json:"allow_squash_merge"`
+	AvatarURL                 string      `json:"avatar_url"`
 }
-
-// RepositoryList represents a list of API repository.
-// swagger:response RepositoryList
-type RepositoryList []*Repository
 
 // ListMyRepos lists all repositories for the authenticated user that has access to.
 func (c *Client) ListMyRepos() ([]*Repository, error) {
@@ -69,36 +75,23 @@ func (c *Client) ListOrgRepos(org string) ([]*Repository, error) {
 }
 
 // CreateRepoOption options when creating repository
-//swagger:parameters createOrgRepo
 type CreateRepoOption struct {
 	// Name of the repository to create
 	//
-	// in: body
-	// unique: true
-	Name string `json:"name" binding:"Required;AlphaDashDot;MaxSize(100)"`
+	Name string `json:"name"`
 	// Description of the repository to create
-	//
-	// in: body
-	Description string `json:"description" binding:"MaxSize(255)"`
-	// Is the repository to create private ?
-	//
-	// in: body
+	Description string `json:"description"`
+	// Whether the repository is private
 	Private bool `json:"private"`
-	// Init the repository to create ?
-	//
-	// in: body
+	// Issue Label set to use
+	IssueLabels string `json:"issue_labels"`
+	// Whether the repository should be auto-intialized?
 	AutoInit bool `json:"auto_init"`
 	// Gitignores to use
-	//
-	// in: body
 	Gitignores string `json:"gitignores"`
 	// License to use
-	//
-	// in: body
 	License string `json:"license"`
 	// Readme of the repository to create
-	//
-	// in: body
 	Readme string `json:"readme"`
 }
 
@@ -128,19 +121,63 @@ func (c *Client) GetRepo(owner, reponame string) (*Repository, error) {
 	return repo, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s", owner, reponame), nil, nil, repo)
 }
 
+// EditRepoOption options when editing a repository's properties
+type EditRepoOption struct {
+	// name of the repository
+	Name *string `json:"name,omitempty"`
+	// a short description of the repository.
+	Description *string `json:"description,omitempty"`
+	// a URL with more information about the repository.
+	Website *string `json:"website,omitempty"`
+	// either `true` to make the repository private or `false` to make it public.
+	// Note: you will get a 422 error if the organization restricts changing repository visibility to organization
+	// owners and a non-owner tries to change the value of private.
+	Private *bool `json:"private,omitempty"`
+	// either `true` to enable issues for this repository or `false` to disable them.
+	HasIssues *bool `json:"has_issues,omitempty"`
+	// either `true` to enable the wiki for this repository or `false` to disable it.
+	HasWiki *bool `json:"has_wiki,omitempty"`
+	// sets the default branch for this repository.
+	DefaultBranch *string `json:"default_branch,omitempty"`
+	// either `true` to allow pull requests, or `false` to prevent pull request.
+	HasPullRequests *bool `json:"has_pull_requests,omitempty"`
+	// either `true` to ignore whitespace for conflicts, or `false` to not ignore whitespace. `has_pull_requests` must be `true`.
+	IgnoreWhitespaceConflicts *bool `json:"ignore_whitespace_conflicts,omitempty"`
+	// either `true` to allow merging pull requests with a merge commit, or `false` to prevent merging pull requests with merge commits. `has_pull_requests` must be `true`.
+	AllowMerge *bool `json:"allow_merge_commits,omitempty"`
+	// either `true` to allow rebase-merging pull requests, or `false` to prevent rebase-merging. `has_pull_requests` must be `true`.
+	AllowRebase *bool `json:"allow_rebase,omitempty"`
+	// either `true` to allow rebase with explicit merge commits (--no-ff), or `false` to prevent rebase with explicit merge commits. `has_pull_requests` must be `true`.
+	AllowRebaseMerge *bool `json:"allow_rebase_explicit,omitempty"`
+	// either `true` to allow squash-merging pull requests, or `false` to prevent squash-merging. `has_pull_requests` must be `true`.
+	AllowSquash *bool `json:"allow_squash_merge,omitempty"`
+	// set to `true` to archive this repository.
+	Archived *bool `json:"archived,omitempty"`
+}
+
+// EditRepo edit the properties of a repository
+func (c *Client) EditRepo(owner, reponame string, opt EditRepoOption) (*Repository, error) {
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	repo := new(Repository)
+	return repo, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s", owner, reponame), jsonHeader, bytes.NewReader(body), repo)
+}
+
 // DeleteRepo deletes a repository of user or organization.
 func (c *Client) DeleteRepo(owner, repo string) error {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s", owner, repo), nil, nil)
 	return err
 }
 
-// MigrateRepoOption options when migrate repository from an external place
+// MigrateRepoOption options for migrating a repository from an external service
 type MigrateRepoOption struct {
-	CloneAddr    string `json:"clone_addr" binding:"Required"`
+	CloneAddr    string `json:"clone_addr"`
 	AuthUsername string `json:"auth_username"`
 	AuthPassword string `json:"auth_password"`
-	UID          int    `json:"uid" binding:"Required"`
-	RepoName     string `json:"repo_name" binding:"Required"`
+	UID          int    `json:"uid"`
+	RepoName     string `json:"repo_name"`
 	Mirror       bool   `json:"mirror"`
 	Private      bool   `json:"private"`
 	Description  string `json:"description"`

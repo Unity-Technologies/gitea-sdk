@@ -6,9 +6,44 @@ package gitea
 
 import (
 	"fmt"
+	"time"
 )
 
-// Branch represents a repository branch.
+// PayloadUser represents the author or committer of a commit
+type PayloadUser struct {
+	// Full name of the commit author
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	UserName string `json:"username"`
+}
+
+// FIXME: consider using same format as API when commits API are added.
+//        applies to PayloadCommit and PayloadCommitVerification
+
+// PayloadCommit represents a commit
+type PayloadCommit struct {
+	// sha1 hash of the commit
+	ID           string                     `json:"id"`
+	Message      string                     `json:"message"`
+	URL          string                     `json:"url"`
+	Author       *PayloadUser               `json:"author"`
+	Committer    *PayloadUser               `json:"committer"`
+	Verification *PayloadCommitVerification `json:"verification"`
+	Timestamp    time.Time                  `json:"timestamp"`
+	Added        []string                   `json:"added"`
+	Removed      []string                   `json:"removed"`
+	Modified     []string                   `json:"modified"`
+}
+
+// PayloadCommitVerification represents the GPG verification of a commit
+type PayloadCommitVerification struct {
+	Verified  bool   `json:"verified"`
+	Reason    string `json:"reason"`
+	Signature string `json:"signature"`
+	Payload   string `json:"payload"`
+}
+
+// Branch represents a repository branch
 type Branch struct {
 	Name   string         `json:"name"`
 	Commit *PayloadCommit `json:"commit"`

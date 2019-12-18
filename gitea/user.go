@@ -5,37 +5,39 @@
 package gitea
 
 import (
-	"encoding/json"
 	"fmt"
+	"time"
 )
 
-// User represents a API user.
-// swagger:response User
+// User represents a user
 type User struct {
-	ID        int64  `json:"id"`
-	UserName  string `json:"login"`
-	FullName  string `json:"full_name"`
-	Email     string `json:"email"`
+	// the user's id
+	ID int64 `json:"id"`
+	// the user's username
+	UserName string `json:"login"`
+	// the user's full name
+	FullName string `json:"full_name"`
+	Email    string `json:"email"`
+	// URL to the user's avatar
 	AvatarURL string `json:"avatar_url"`
-}
-
-// UserList represents a list of API user.
-// swagger:response UserList
-type UserList []*User
-
-// MarshalJSON implements the json.Marshaler interface for User, adding field(s) for backward compatibility
-func (u User) MarshalJSON() ([]byte, error) {
-	// Re-declaring User to avoid recursion
-	type shadow User
-	return json.Marshal(struct {
-		shadow
-		CompatUserName string `json:"username"`
-	}{shadow(u), u.UserName})
+	// User locale
+	Language string `json:"language"`
+	// Is the user an administrator
+	IsAdmin   bool      `json:"is_admin"`
+	LastLogin time.Time `json:"last_login,omitempty"`
+	Created   time.Time `json:"created,omitempty"`
 }
 
 // GetUserInfo get user info by user's name
 func (c *Client) GetUserInfo(user string) (*User, error) {
 	u := new(User)
 	err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s", user), nil, nil, u)
+	return u, err
+}
+
+// GetMyUserInfo get user info of current user
+func (c *Client) GetMyUserInfo() (*User, error) {
+	u := new(User)
+	err := c.getParsedResponse("GET", "/user", nil, nil, u)
 	return u, err
 }

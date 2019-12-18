@@ -1,4 +1,5 @@
 // Copyright 2014 The Gogs Authors. All rights reserved.
+// Copyright 2019 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -17,16 +18,13 @@ func BasicAuthEncode(user, pass string) string {
 	return base64.StdEncoding.EncodeToString([]byte(user + ":" + pass))
 }
 
-// AccessToken represents a API access token.
-// swagger:response AccessToken
+// AccessToken represents an API access token.
 type AccessToken struct {
-	Name string `json:"name"`
-	Sha1 string `json:"sha1"`
+	ID             int64  `json:"id"`
+	Name           string `json:"name"`
+	Token          string `json:"sha1"`
+	TokenLastEight string `json:"token_last_eight"`
 }
-
-// AccessTokenList represents a list of API access token.
-// swagger:response AccessTokenList
-type AccessTokenList []*AccessToken
 
 // ListAccessTokens lista all the access tokens of user
 func (c *Client) ListAccessTokens(user, pass string) ([]*AccessToken, error) {
@@ -36,9 +34,8 @@ func (c *Client) ListAccessTokens(user, pass string) ([]*AccessToken, error) {
 }
 
 // CreateAccessTokenOption options when create access token
-// swagger:parameters userCreateToken
 type CreateAccessTokenOption struct {
-	Name string `json:"name" binding:"Required"`
+	Name string `json:"name"`
 }
 
 // CreateAccessToken create one access token with options
@@ -53,4 +50,10 @@ func (c *Client) CreateAccessToken(user, pass string, opt CreateAccessTokenOptio
 			"content-type":  []string{"application/json"},
 			"Authorization": []string{"Basic " + BasicAuthEncode(user, pass)}},
 		bytes.NewReader(body), t)
+}
+
+// DeleteAccessToken delete token with key id
+func (c *Client) DeleteAccessToken(user string, keyID int64) error {
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/user/%s/tokens/%d", user, keyID), nil, nil)
+	return err
 }

@@ -12,13 +12,15 @@ import (
 
 // Label a label to an issue or a pr
 type Label struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Color string `json:"color"`
-	URL   string `json:"url"`
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+	// example: 00aabb
+	Color       string `json:"color"`
+	Description string `json:"description"`
+	URL         string `json:"url"`
 }
 
-// ListRepoLabels list lables of one reppsitory
+// ListRepoLabels list labels of one repository
 func (c *Client) ListRepoLabels(owner, repo string) ([]*Label, error) {
 	labels := make([]*Label, 0, 10)
 	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels", owner, repo), nil, nil, &labels)
@@ -31,10 +33,12 @@ func (c *Client) GetRepoLabel(owner, repo string, id int64) (*Label, error) {
 	return label, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id), nil, nil, label)
 }
 
-// CreateLabelOption create options when one label of repository
+// CreateLabelOption options for creating a label
 type CreateLabelOption struct {
-	Name  string `json:"name" binding:"Required"`
-	Color string `json:"color" binding:"Required;Size(7)"`
+	Name string `json:"name"`
+	// example: #00aabb
+	Color       string `json:"color"`
+	Description string `json:"description"`
 }
 
 // CreateLabel create one label of repository
@@ -48,10 +52,11 @@ func (c *Client) CreateLabel(owner, repo string, opt CreateLabelOption) (*Label,
 		jsonHeader, bytes.NewReader(body), label)
 }
 
-// EditLabelOption edit label options
+// EditLabelOption options for editing a label
 type EditLabelOption struct {
-	Name  *string `json:"name"`
-	Color *string `json:"color"`
+	Name        *string `json:"name"`
+	Color       *string `json:"color"`
+	Description *string `json:"description"`
 }
 
 // EditLabel modify one label with options
@@ -71,15 +76,16 @@ func (c *Client) DeleteLabel(owner, repo string, id int64) error {
 	return err
 }
 
-// IssueLabelsOption list one issue's labels options
-type IssueLabelsOption struct {
-	Labels []int64 `json:"labels"`
-}
-
 // GetIssueLabels get labels of one issue via issue id
 func (c *Client) GetIssueLabels(owner, repo string, index int64) ([]*Label, error) {
 	labels := make([]*Label, 0, 5)
 	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index), nil, nil, &labels)
+}
+
+// IssueLabelsOption a collection of labels
+type IssueLabelsOption struct {
+	// list of label IDs
+	Labels []int64 `json:"labels"`
 }
 
 // AddIssueLabels add one or more labels to one issue

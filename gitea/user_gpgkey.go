@@ -11,12 +11,7 @@ import (
 	"time"
 )
 
-// GPGKeyList represents a list of GPGKey
-// swagger:response GPGKeyList
-type GPGKeyList []*GPGKey
-
 // GPGKey a user GPG key to sign commit and tag in repository
-// swagger:response GPGKey
 type GPGKey struct {
 	ID                int64          `json:"id"`
 	PrimaryKeyID      string         `json:"primary_key_id"`
@@ -33,21 +28,9 @@ type GPGKey struct {
 }
 
 // GPGKeyEmail an email attached to a GPGKey
-// swagger:model GPGKeyEmail
 type GPGKeyEmail struct {
 	Email    string `json:"email"`
 	Verified bool   `json:"verified"`
-}
-
-// CreateGPGKeyOption options create user GPG key
-// swagger:parameters userCurrentPostGPGKey
-type CreateGPGKeyOption struct {
-	// An armored GPG key to add
-	//
-	// in: body
-	// required: true
-	// unique: true
-	ArmoredKey string `json:"armored_public_key" binding:"Required"`
 }
 
 // ListGPGKeys list all the GPG keys of the user
@@ -66,6 +49,13 @@ func (c *Client) ListMyGPGKeys() ([]*GPGKey, error) {
 func (c *Client) GetGPGKey(keyID int64) (*GPGKey, error) {
 	key := new(GPGKey)
 	return key, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys/%d", keyID), nil, nil, &key)
+}
+
+// CreateGPGKeyOption options create user GPG key
+type CreateGPGKeyOption struct {
+	// An armored GPG key to add
+	//
+	ArmoredKey string `json:"armored_public_key"`
 }
 
 // CreateGPGKey create GPG key with options

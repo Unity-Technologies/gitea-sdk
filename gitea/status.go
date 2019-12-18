@@ -41,28 +41,12 @@ type Status struct {
 	Updated     time.Time   `json:"updated_at"`
 }
 
-// CombinedStatus holds the combined state of several statuses for a single commit
-type CombinedStatus struct {
-	State      StatusState `json:"state"`
-	SHA        string      `json:"sha"`
-	TotalCount int         `json:"total_count"`
-	Statuses   []*Status   `json:"statuses"`
-	Repository *Repository `json:"repository"`
-	CommitURL  string      `json:"commit_url"`
-	URL        string      `json:"url"`
-}
-
 // CreateStatusOption holds the information needed to create a new Status for a Commit
 type CreateStatusOption struct {
 	State       StatusState `json:"state"`
 	TargetURL   string      `json:"target_url"`
 	Description string      `json:"description"`
 	Context     string      `json:"context"`
-}
-
-// ListStatusesOption holds pagination information
-type ListStatusesOption struct {
-	Page int
 }
 
 // CreateStatus creates a new Status for a given Commit
@@ -78,12 +62,28 @@ func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) 
 		jsonHeader, bytes.NewReader(body), status)
 }
 
+// ListStatusesOption holds pagination information
+type ListStatusesOption struct {
+	Page int
+}
+
 // ListStatuses returns all statuses for a given Commit
 //
 // GET /repos/:owner/:repo/commits/:ref/statuses
 func (c *Client) ListStatuses(owner, repo, sha string, opts ListStatusesOption) ([]*Status, error) {
 	statuses := make([]*Status, 0, 10)
 	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?page=%d", owner, repo, sha, opts.Page), nil, nil, &statuses)
+}
+
+// CombinedStatus holds the combined state of several statuses for a single commit
+type CombinedStatus struct {
+	State      StatusState `json:"state"`
+	SHA        string      `json:"sha"`
+	TotalCount int         `json:"total_count"`
+	Statuses   []*Status   `json:"statuses"`
+	Repository *Repository `json:"repository"`
+	CommitURL  string      `json:"commit_url"`
+	URL        string      `json:"url"`
 }
 
 // GetCombinedStatus returns the CombinedStatus for a given Commit

@@ -11,6 +11,18 @@ import (
 	"time"
 )
 
+// StateType issue state type
+type StateType string
+
+const (
+	// StateOpen pr is opend
+	StateOpen StateType = "open"
+	// StateClosed pr is closed
+	StateClosed StateType = "closed"
+	// StateAll is all
+	StateAll StateType = "all"
+)
+
 // Milestone milestone is a collection of issues on one repository
 type Milestone struct {
 	ID           int64      `json:"id"`
@@ -35,7 +47,7 @@ func (c *Client) GetMilestone(owner, repo string, id int64) (*Milestone, error) 
 	return milestone, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil, milestone)
 }
 
-// CreateMilestoneOption options when creating milestone
+// CreateMilestoneOption options for creating a milestone
 type CreateMilestoneOption struct {
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
@@ -52,7 +64,7 @@ func (c *Client) CreateMilestone(owner, repo string, opt CreateMilestoneOption) 
 	return milestone, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/milestones", owner, repo), jsonHeader, bytes.NewReader(body), milestone)
 }
 
-// EditMilestoneOption options when modify milestone
+// EditMilestoneOption options for editing a milestone
 type EditMilestoneOption struct {
 	Title       string     `json:"title"`
 	Description *string    `json:"description"`
