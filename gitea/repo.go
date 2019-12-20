@@ -56,22 +56,43 @@ type Repository struct {
 	AvatarURL                 string      `json:"avatar_url"`
 }
 
+// ListMyReposOptions options for listing current's user repositories
+type ListMyReposOptions struct {
+	ListOptions
+}
+
 // ListMyRepos lists all repositories for the authenticated user that has access to.
-func (c *Client) ListMyRepos() ([]*Repository, error) {
-	repos := make([]*Repository, 0, 10)
-	return repos, c.getParsedResponse("GET", "/user/repos", nil, nil, &repos)
+func (c *Client) ListMyRepos(options *ListMyReposOptions) ([]*Repository, error) {
+	if options == nil {
+		options = &ListMyReposOptions{}
+	}
+
+	repos := make([]*Repository, 0, options.getPerPage())
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/repos?%s", options.getURLQuery()), nil, nil, &repos)
+}
+
+// ListUserReposOptions options for listing a user's repositories
+type ListUserReposOptions struct {
+	ListOptions
+	User string
 }
 
 // ListUserRepos list all repositories of one user by user's name
-func (c *Client) ListUserRepos(user string) ([]*Repository, error) {
-	repos := make([]*Repository, 0, 10)
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos", user), nil, nil, &repos)
+func (c *Client) ListUserRepos(options ListUserReposOptions) ([]*Repository, error) {
+	repos := make([]*Repository, 0, options.getPerPage())
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", options.User, options.getURLQuery()), nil, nil, &repos)
+}
+
+// ListOrgReposOptions options for a organization's repositories
+type ListOrgReposOptions struct {
+	ListOptions
+	Org string
 }
 
 // ListOrgRepos list all repositories of one organization by organization's name
-func (c *Client) ListOrgRepos(org string) ([]*Repository, error) {
-	repos := make([]*Repository, 0, 10)
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos", org), nil, nil, &repos)
+func (c *Client) ListOrgRepos(options ListOrgReposOptions) ([]*Repository, error) {
+	repos := make([]*Repository, 0, options.getPerPage())
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", options.Org, options.getURLQuery()), nil, nil, &repos)
 }
 
 // CreateRepoOption options when creating repository

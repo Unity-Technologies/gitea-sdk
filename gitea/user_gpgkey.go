@@ -33,16 +33,31 @@ type GPGKeyEmail struct {
 	Verified bool   `json:"verified"`
 }
 
+// ListGPGKeys options for listing a user's GPGKeys
+type ListGPGKeys struct {
+	ListOptions
+	User string
+}
+
 // ListGPGKeys list all the GPG keys of the user
-func (c *Client) ListGPGKeys(user string) ([]*GPGKey, error) {
-	keys := make([]*GPGKey, 0, 10)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys", user), nil, nil, &keys)
+func (c *Client) ListGPGKeys(options ListGPGKeys) ([]*GPGKey, error) {
+	keys := make([]*GPGKey, 0, options.getPerPage())
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", options.User, options.getURLQuery()), nil, nil, &keys)
+}
+
+// ListMyGPGKeysOptions options for listing current's user GPGKeys
+type ListMyGPGKeysOptions struct {
+	ListOptions
 }
 
 // ListMyGPGKeys list all the GPG keys of current user
-func (c *Client) ListMyGPGKeys() ([]*GPGKey, error) {
-	keys := make([]*GPGKey, 0, 10)
-	return keys, c.getParsedResponse("GET", "/user/gpg_keys", nil, nil, &keys)
+func (c *Client) ListMyGPGKeys(options *ListMyGPGKeysOptions) ([]*GPGKey, error) {
+	if options == nil {
+		options = &ListMyGPGKeysOptions{}
+	}
+
+	keys := make([]*GPGKey, 0, options.getPerPage())
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", options.getURLQuery()), nil, nil, &keys)
 }
 
 // GetGPGKey get current user's GPG key by key id

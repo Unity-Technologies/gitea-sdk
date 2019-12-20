@@ -13,36 +13,17 @@ import (
 
 // AdminListOrgsOptions options for listing admin's organizations
 type AdminListOrgsOptions struct {
-	Page  int
-	Limit int
+	ListOptions
 }
 
 // AdminListOrgs lists all orgs
 func (c *Client) AdminListOrgs(options *AdminListOrgsOptions) ([]*Organization, error) {
-	defaultPage := 1
-	defaultLimit := 10
-
 	if options == nil {
-		options = &AdminListOrgsOptions{
-			Page:  defaultPage,
-			Limit: defaultLimit,
-		}
+		options = &AdminListOrgsOptions{}
 	}
 
-	if options.Page < 1 {
-		options.Page = defaultPage
-	}
-
-	if options.Limit < 0 {
-		options.Limit = defaultLimit
-	}
-
-	if options.Limit > 50 {
-		options.Limit = 50
-	}
-
-	orgs := make([]*Organization, 0, options.Limit)
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?page=%d&limit=%d", options.Page, options.Limit), nil, nil, &orgs)
+	orgs := make([]*Organization, 0, options.getPerPage())
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", options.getURLQuery()), nil, nil, &orgs)
 }
 
 // AdminCreateOrg create an organization

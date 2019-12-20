@@ -17,8 +17,15 @@ type Tag struct {
 	TarballURL string      `json:"tarball_url"`
 }
 
+// ListRepoTagsOptions options for listing a repository's tags
+type ListRepoTagsOptions struct {
+	ListOptions
+	User string
+	Repo string
+}
+
 // ListRepoTags list all the branches of one repository
-func (c *Client) ListRepoTags(user, repo string) ([]*Tag, error) {
-	tags := make([]*Tag, 0, 10)
-	return tags, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/tags", user, repo), nil, nil, &tags)
+func (c *Client) ListRepoTags(options ListRepoTagsOptions) ([]*Tag, error) {
+	tags := make([]*Tag, 0, options.getPerPage())
+	return tags, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/tags?%s", options.User, options.Repo, options.getURLQuery()), nil, nil, &tags)
 }

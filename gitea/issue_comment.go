@@ -25,16 +25,31 @@ type Comment struct {
 	Updated          time.Time `json:"updated_at"`
 }
 
+// ListIssueCommentsOptions options for listing issue's comments
+type ListIssueCommentsOptions struct {
+	ListOptions
+	Owner string
+	Repo  string
+	Index int64
+}
+
 // ListIssueComments list comments on an issue.
-func (c *Client) ListIssueComments(owner, repo string, index int64) ([]*Comment, error) {
-	comments := make([]*Comment, 0, 10)
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index), nil, nil, &comments)
+func (c *Client) ListIssueComments(options ListIssueCommentsOptions) ([]*Comment, error) {
+	comments := make([]*Comment, 0, options.getPerPage())
+	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments?%s", options.Owner, options.Repo, options.Index, options.getURLQuery()), nil, nil, &comments)
+}
+
+// ListRepoIssueCommentsOptions options for listing repository's issue's comments
+type ListRepoIssueCommentsOptions struct {
+	ListOptions
+	Owner string
+	Repo  string
 }
 
 // ListRepoIssueComments list comments for a given repo.
-func (c *Client) ListRepoIssueComments(owner, repo string) ([]*Comment, error) {
-	comments := make([]*Comment, 0, 10)
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments", owner, repo), nil, nil, &comments)
+func (c *Client) ListRepoIssueComments(options ListRepoIssueCommentsOptions) ([]*Comment, error) {
+	comments := make([]*Comment, 0, options.getPerPage())
+	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments?%s", options.Owner, options.Repo, options.getURLQuery()), nil, nil, &comments)
 }
 
 // CreateIssueCommentOption options for creating a comment on an issue

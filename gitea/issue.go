@@ -42,28 +42,39 @@ type Issue struct {
 	PullRequest *PullRequestMeta `json:"pull_request"`
 }
 
-// ListIssueOption list issue options
-type ListIssueOption struct {
-	Page  int
-	State string
+// ListIssuesOptions options for listing issues
+type ListIssuesOptions struct {
+	ListOptions
 }
 
 // ListIssues returns all issues assigned the authenticated user
-func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
-	issues := make([]*Issue, 0, 10)
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/issues?page=%d", opt.Page), nil, nil, &issues)
+func (c *Client) ListIssues(options ListIssuesOptions) ([]*Issue, error) {
+	issues := make([]*Issue, 0, options.getPerPage())
+	return issues, c.getParsedResponse("GET", fmt.Sprintf("/issues?%s", options.getURLQuery()), nil, nil, &issues)
+}
+
+// ListUserIssuesOptions options for listing user's issues
+type ListUserIssuesOptions struct {
+	ListOptions
 }
 
 // ListUserIssues returns all issues assigned to the authenticated user
-func (c *Client) ListUserIssues(opt ListIssueOption) ([]*Issue, error) {
-	issues := make([]*Issue, 0, 10)
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/user/issues?page=%d", opt.Page), nil, nil, &issues)
+func (c *Client) ListUserIssues(options ListUserIssuesOptions) ([]*Issue, error) {
+	issues := make([]*Issue, 0, options.getPerPage())
+	return issues, c.getParsedResponse("GET", fmt.Sprintf("/user/issues?%s", options.getURLQuery()), nil, nil, &issues)
+}
+
+// ListRepoIssuesOptions options for listing repository's issues
+type ListRepoIssuesOptions struct {
+	ListOptions
+	Owner string
+	Repo  string
 }
 
 // ListRepoIssues returns all issues for a given repository
-func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Issue, error) {
-	issues := make([]*Issue, 0, 10)
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues?page=%d", owner, repo, opt.Page), nil, nil, &issues)
+func (c *Client) ListRepoIssues(options ListRepoIssuesOptions) ([]*Issue, error) {
+	issues := make([]*Issue, 0, options.getPerPage())
+	return issues, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues?%s", options.Owner, options.Repo, options.getURLQuery()), nil, nil, &issues)
 }
 
 // GetIssue returns a single issue for a given repository

@@ -11,10 +11,19 @@ import (
 	"fmt"
 )
 
+// AdminListUsersOptions options for listing admin users
+type AdminListUsersOptions struct {
+	ListOptions
+}
+
 // AdminListUsers lists all users
-func (c *Client) AdminListUsers() ([]*User, error) {
-	users := make([]*User, 0, 10)
-	return users, c.getParsedResponse("GET", "/admin/users", nil, nil, &users)
+func (c *Client) AdminListUsers(options *AdminListUsersOptions) ([]*User, error) {
+	if options == nil {
+		options = &AdminListUsersOptions{}
+	}
+
+	users := make([]*User, 0, options.getPerPage())
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/admin/users?%s", options.getURLQuery()), nil, nil, &users)
 }
 
 // CreateUserOption create user options

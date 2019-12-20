@@ -23,16 +23,31 @@ type Organization struct {
 	Visibility  string `json:"visibility"`
 }
 
+// ListMyOrgsOptions options for listing current user's organizations
+type ListMyOrgsOptions struct {
+	ListOptions
+}
+
 // ListMyOrgs list all of current user's organizations
-func (c *Client) ListMyOrgs() ([]*Organization, error) {
-	orgs := make([]*Organization, 0, 5)
-	return orgs, c.getParsedResponse("GET", "/user/orgs", nil, nil, &orgs)
+func (c *Client) ListMyOrgs(options *ListMyOrgsOptions) ([]*Organization, error) {
+	if options == nil {
+		options = &ListMyOrgsOptions{}
+	}
+
+	orgs := make([]*Organization, 0, options.getPerPage())
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", options.getURLQuery()), nil, nil, &orgs)
+}
+
+// ListUserOrgsOptions options for listing an user's organizations
+type ListUserOrgsOptions struct {
+	ListOptions
+	User string
 }
 
 // ListUserOrgs list all of some user's organizations
-func (c *Client) ListUserOrgs(user string) ([]*Organization, error) {
-	orgs := make([]*Organization, 0, 5)
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs", user), nil, nil, &orgs)
+func (c *Client) ListUserOrgs(options ListUserOrgsOptions) ([]*Organization, error) {
+	orgs := make([]*Organization, 0, options.getPerPage())
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", options.User, options.getURLQuery()), nil, nil, &orgs)
 }
 
 // GetOrg get one organization by name

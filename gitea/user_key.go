@@ -24,16 +24,31 @@ type PublicKey struct {
 	KeyType     string    `json:"key_type,omitempty"`
 }
 
+// ListPublicKeysOptions options for listing a user's PublicKeys
+type ListPublicKeysOptions struct {
+	ListOptions
+	User string
+}
+
 // ListPublicKeys list all the public keys of the user
-func (c *Client) ListPublicKeys(user string) ([]*PublicKey, error) {
-	keys := make([]*PublicKey, 0, 10)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys", user), nil, nil, &keys)
+func (c *Client) ListPublicKeys(options ListPublicKeysOptions) ([]*PublicKey, error) {
+	keys := make([]*PublicKey, 0, options.getPerPage())
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", options.User, options.getURLQuery()), nil, nil, &keys)
+}
+
+// ListMyPublicKeysOptions options for listing current's user PublicKeys
+type ListMyPublicKeysOptions struct {
+	ListOptions
 }
 
 // ListMyPublicKeys list all the public keys of current user
-func (c *Client) ListMyPublicKeys() ([]*PublicKey, error) {
-	keys := make([]*PublicKey, 0, 10)
-	return keys, c.getParsedResponse("GET", "/user/keys", nil, nil, &keys)
+func (c *Client) ListMyPublicKeys(options *ListMyPublicKeysOptions) ([]*PublicKey, error) {
+	if options == nil {
+		options = &ListMyPublicKeysOptions{}
+	}
+
+	keys := make([]*PublicKey, 0, options.getPerPage())
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/keys?%s", options.getURLQuery()), nil, nil, &keys)
 }
 
 // GetPublicKey get current user's public key by key id

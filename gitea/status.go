@@ -62,17 +62,20 @@ func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) 
 		jsonHeader, bytes.NewReader(body), status)
 }
 
-// ListStatusesOption holds pagination information
-type ListStatusesOption struct {
-	Page int
+// ListStatusesOptions options for listing a repository's commit's statuses
+type ListStatusesOptions struct {
+	ListOptions
+	Owner string
+	Repo  string
+	SHA   string
 }
 
 // ListStatuses returns all statuses for a given Commit
 //
 // GET /repos/:owner/:repo/commits/:ref/statuses
-func (c *Client) ListStatuses(owner, repo, sha string, opts ListStatusesOption) ([]*Status, error) {
-	statuses := make([]*Status, 0, 10)
-	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?page=%d", owner, repo, sha, opts.Page), nil, nil, &statuses)
+func (c *Client) ListStatuses(options ListStatusesOptions) ([]*Status, error) {
+	statuses := make([]*Status, 0, options.getPerPage())
+	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", options.Owner, options.Repo, options.SHA, options.getURLQuery()), nil, nil, &statuses)
 }
 
 // CombinedStatus holds the combined state of several statuses for a single commit

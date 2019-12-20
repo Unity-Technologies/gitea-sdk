@@ -57,18 +57,20 @@ type PullRequest struct {
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	Page  int    `json:"page"`
-	State string `json:"state"`
+	ListOptions `json:"-"`
+	Owner       string `json:"-"`
+	Repo        string `json:"-"`
+	State       string `json:"state"`
 }
 
 // ListRepoPullRequests list PRs of one repository
-func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
-	body, err := json.Marshal(&opt)
+func (c *Client) ListRepoPullRequests(options ListPullRequestsOptions) ([]*PullRequest, error) {
+	body, err := json.Marshal(&options)
 	if err != nil {
 		return nil, err
 	}
-	prs := make([]*PullRequest, 0, 10)
-	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo), jsonHeader, bytes.NewReader(body), &prs)
+	prs := make([]*PullRequest, 0, options.getPerPage())
+	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls?%s", options.Owner, options.Repo, options.getURLQuery()), jsonHeader, bytes.NewReader(body), &prs)
 }
 
 // GetPullRequest get information of one PR

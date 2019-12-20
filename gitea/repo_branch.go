@@ -49,10 +49,17 @@ type Branch struct {
 	Commit *PayloadCommit `json:"commit"`
 }
 
+// ListRepoBranchesOptions options for listing a repository's branches
+type ListRepoBranchesOptions struct {
+	ListOptions
+	User string
+	Repo string
+}
+
 // ListRepoBranches list all the branches of one repository
-func (c *Client) ListRepoBranches(user, repo string) ([]*Branch, error) {
-	branches := make([]*Branch, 0, 10)
-	return branches, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches", user, repo), nil, nil, &branches)
+func (c *Client) ListRepoBranches(options ListRepoBranchesOptions) ([]*Branch, error) {
+	branches := make([]*Branch, 0, options.getPerPage())
+	return branches, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches?%s", options.User, options.Repo, options.getURLQuery()), nil, nil, &branches)
 }
 
 // GetRepoBranch get one branch's information of one repository
