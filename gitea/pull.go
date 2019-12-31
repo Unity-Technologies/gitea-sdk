@@ -128,7 +128,7 @@ func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRe
 type MergePullRequestOption struct {
 	// required: true
 	// enum: merge,rebase,rebase-merge,squash
-	Do                string `json:"Do" binding:"Required"`
+	Do                string `json:"Do" binding:"Required;In(merge,rebase,rebase-merge,squash)"`
 	MergeTitleField   string `json:"MergeTitleField"`
 	MergeMessageField string `json:"MergeMessageField"`
 }
