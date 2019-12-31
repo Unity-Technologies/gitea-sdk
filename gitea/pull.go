@@ -132,6 +132,7 @@ type MergePullRequestOption struct {
 	MergeTitleField   string `json:"MergeTitleField"`
 	MergeMessageField string `json:"MergeMessageField"`
 }
+
 // MergePullRequestResponse response when merging a pull request
 type MergePullRequestResponse struct {
 }
