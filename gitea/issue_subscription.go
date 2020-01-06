@@ -20,7 +20,7 @@ func (c *Client) AddIssueSubscription(owner, repo string, index int64, user stri
 	return err
 }
 
-// DelIssueSubscription Unsubscribe user from issue
+// DeleteIssueSubscription unsubscribe user from issue
 func (c *Client) DeleteIssueSubscription(owner, repo string, index int64, user string) error {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/issues/%d/subscriptions/%s", owner, repo, index, user), nil, nil)
 	return err
