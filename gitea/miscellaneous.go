@@ -3,11 +3,3 @@
 // license that can be found in the LICENSE file.
 
 package gitea
-
-// ServerVersion returns the version of the server
-func (c *Client) ServerVersion() (string, error) {
-	var v = struct {
-		Version string `json:"version"`
-	}{}
-	return v.Version, c.getParsedResponse("GET", "/version", nil, nil, &v)
-}
