@@ -58,8 +58,10 @@ type PullRequest struct {
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	Page  int    `json:"page"`
-	State string `json:"state"`
+	Page      int    `json:"page"`
+	State     string `json:"state"`
+	Sort      string `json:"sort"`
+	Milestone int64  `json:"milestone"`
 }
 
 // ListRepoPullRequests list PRs of one repository
