@@ -29,7 +29,8 @@ steps:
   commands:
   - make clean
   - make vet
-  - make lint
+  - make golangci-lint
+  - make revive
   - make test
   - make build
 
