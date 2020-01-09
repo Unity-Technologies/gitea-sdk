@@ -80,6 +80,12 @@ func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOp
 	if len(opt.State) > 0 {
 		query.Add("state", opt.State)
 	}
+	if len(opt.Sort) > 0 {
+		query.Add("sort", opt.Sort)
+	}
+	if opt.Milestone > 0 {
+		query.Add("milestone", fmt.Sprintf("%d", opt.Milestone))
+	}
 	link.RawQuery = query.Encode()
 	// request
 	return prs, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &prs)
