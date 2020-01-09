@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -68,12 +69,20 @@ type ListPullRequestsOptions struct {
 
 // ListRepoPullRequests list PRs of one repository
 func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
+	// declare variables
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
 	prs := make([]*PullRequest, 0, 10)
-	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo), jsonHeader, bytes.NewReader(body), &prs)
+	query := make(url.Values)
+	// add options to query
+	if opt.Page > 0 {
+		query.Add("page", fmt.Sprintf("%d", opt.Page))
+	}
+	if len(opt.State) > 0 {
+		query.Add("state", opt.State)
+	}
+	link.RawQuery = query.Encode()
+	// request
+	return prs, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &prs)
 }
 
 // GetPullRequest get information of one PR
