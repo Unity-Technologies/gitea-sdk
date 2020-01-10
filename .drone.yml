@@ -14,6 +14,16 @@ workspace:
   path: src/code.gitea.io/sdk
 
 steps:
+- name: gitea
+  image: gitea/gitea:latest
+  detach: true
+  commands:
+  - mkdir -p /data/gitea/conf
+  - cp /go/src/code.gitea.io/sdk/drone/app.ini /data/gitea/conf/
+  - gitea migrate
+  - gitea admin create-user --username=test01 --password=test01 --email=test01@gitea.io --admin=true --must-change-password=false --access-token
+  - gitea web
+
 - name: git
   pull: default
   image: plugins/git:next
@@ -25,13 +35,17 @@ steps:
   pull: always
   image: golang:1.13
   environment:
-    GOPROXY: https://goproxy.cn 
+    GOPROXY: https://goproxy.cn
+    GITEA_SDK_TEST_URL: "http://gitea:3000"
+    GITEA_SDK_TEST_USERNAME: "test01"
+    GITEA_SDK_TEST_PASSWORD: "test01"
+    #GITEA_SDK_TEST_RUN_GITEA: "true"
   commands:
   - make clean
   - make vet
   - make lint
-  - make test
   - make build
+  - make test
 
 - name: discord
   pull: always
