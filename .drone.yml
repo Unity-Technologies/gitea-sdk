@@ -28,6 +28,9 @@ steps:
   settings:
     depth: 50
     tags: true
+  when:
+    branch:
+    - master
 
 - name: testing
   pull: always
