@@ -18,9 +18,9 @@ steps:
   image: gitea/gitea:latest
   detach: true
   commands:
-  - gitea migrate -c drone/app.ini
-  - gitea admin create-user --username=test01 --password=test01 --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c drone/app.ini
-  - gitea web -c drone/app.ini
+  - gitea migrate -c /go/src/code.gitea.io/sdk/drone/app.ini
+  - gitea admin create-user --username=test01 --password=test01 --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c /go/src/code.gitea.io/sdk/drone/app.ini
+  - gitea web -c /go/src/code.gitea.io/sdk/drone/app.ini
 
 - name: git
   pull: default
