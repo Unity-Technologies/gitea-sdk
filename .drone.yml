@@ -6,9 +6,6 @@ platform:
   os: linux
   arch: amd64
 
-clone:
-  disable: true
-
 workspace:
   base: /go
   path: src/code.gitea.io/sdk
@@ -28,16 +25,6 @@ steps:
   - gitea migrate -c /tmp/conf/app.ini
   - gitea admin create-user --username=test01 --password=test01 --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c /tmp/conf/app.ini
   - gitea web -c /tmp/conf/app.ini
-
-- name: git
-  pull: default
-  image: plugins/git:next
-  settings:
-    depth: 50
-    tags: true
-  when:
-    branch:
-    - master
 
 - name: testing
   pull: always
