@@ -38,7 +38,7 @@ steps:
   commands:
   - make clean
   - make vet
-  - make lint
+  #- make lint
   - make build
   - make test
 
