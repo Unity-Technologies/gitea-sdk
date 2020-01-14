@@ -59,9 +59,9 @@ type PullRequest struct {
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	Page      int    `json:"page"`
+	Page int `json:"page"`
 	// open, closed, all
-	State     string `json:"state"`
+	State string `json:"state"`
 	// oldest, recentupdate, leastupdate, mostcomment, leastcomment, priority
 	Sort      string `json:"sort"`
 	Milestone int64  `json:"milestone"`
