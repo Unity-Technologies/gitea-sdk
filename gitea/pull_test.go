@@ -40,6 +40,8 @@ func TestPull(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, pulls, 0)
 
+	//ToDo add git stuff to have different branches witch can be used to create PRs and test merge etc ...
+
 	// GetPullRequest get information of one PR
 	//func (c *Client) GetPullRequest(owner, repo string, index int64) (*PullRequest, error)
 
