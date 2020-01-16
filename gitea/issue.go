@@ -94,9 +94,23 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
 
 // ListUserIssues returns all issues assigned to the authenticated user
 func (c *Client) ListUserIssues(opt ListIssueOption) ([]*Issue, error) {
-	//issues := make([]*Issue, 0, 10)
-	//return issues, c.getParsedResponse("GET", fmt.Sprintf("/user/issues?page=%d", opt.Page), nil, nil, &issues)
-	return nil, fmt.Errorf("This API is not implemented jet")
+	// WARNING: "/user/issues?page=%d" API is not implemented jet!
+	allIssues, err := c.ListIssues(opt)
+	if err != nil {
+		return nil, err
+	}
+	user, err :=  c.GetMyUserInfo()
+	if err != nil {
+		return nil, err
+	}
+	// Workaround: client sort out non user related issues
+	issues := make([]*Issue, 0, 10)
+	for _, i := range allIssues {
+		if i.ID == user.ID {
+			issues = append(issues, i)
+		}
+	}
+	return issues, nil
 }
 
 // ListRepoIssues returns all issues for a given repository
