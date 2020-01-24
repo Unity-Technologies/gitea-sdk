@@ -5,26 +5,27 @@
 package gitea
 
 import (
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateRepo(t *testing.T) {
-	c := newTestClient()
-	user, err := c.GetMyUserInfo()
+	log.Printf("== TestCreateRepo ==")
+	user, err := testClient.GetMyUserInfo()
 	assert.NoError(t, err)
 
 	var repoName = "test1"
-	_, err = c.GetRepo(user.UserName, repoName)
+	_, err = testClient.GetRepo(user.UserName, repoName)
 	if err != nil {
-		repo, err := c.CreateRepo(CreateRepoOption{
+		repo, err := testClient.CreateRepo(CreateRepoOption{
 			Name: repoName,
 		})
 		assert.NoError(t, err)
 		assert.NotNil(t, repo)
 	}
 
-	err = c.DeleteRepo(user.UserName, repoName)
+	err = testClient.DeleteRepo(user.UserName, repoName)
 	assert.NoError(t, err)
 }

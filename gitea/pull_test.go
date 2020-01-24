@@ -5,20 +5,21 @@
 package gitea
 
 import (
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPull(t *testing.T) {
-	c := newTestClient()
-	user, err := c.GetMyUserInfo()
+	log.Printf("== TestPull ==")
+	user, err := testClient.GetMyUserInfo()
 	assert.NoError(t, err)
 
 	var repoName = "repo_pull_test"
-	repo, err := c.GetRepo(user.UserName, repoName)
+	repo, err := testClient.GetRepo(user.UserName, repoName)
 	if err != nil {
-		repo, err = c.CreateRepo(CreateRepoOption{
+		repo, err = testClient.CreateRepo(CreateRepoOption{
 			Name:        repoName,
 			Description: "PullTests",
 			AutoInit:    true,
@@ -32,7 +33,7 @@ func TestPull(t *testing.T) {
 	}
 
 	// ListRepoPullRequests list PRs of one repository
-	pulls, err := c.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{
+	pulls, err := testClient.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{
 		Page:  1,
 		State: "all",
 		Sort:  "leastupdate",

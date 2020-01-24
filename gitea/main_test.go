@@ -18,6 +18,8 @@ import (
 	"testing"
 )
 
+var testClient *Client
+
 func getGiteaURL() string {
 	return os.Getenv("GITEA_SDK_TEST_URL")
 }
@@ -151,6 +153,7 @@ func TestMain(m *testing.M) {
 			p.Kill()
 		}()
 	}
+	testClient = newTestClient()
 	exitCode := m.Run()
 	os.Exit(exitCode)
 }
