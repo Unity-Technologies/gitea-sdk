@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"strings"
 
-	version "github.com/hashicorp/go-version"
+	"github.com/hashicorp/go-version"
 )
 
 var jsonHeader = http.Header{"content-type": []string{"application/json"}}
@@ -26,25 +26,22 @@ func Version() string {
 
 // Client represents a Gitea API client.
 type Client struct {
-	url         string
-	accessToken string
-	username    string
-	password    string
-	sudo        string
-	client      *http.Client
+	url           string
+	accessToken   string
+	username      string
+	password      string
+	sudo          string
+	client        *http.Client
+	serverVersion *version.Version
 }
 
 // NewClient initializes and returns a API client.
 func NewClient(url, token string) *Client {
-	c := &Client{
+	return &Client{
 		url:         strings.TrimSuffix(url, "/"),
 		accessToken: token,
 		client:      &http.Client{},
 	}
-	if raw, err := c.ServerVersion(); err == nil {
-		serverVersion, _ = version.NewVersion(raw)
-	}
-	return c
 }
 
 // NewClientWithHTTP creates an API client with a custom http client

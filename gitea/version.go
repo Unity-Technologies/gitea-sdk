@@ -7,10 +7,8 @@ package gitea
 import (
 	"fmt"
 
-	version "github.com/hashicorp/go-version"
+	"github.com/hashicorp/go-version"
 )
-
-var serverVersion *version.Version
 
 // ServerVersion returns the version of the server
 func (c *Client) ServerVersion() (string, error) {
@@ -23,12 +21,12 @@ func (c *Client) ServerVersion() (string, error) {
 // CheckServerVersionConstraint validates that the login's server satisfies a
 // given version constraint such as ">= 1.11.0+dev"
 func (c *Client) CheckServerVersionConstraint(constraint string) error {
-	if serverVersion == nil {
+	if c.serverVersion == nil {
 		raw, err := c.ServerVersion()
 		if err != nil {
 			return err
 		}
-		if serverVersion, err = version.NewVersion(raw); err != nil {
+		if c.serverVersion, err = version.NewVersion(raw); err != nil {
 			return err
 		}
 	}
@@ -36,7 +34,7 @@ func (c *Client) CheckServerVersionConstraint(constraint string) error {
 	if err != nil {
 		return err
 	}
-	if !check.Check(serverVersion) {
+	if !check.Check(c.serverVersion) {
 		return fmt.Errorf("gitea server at %s does not satisfy version constraint %s", c.url, constraint)
 	}
 	return nil
