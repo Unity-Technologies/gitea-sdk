@@ -6,7 +6,8 @@ package gitea
 
 import (
 	"fmt"
-	"github.com/hashicorp/go-version"
+
+	version "github.com/hashicorp/go-version"
 )
 
 var serverVersion *version.Version
