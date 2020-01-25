@@ -95,4 +95,8 @@ func listIssues(t *testing.T, c *Client) {
 	})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 1)
+
+	issues, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{})
+	assert.NoError(t, err)
+	assert.Len(t, issues, 4)
 }
