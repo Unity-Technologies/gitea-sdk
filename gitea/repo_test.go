@@ -41,19 +41,22 @@ func TestDeleteRepo(t *testing.T) {
 func createTestRepo(t *testing.T, name string, c *Client) (*Repository, error) {
 	user, uErr := c.GetMyUserInfo()
 	assert.NoError(t, uErr)
-	repo, err := c.GetRepo(user.UserName, name)
-	if err != nil {
-		repo, err = c.CreateRepo(CreateRepoOption{
-			Name:        name,
-			Description: "A test Repo: " + name,
-			AutoInit:    true,
-			Gitignores:  "C,C++",
-			License:     "MIT",
-			Readme:      "Default",
-			Private:     false,
-		})
-		assert.NoError(t, err)
-		assert.NotNil(t, repo)
+	_, err := c.GetRepo(user.UserName, name)
+	if err == nil {
+		_ = c.DeleteRepo(user.UserName, name)
 	}
+	repo, err := c.CreateRepo(CreateRepoOption{
+		Name:        name,
+		Description: "A test Repo: " + name,
+		AutoInit:    true,
+		Gitignores:  "C,C++",
+		License:     "MIT",
+		Readme:      "Default",
+		IssueLabels: "Default",
+		Private:     false,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, repo)
+
 	return repo, err
 }

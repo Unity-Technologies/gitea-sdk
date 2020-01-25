@@ -94,7 +94,7 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
 
 // ListUserIssues returns all issues assigned to the authenticated user
 func (c *Client) ListUserIssues(opt ListIssueOption) ([]*Issue, error) {
-	// WARNING: "/user/issues?page=%d" API is not implemented jet!
+	// WARNING: "/user/issues" API is not implemented jet!
 	allIssues, err := c.ListIssues(opt)
 	if err != nil {
 		return nil, err
