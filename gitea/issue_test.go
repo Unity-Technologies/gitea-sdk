@@ -80,7 +80,15 @@ func createIssue(t *testing.T, c *Client) {
 func listIssues(t *testing.T, c *Client) {
 	log.Println("== TestListIssues ==")
 
-	issues, err := c.ListIssues(ListIssueOption{
+	issues, err := c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
+		Labels:  []string{"Label2"},
+		KeyWord: "Done",
+		State:   "all",
+	})
+	assert.NoError(t, err)
+	assert.Len(t, issues, 1)
+
+	issues, err = c.ListIssues(ListIssueOption{
 		Labels:  []string{"Label2"},
 		KeyWord: "Done",
 		State:   "all",

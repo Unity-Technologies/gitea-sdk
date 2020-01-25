@@ -86,10 +86,10 @@ func (opt *ListIssueOption) QueryEncode() string {
 
 // ListIssues returns all issues assigned the authenticated user
 func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
-	link, _ := url.Parse("​/repos​/issues​/search")
+	link, _ := url.Parse("/repos/issues/search")
 	issues := make([]*Issue, 0, 10)
 	link.RawQuery = opt.QueryEncode()
-	return issues, c.getParsedResponse("GET", link.String(), nil, nil, &issues)
+	return issues, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
 }
 
 // ListUserIssues returns all issues assigned to the authenticated user
@@ -118,7 +118,7 @@ func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Iss
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
 	issues := make([]*Issue, 0, 10)
 	link.RawQuery = opt.QueryEncode()
-	return issues, c.getParsedResponse("GET", link.String(), nil, nil, &issues)
+	return issues, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
 }
 
 // GetIssue returns a single issue for a given repository
