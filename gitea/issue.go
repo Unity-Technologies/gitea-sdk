@@ -99,7 +99,7 @@ func (c *Client) ListUserIssues(opt ListIssueOption) ([]*Issue, error) {
 	if err != nil {
 		return nil, err
 	}
-	user, err :=  c.GetMyUserInfo()
+	user, err := c.GetMyUserInfo()
 	if err != nil {
 		return nil, err
 	}
