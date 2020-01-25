@@ -12,6 +12,7 @@ import (
 )
 
 func TestCreateRepo(t *testing.T) {
+	log.Println("== TestCreateRepo ==")
 	c := newTestClient()
 	user, err := c.GetMyUserInfo()
 	assert.NoError(t, err)

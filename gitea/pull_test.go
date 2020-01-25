@@ -5,12 +5,14 @@
 package gitea
 
 import (
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPull(t *testing.T) {
+	log.Println("== TestPull ==")
 	c := newTestClient()
 	user, err := c.GetMyUserInfo()
 	assert.NoError(t, err)
