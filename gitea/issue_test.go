@@ -82,16 +82,16 @@ func listIssues(t *testing.T, c *Client) {
 
 	issues, err := c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
 		Labels:  []string{"Label2"},
-		KeyWord: "Done",
+		KeyWord: "",
 		State:   "all",
 	})
 	assert.NoError(t, err)
-	assert.Len(t, issues, 1)
+	assert.Len(t, issues, 2)
 
 	issues, err = c.ListIssues(ListIssueOption{
 		Labels:  []string{"Label2"},
 		KeyWord: "Done",
-		State:   "all",
+		State:   "",
 	})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 1)
