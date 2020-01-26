@@ -24,7 +24,7 @@ func (c *Client) CheckServerVersionConstraint(constraint string) error {
 	c.versionLock.RLock()
 	if c.serverVersion == nil {
 		c.versionLock.RUnlock()
-		if err := initClientServerVersion(c); err != nil {
+		if err := c.loadClientServerVersion(); err != nil {
 			return err
 		}
 	} else {
@@ -41,7 +41,8 @@ func (c *Client) CheckServerVersionConstraint(constraint string) error {
 	return nil
 }
 
-func initClientServerVersion(c *Client) error {
+// loadClientServerVersion init the serverVersion variable
+func (c *Client) loadClientServerVersion() error {
 	c.versionLock.Lock()
 	defer c.versionLock.Unlock()
 
