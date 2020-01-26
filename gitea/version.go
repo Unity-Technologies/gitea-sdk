@@ -21,23 +21,32 @@ func (c *Client) ServerVersion() (string, error) {
 // CheckServerVersionConstraint validates that the login's server satisfies a
 // given version constraint such as ">= 1.11.0+dev"
 func (c *Client) CheckServerVersionConstraint(constraint string) error {
-	c.propertyLock.Lock()
-	defer c.propertyLock.Unlock()
-	if c.serverVersion == nil {
-		raw, err := c.ServerVersion()
+	checkFunc := func () error {
+		check, err := version.NewConstraint(constraint)
 		if err != nil {
 			return err
 		}
-		if c.serverVersion, err = version.NewVersion(raw); err != nil {
-			return err
+		if !check.Check(c.serverVersion) {
+			return fmt.Errorf("gitea server at %s does not satisfy version constraint %s", c.url, constraint)
 		}
+		return nil
+	}	
+	c.versionLock.RLock()
+	if c.serverVersion != nil {
+		c.versionLock.RUnlock()
+		return checkFunc()
 	}
-	check, err := version.NewConstraint(constraint)
+	c.versionLock.RUnlock()
+
+	c.versionLock.Lock()
+	defer c.versionLock.Unlock()
+
+	raw, err := c.ServerVersion()
 	if err != nil {
 		return err
 	}
-	if !check.Check(c.serverVersion) {
-		return fmt.Errorf("gitea server at %s does not satisfy version constraint %s", c.url, constraint)
+	if c.serverVersion, err = version.NewVersion(raw); err != nil {
+		return err
 	}
-	return nil
+	return checkFunc()
 }

@@ -34,7 +34,7 @@ type Client struct {
 	sudo          string
 	client        *http.Client
 	serverVersion *version.Version
-	propertyLock  sync.RWMutex
+	versionLock   sync.RWMutex
 }
 
 // NewClient initializes and returns a API client.
