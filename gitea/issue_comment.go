@@ -72,3 +72,12 @@ func (c *Client) DeleteIssueComment(owner, repo string, commentID int64) error {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, commentID), nil, nil)
 	return err
 }
+
+// GetIssueComment get an issue comment.
+func (c *Client) GetIssueComment(owner, repo string, commentID int64) (*Comment, error) {
+	//	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	//		return err
+	//	}
+	comment := new(Comment)
+	return comment, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, commentID), nil, nil, comment)
+}
