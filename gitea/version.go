@@ -21,6 +21,8 @@ func (c *Client) ServerVersion() (string, error) {
 // CheckServerVersionConstraint validates that the login's server satisfies a
 // given version constraint such as ">= 1.11.0+dev"
 func (c *Client) CheckServerVersionConstraint(constraint string) error {
+	c.propertyLock.Lock()
+	defer c.propertyLock.Unlock()
 	if c.serverVersion == nil {
 		raw, err := c.ServerVersion()
 		if err != nil {

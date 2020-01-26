@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/hashicorp/go-version"
 )
@@ -33,6 +34,7 @@ type Client struct {
 	sudo          string
 	client        *http.Client
 	serverVersion *version.Version
+	propertyLock  sync.RWMutex
 }
 
 // NewClient initializes and returns a API client.
