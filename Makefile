@@ -56,6 +56,7 @@ test-instance:
 	echo "INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1NTg4MzY4ODB9.LoKQyK5TN_0kMJFVHWUW0uDAyoGjDP6Mkup4ps2VJN4" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "INSTALL_LOCK   = true" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "SECRET_KEY     = 2crAW4UANgvLipDS6U5obRcFosjSJHQANll6MNfX7P0G3se3fKcCwwK3szPyGcbo" >> ${WORK_DIR}/test/conf/app.ini; \
+	echo "PASSWORD_COMPLEXITY = off" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "[database]" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "DB_TYPE = sqlite3" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "[repository]" >> ${WORK_DIR}/test/conf/app.ini; \
