@@ -53,4 +53,5 @@ func (c *Client) loadClientServerVersion() error {
 	if c.serverVersion, err = version.NewVersion(raw); err != nil {
 		return err
 	}
+	return nil
 }
