@@ -21,6 +21,6 @@ func TestMyUser(t *testing.T) {
 	assert.EqualValues(t, "test01", user.UserName)
 	assert.EqualValues(t, "test01@gitea.io", user.Email)
 	assert.EqualValues(t, "", user.FullName)
-	assert.EqualValues(t, c.url+"/user/avatar/test01/-1", user.AvatarURL)
+	assert.EqualValues(t, getGiteaURL()+"/user/avatar/test01/-1", user.AvatarURL)
 	assert.Equal(t, true, user.IsAdmin)
 }
