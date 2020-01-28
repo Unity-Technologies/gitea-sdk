@@ -24,3 +24,14 @@ func TestMyUser(t *testing.T) {
 	assert.EqualValues(t, getGiteaURL()+"/user/avatar/test01/-1", user.AvatarURL)
 	assert.Equal(t, true, user.IsAdmin)
 }
+
+func createTestUser(t *testing.T, username string, client *Client) *User {
+	bFalse := false
+	user, _ := client.GetUserInfo(username)
+	if user.ID != 0 {
+		return user
+	}
+	user, err := client.AdminCreateUser(CreateUserOption{Username: username, Password: username + "!1234", Email: username + "@gitea.io", MustChangePassword: &bFalse, SendNotify: bFalse})
+	assert.NoError(t, err)
+	return user
+}
