@@ -29,7 +29,7 @@ func (c *Client) GetWatchedRepos(user string) ([]*Repository, error) {
 // GetMyWatchedRepos list repositories watched by the authenticated user
 func (c *Client) GetMyWatchedRepos() ([]*Repository, error) {
 	repos := make([]*Repository, 0, 10)
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/subscriptions"), nil, nil, &repos)
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/subscriptions"), nil, nil, &repos)
 }
 
 // CheckRepoWatch check if the current user is watching a repo
