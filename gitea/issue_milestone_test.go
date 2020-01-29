@@ -32,7 +32,6 @@ func TestMilestones(t *testing.T) {
 	assert.NoError(t, err)
 
 	// EditMilestone
-	// cant close for now: https://github.com/go-gitea/gitea/issues/10047
 	m1, err = c.EditMilestone(repo.Owner.UserName, repo.Name, m1.ID, EditMilestoneOption{Description: &closed, State: &closed})
 	assert.NoError(t, err)
 
@@ -42,10 +41,10 @@ func TestMilestones(t *testing.T) {
 	// ListRepoMilestones
 	ml, err := c.ListRepoMilestones(repo.Owner.UserName, repo.Name, ListMilestoneOption{})
 	assert.NoError(t, err)
-	assert.Len(t, ml, 3)
+	assert.Len(t, ml, 2)
 	ml, err = c.ListRepoMilestones(repo.Owner.UserName, repo.Name, ListMilestoneOption{State: "closed"})
 	assert.NoError(t, err)
-	assert.Len(t, ml, 0)
+	assert.Len(t, ml, 1)
 	ml, err = c.ListRepoMilestones(repo.Owner.UserName, repo.Name, ListMilestoneOption{State: "all"})
 	assert.NoError(t, err)
 	assert.Len(t, ml, 3)
