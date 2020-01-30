@@ -6,6 +6,6 @@ package gitea
 
 // ListOptions options for using Gitea's API pagination
 type ListOptions struct {
-	Page    int
-	PerPage int
+	Page     int
+	PageSize int
 }
