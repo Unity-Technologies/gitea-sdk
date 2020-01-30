@@ -40,7 +40,7 @@ type Milestone struct {
 type ListMilestoneOption struct {
 	ListOptions
 	// open, closed, all
-	State string
+	State StateType
 }
 
 // QueryEncode turns options into querystring argument
@@ -53,7 +53,7 @@ func (opt *ListMilestoneOption) QueryEncode() string {
 		query.Add("limit", fmt.Sprintf("%d", opt.PageSize))
 	}
 	if opt.State != "" {
-		query.Add("state", opt.State)
+		query.Add("state", string(opt.State))
 	}
 	return query.Encode()
 }
