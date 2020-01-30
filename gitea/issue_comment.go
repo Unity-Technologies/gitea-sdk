@@ -49,6 +49,9 @@ type ListRepoIssueCommentsOptions struct {
 // ListRepoIssueComments list comments for a given repo.
 func (c *Client) ListRepoIssueComments(options ListRepoIssueCommentsOptions) ([]*Comment, error) {
 	comments := make([]*Comment, 0, options.getPerPage())
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return comments, err
+	}
 	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments?%s", options.Owner, options.Repo, options.getURLQueryEncoded()), nil, nil, &comments)
 }
 
