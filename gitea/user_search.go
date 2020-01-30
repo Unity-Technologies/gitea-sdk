@@ -15,9 +15,8 @@ type searchUsersResponse struct {
 
 // SearchUsersOption options for SearchUsers
 type SearchUsersOption struct {
-	Page     int
-	PageSize int
-	KeyWord  string
+	ListOptions
+	KeyWord string
 }
 
 // QueryEncode turns options into querystring argument
