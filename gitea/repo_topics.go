@@ -1,4 +1,4 @@
-// Copyright 2016 The Gogs Authors. All rights reserved.
+// Copyright 2019 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -25,7 +25,7 @@ type TopicsList struct {
 // ListRepoTopics list all repository's topics
 func (c *Client) ListRepoTopics(options ListRepoTopics) (*TopicsList, error) {
 	var list TopicsList
-	return &list, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/topics?%s", options.User, options.Repo, options.getURLQuery()), nil, nil, &list)
+	return &list, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/topics?%s", options.User, options.Repo, options.getURLQueryEncoded()), nil, nil, &list)
 }
 
 // SetRepoTopics replaces the list of repo's topics

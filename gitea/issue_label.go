@@ -30,7 +30,7 @@ type ListRepoLabelsOptions struct {
 // ListRepoLabels list labels of one repository
 func (c *Client) ListRepoLabels(options ListRepoLabelsOptions) ([]*Label, error) {
 	labels := make([]*Label, 0, options.getPerPage())
-	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels?%s", options.Owner, options.Repo, options.getURLQuery()), nil, nil, &labels)
+	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels?%s", options.Owner, options.Repo, options.getURLQueryEncoded()), nil, nil, &labels)
 }
 
 // GetRepoLabel get one label of repository by repo it

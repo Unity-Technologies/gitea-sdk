@@ -40,7 +40,7 @@ type ListReleasesOptions struct {
 func (c *Client) ListReleases(options ListReleasesOptions) ([]*Release, error) {
 	releases := make([]*Release, 0, options.getPerPage())
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases?%s", options.User, options.Repo, options.getURLQuery()),
+		fmt.Sprintf("/repos/%s/%s/releases?%s", options.User, options.Repo, options.getURLQueryEncoded()),
 		nil, nil, &releases)
 	return releases, err
 }

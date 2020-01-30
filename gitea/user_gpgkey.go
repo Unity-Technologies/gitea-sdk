@@ -42,7 +42,7 @@ type ListGPGKeys struct {
 // ListGPGKeys list all the GPG keys of the user
 func (c *Client) ListGPGKeys(options ListGPGKeys) ([]*GPGKey, error) {
 	keys := make([]*GPGKey, 0, options.getPerPage())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", options.User, options.getURLQuery()), nil, nil, &keys)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", options.User, options.getURLQueryEncoded()), nil, nil, &keys)
 }
 
 // ListMyGPGKeysOptions options for listing current's user GPGKeys
@@ -57,7 +57,7 @@ func (c *Client) ListMyGPGKeys(options *ListMyGPGKeysOptions) ([]*GPGKey, error)
 	}
 
 	keys := make([]*GPGKey, 0, options.getPerPage())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", options.getURLQuery()), nil, nil, &keys)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", options.getURLQueryEncoded()), nil, nil, &keys)
 }
 
 // GetGPGKey get current user's GPG key by key id

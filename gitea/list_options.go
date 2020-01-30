@@ -1,6 +1,9 @@
 package gitea
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
 
 // ListOptions options for using Gitea's API pagination
 type ListOptions struct {
@@ -8,10 +11,24 @@ type ListOptions struct {
 	PerPage int
 }
 
-func (o ListOptions) getURLQuery() string {
+func (o ListOptions) getURLQueryEncoded() string {
 	o.setDefaults()
 
-	return fmt.Sprintf("page=%d&limit=%d", o.Page, o.PerPage)
+	query := make(url.Values)
+	query.Add("page", fmt.Sprintf("%d", o.Page))
+	query.Add("limit", fmt.Sprintf("%d", o.PerPage))
+
+	return query.Encode()
+}
+
+func (o ListOptions) getURLQuery() url.Values {
+	o.setDefaults()
+
+	query := make(url.Values)
+	query.Add("page", fmt.Sprintf("%d", o.Page))
+	query.Add("limit", fmt.Sprintf("%d", o.PerPage))
+
+	return query
 }
 
 func (o ListOptions) setDefaults() {

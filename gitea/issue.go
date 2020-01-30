@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -42,39 +43,74 @@ type Issue struct {
 	PullRequest *PullRequestMeta `json:"pull_request"`
 }
 
-// ListIssuesOptions options for listing issues
-type ListIssuesOptions struct {
+// ListIssueOption list issue options
+type ListIssueOption struct {
 	ListOptions
+	// open, closed, all
+	State   string
+	Labels  []string
+	KeyWord string
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListIssueOption) QueryEncode() string {
+	query := opt.getURLQuery()
+	if len(opt.State) > 0 {
+		query.Add("state", opt.State)
+	}
+
+	if len(opt.Labels) > 0 {
+		var lq string
+		for _, l := range opt.Labels {
+			if len(lq) > 0 {
+				lq += ","
+			}
+			lq += l
+		}
+		query.Add("labels", lq)
+	}
+	if len(opt.KeyWord) > 0 {
+		query.Add("q", opt.KeyWord)
+	}
+
+	return query.Encode()
 }
 
 // ListIssues returns all issues assigned the authenticated user
-func (c *Client) ListIssues(options ListIssuesOptions) ([]*Issue, error) {
-	issues := make([]*Issue, 0, options.getPerPage())
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/issues?%s", options.getURLQuery()), nil, nil, &issues)
-}
-
-// ListUserIssuesOptions options for listing user's issues
-type ListUserIssuesOptions struct {
-	ListOptions
+func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
+	link, _ := url.Parse("/repos/issues/search")
+	issues := make([]*Issue, 0, 10)
+	link.RawQuery = opt.QueryEncode()
+	return issues, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
 }
 
 // ListUserIssues returns all issues assigned to the authenticated user
-func (c *Client) ListUserIssues(options ListUserIssuesOptions) ([]*Issue, error) {
-	issues := make([]*Issue, 0, options.getPerPage())
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/user/issues?%s", options.getURLQuery()), nil, nil, &issues)
-}
-
-// ListRepoIssuesOptions options for listing repository's issues
-type ListRepoIssuesOptions struct {
-	ListOptions
-	Owner string
-	Repo  string
+func (c *Client) ListUserIssues(opt ListIssueOption) ([]*Issue, error) {
+	// WARNING: "/user/issues" API is not implemented yet!
+	allIssues, err := c.ListIssues(opt)
+	if err != nil {
+		return nil, err
+	}
+	user, err := c.GetMyUserInfo()
+	if err != nil {
+		return nil, err
+	}
+	// Workaround: client sort out non user related issues
+	issues := make([]*Issue, 0, 10)
+	for _, i := range allIssues {
+		if i.ID == user.ID {
+			issues = append(issues, i)
+		}
+	}
+	return issues, nil
 }
 
 // ListRepoIssues returns all issues for a given repository
-func (c *Client) ListRepoIssues(options ListRepoIssuesOptions) ([]*Issue, error) {
-	issues := make([]*Issue, 0, options.getPerPage())
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues?%s", options.Owner, options.Repo, options.getURLQuery()), nil, nil, &issues)
+func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Issue, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
+	issues := make([]*Issue, 0, 10)
+	link.RawQuery = opt.QueryEncode()
+	return issues, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
 }
 
 // GetIssue returns a single issue for a given repository
@@ -129,20 +165,4 @@ func (c *Client) EditIssue(owner, repo string, index int64, opt EditIssueOption)
 	issue := new(Issue)
 	return issue, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index),
 		jsonHeader, bytes.NewReader(body), issue)
-}
-
-// StartIssueStopWatch starts a stopwatch for an existing issue for a given
-// repository
-func (c *Client) StartIssueStopWatch(owner, repo string, index int64) error {
-	_, err := c.getResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/stopwatch/start", owner, repo, index),
-		jsonHeader, nil)
-	return err
-}
-
-// StopIssueStopWatch stops an existing stopwatch for an issue in a given
-// repository
-func (c *Client) StopIssueStopWatch(owner, repo string, index int64) error {
-	_, err := c.getResponse("POST", fmt.Sprintf("/repos/%s/%s/issues/%d/stopwatch/stop", owner, repo, index),
-		jsonHeader, nil)
-	return err
 }

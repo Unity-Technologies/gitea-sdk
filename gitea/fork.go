@@ -21,7 +21,7 @@ type ListForksOptions struct {
 func (c *Client) ListForks(options ListForksOptions) ([]*Repository, error) {
 	forks := make([]*Repository, options.getPerPage())
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/forks?%s", options.User, options.Repo, options.getURLQuery()),
+		fmt.Sprintf("/repos/%s/%s/forks?%s", options.User, options.Repo, options.getURLQueryEncoded()),
 		nil, nil, &forks)
 	return forks, err
 }

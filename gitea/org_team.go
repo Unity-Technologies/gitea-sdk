@@ -31,7 +31,7 @@ type ListOrgTeamsOptions struct {
 // ListOrgTeams lists all teams of an organization
 func (c *Client) ListOrgTeams(options ListOrgTeamsOptions) ([]*Team, error) {
 	teams := make([]*Team, 0, options.getPerPage())
-	return teams, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams?%s", options.Org, options.getURLQuery()), nil, nil, &teams)
+	return teams, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams?%s", options.Org, options.getURLQueryEncoded()), nil, nil, &teams)
 }
 
 // ListMyTeamsOptions options for current's user teams
@@ -46,7 +46,7 @@ func (c *Client) ListMyTeams(options *ListMyOrgsOptions) ([]*Team, error) {
 	}
 
 	teams := make([]*Team, 0, options.getPerPage())
-	return teams, c.getParsedResponse("GET", fmt.Sprintf("/user/teams?%s", options.getURLQuery()), nil, nil, &teams)
+	return teams, c.getParsedResponse("GET", fmt.Sprintf("/user/teams?%s", options.getURLQueryEncoded()), nil, nil, &teams)
 }
 
 // GetTeam gets a team by ID
@@ -110,7 +110,7 @@ type ListTeamMembersOptions struct {
 // ListTeamMembers lists all members of a team
 func (c *Client) ListTeamMembers(options ListTeamMembersOptions) ([]*User, error) {
 	members := make([]*User, 0, options.getPerPage())
-	return members, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/members?%s", options.ID, options.getURLQuery()), nil, nil, &members)
+	return members, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/members?%s", options.ID, options.getURLQueryEncoded()), nil, nil, &members)
 }
 
 // GetTeamMember gets a member of a team
@@ -140,7 +140,7 @@ type ListTeamRepositoriesOptions struct {
 // ListTeamRepositories lists all repositories of a team
 func (c *Client) ListTeamRepositories(options ListTeamRepositoriesOptions) ([]*Repository, error) {
 	repos := make([]*Repository, 0, options.getPerPage())
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/repos?%s", options.ID, options.getURLQuery()), nil, nil, &repos)
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/repos?%s", options.ID, options.getURLQueryEncoded()), nil, nil, &repos)
 }
 
 // AddTeamRepository adds a repository to a team

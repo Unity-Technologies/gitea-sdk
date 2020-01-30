@@ -75,7 +75,7 @@ type ListStatusesOptions struct {
 // GET /repos/:owner/:repo/commits/:ref/statuses
 func (c *Client) ListStatuses(options ListStatusesOptions) ([]*Status, error) {
 	statuses := make([]*Status, 0, options.getPerPage())
-	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", options.Owner, options.Repo, options.SHA, options.getURLQuery()), nil, nil, &statuses)
+	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", options.Owner, options.Repo, options.SHA, options.getURLQueryEncoded()), nil, nil, &statuses)
 }
 
 // CombinedStatus holds the combined state of several statuses for a single commit

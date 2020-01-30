@@ -34,7 +34,7 @@ type ListDeployKeysOptions struct {
 // ListDeployKeys list all the deploy keys of one repository
 func (c *Client) ListDeployKeys(options ListDeployKeysOptions) ([]*DeployKey, error) {
 	keys := make([]*DeployKey, 0, options.getPerPage())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys?%s", options.User, options.Repo, options.getURLQuery()), nil, nil, &keys)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys?%s", options.User, options.Repo, options.getURLQueryEncoded()), nil, nil, &keys)
 }
 
 // GetDeployKey get one deploy key with key id

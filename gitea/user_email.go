@@ -25,7 +25,7 @@ type ListEmailsOptions struct {
 // ListEmails all the email addresses of user
 func (c *Client) ListEmails(options ListEmailsOptions) ([]*Email, error) {
 	emails := make([]*Email, 0, options.getPerPage())
-	return emails, c.getParsedResponse("GET", fmt.Sprintf("/user/emails?%s", options.getURLQuery()), nil, nil, &emails)
+	return emails, c.getParsedResponse("GET", fmt.Sprintf("/user/emails?%s", options.getURLQueryEncoded()), nil, nil, &emails)
 }
 
 // CreateEmailOption options when creating email addresses

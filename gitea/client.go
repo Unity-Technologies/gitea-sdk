@@ -1,4 +1,5 @@
 // Copyright 2014 The Gogs Authors. All rights reserved.
+// Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -12,6 +13,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
+
+	"github.com/hashicorp/go-version"
 )
 
 var jsonHeader = http.Header{"content-type": []string{"application/json"}}
@@ -21,12 +25,16 @@ func Version() string {
 	return "0.12.3"
 }
 
-// Client represents a Gogs API client.
+// Client represents a Gitea API client.
 type Client struct {
-	url         string
-	accessToken string
-	sudo        string
-	client      *http.Client
+	url           string
+	accessToken   string
+	username      string
+	password      string
+	sudo          string
+	client        *http.Client
+	serverVersion *version.Version
+	versionLock   sync.RWMutex
 }
 
 // NewClient initializes and returns a API client.
@@ -43,6 +51,11 @@ func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
 	client := NewClient(url, "")
 	client.client = httpClient
 	return client
+}
+
+// SetBasicAuth sets basicauth
+func (c *Client) SetBasicAuth(username, password string) {
+	c.username, c.password = username, password
 }
 
 // SetHTTPClient replaces default http.Client with user given one.
@@ -62,6 +75,9 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	}
 	if len(c.accessToken) != 0 {
 		req.Header.Set("Authorization", "token "+c.accessToken)
+	}
+	if len(c.username) != 0 {
+		req.SetBasicAuth(c.username, c.password)
 	}
 	if c.sudo != "" {
 		req.Header.Set("Sudo", c.sudo)

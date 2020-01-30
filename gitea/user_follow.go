@@ -18,7 +18,7 @@ func (c *Client) ListMyFollowers(options *ListMyFollowersOptions) ([]*User, erro
 	}
 
 	users := make([]*User, 0, options.getPerPage())
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/followers?%s", options.getURLQuery()), nil, nil, &users)
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/followers?%s", options.getURLQueryEncoded()), nil, nil, &users)
 }
 
 // ListFollowersOptions options for listing a user's followers
@@ -30,7 +30,7 @@ type ListFollowersOptions struct {
 // ListFollowers list all the followers of one user
 func (c *Client) ListFollowers(options ListFollowersOptions) ([]*User, error) {
 	users := make([]*User, 0, options.getPerPage())
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/followers?%s", options.User, options.getURLQuery()), nil, nil, &users)
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/followers?%s", options.User, options.getURLQueryEncoded()), nil, nil, &users)
 }
 
 // ListMyFollowingOptions options for listing current's user's users being followed
@@ -45,7 +45,7 @@ func (c *Client) ListMyFollowing(options *ListMyFollowingOptions) ([]*User, erro
 	}
 
 	users := make([]*User, 0, options.getPerPage())
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/following?%s", options.getURLQuery()), nil, nil, &users)
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/following?%s", options.getURLQueryEncoded()), nil, nil, &users)
 }
 
 // ListFollowingOptions options for listing a user's users being followed
@@ -61,7 +61,7 @@ func (c *Client) ListFollowing(options *ListFollowingOptions) ([]*User, error) {
 	}
 
 	users := make([]*User, 0, options.getPerPage())
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/following?%s", options.User, options.getURLQuery()), nil, nil, &users)
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/following?%s", options.User, options.getURLQueryEncoded()), nil, nil, &users)
 }
 
 // IsFollowing if current user followed the target
