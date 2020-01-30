@@ -38,8 +38,7 @@ type Milestone struct {
 
 // ListMilestoneOption list milestone options
 type ListMilestoneOption struct {
-	Page      int64
-	PageLimit int64
+	ListOptions
 	// open, closed, all
 	State string
 }
@@ -50,8 +49,8 @@ func (opt *ListMilestoneOption) QueryEncode() string {
 	if opt.Page > 0 {
 		query.Add("page", fmt.Sprintf("%d", opt.Page))
 	}
-	if opt.PageLimit > 0 {
-		query.Add("limit", fmt.Sprintf("%d", opt.PageLimit))
+	if opt.PageSize > 0 {
+		query.Add("limit", fmt.Sprintf("%d", opt.PageSize))
 	}
 	if opt.State != "" {
 		query.Add("state", opt.State)
