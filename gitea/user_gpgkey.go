@@ -33,20 +33,20 @@ type GPGKeyEmail struct {
 	Verified bool   `json:"verified"`
 }
 
-// ListGPGKeys options for listing a user's GPGKeys
-type ListGPGKeys struct {
+// ListGPGKeysOptions options for listing a user's GPGKeys
+type ListGPGKeysOptions struct {
 	ListOptions
 }
 
 // ListGPGKeys list all the GPG keys of the user
-func (c *Client) ListGPGKeys(user string, opt ListGPGKeys) ([]*GPGKey, error) {
+func (c *Client) ListGPGKeys(user string, opt ListGPGKeysOptions) ([]*GPGKey, error) {
 	opt.setDefaults()
 	keys := make([]*GPGKey, 0, opt.PageSize)
 	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", user, opt.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // ListMyGPGKeys list all the GPG keys of current user
-func (c *Client) ListMyGPGKeys(opt *ListGPGKeys) ([]*GPGKey, error) {
+func (c *Client) ListMyGPGKeys(opt *ListGPGKeysOptions) ([]*GPGKey, error) {
 	opt.setDefaults()
 	keys := make([]*GPGKey, 0, opt.PageSize)
 	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", opt.getURLQuery().Encode()), nil, nil, &keys)
