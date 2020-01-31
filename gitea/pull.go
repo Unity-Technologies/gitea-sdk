@@ -61,10 +61,10 @@ type PullRequest struct {
 type ListPullRequestsOptions struct {
 	ListOptions
 	// open, closed, all
-	State string `json:"state"`
+	State string
 	// oldest, recentupdate, leastupdate, mostcomment, leastcomment, priority
-	Sort      string `json:"sort"`
-	Milestone int64  `json:"milestone"`
+	Sort      string
+	Milestone int64
 }
 
 // QueryEncode turns options into querystring argument
