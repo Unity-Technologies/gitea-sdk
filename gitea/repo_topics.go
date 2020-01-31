@@ -20,7 +20,7 @@ type TopicsList struct {
 	Topics []string `json:"topics"`
 }
 
-// ListRepoTopicsOptions list all repository's topics
+// ListRepoTopics list all repository's topics
 func (c *Client) ListRepoTopics(user, repo string, opt ListRepoTopicsOptions) (*TopicsList, error) {
 	opt.setDefaults()
 
