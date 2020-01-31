@@ -63,11 +63,8 @@ type ListMyReposOptions struct {
 
 // ListMyRepos lists all repositories for the authenticated user that has access to.
 func (c *Client) ListMyRepos(options *ListMyReposOptions) ([]*Repository, error) {
-	if options == nil {
-		options = &ListMyReposOptions{}
-	}
-
-	repos := make([]*Repository, 0, options.getPageSize())
+	options.setDefaults()
+	repos := make([]*Repository, 0, options.PageSize)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/repos?%s", options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
@@ -78,7 +75,8 @@ type ListUserReposOptions struct {
 
 // ListUserRepos list all repositories of one user by user's name
 func (c *Client) ListUserRepos(user string, options ListUserReposOptions) ([]*Repository, error) {
-	repos := make([]*Repository, 0, options.getPageSize())
+	options.setDefaults()
+	repos := make([]*Repository, 0, options.PageSize)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", user, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
@@ -89,7 +87,8 @@ type ListOrgReposOptions struct {
 
 // ListOrgRepos list all repositories of one organization by organization's name
 func (c *Client) ListOrgRepos(org string, options ListOrgReposOptions) ([]*Repository, error) {
-	repos := make([]*Repository, 0, options.getPageSize())
+	options.setDefaults()
+	repos := make([]*Repository, 0, options.PageSize)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", org, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 

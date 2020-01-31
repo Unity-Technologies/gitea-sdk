@@ -31,7 +31,8 @@ type ListOrgHooksOptions struct {
 
 // ListOrgHooks list all the hooks of one organization
 func (c *Client) ListOrgHooks(org string, options ListOrgHooksOptions) ([]*Hook, error) {
-	hooks := make([]*Hook, 0, options.getPageSize())
+	options.setDefaults()
+	hooks := make([]*Hook, 0, options.PageSize)
 	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/hooks?%s", org, options.getURLQuery().Encode()), nil, nil, &hooks)
 }
 
@@ -42,7 +43,8 @@ type ListRepoHooksOptions struct {
 
 // ListRepoHooks list all the hooks of one repository
 func (c *Client) ListRepoHooks(user, repo string, options ListRepoHooksOptions) ([]*Hook, error) {
-	hooks := make([]*Hook, 0, options.getPageSize())
+	options.setDefaults()
+	hooks := make([]*Hook, 0, options.PageSize)
 	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks?%s", user, repo, options.getURLQuery().Encode()), nil, nil, &hooks)
 }
 

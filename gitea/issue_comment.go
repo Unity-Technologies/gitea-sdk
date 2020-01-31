@@ -32,7 +32,8 @@ type ListIssueCommentsOptions struct {
 
 // ListIssueComments list comments on an issue.
 func (c *Client) ListIssueComments(owner, repo string, index int64, options ListIssueCommentsOptions) ([]*Comment, error) {
-	comments := make([]*Comment, 0, options.getPageSize())
+	options.setDefaults()
+	comments := make([]*Comment, 0, options.PageSize)
 	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments?%s", owner, repo, index, options.getURLQuery().Encode()), nil, nil, &comments)
 }
 
@@ -43,7 +44,8 @@ type ListRepoIssueCommentsOptions struct {
 
 // ListRepoIssueComments list comments for a given repo.
 func (c *Client) ListRepoIssueComments(owner, repo string, options ListRepoIssueCommentsOptions) ([]*Comment, error) {
-	comments := make([]*Comment, 0, options.getPageSize())
+	options.setDefaults()
+	comments := make([]*Comment, 0, options.PageSize)
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return comments, err
 	}

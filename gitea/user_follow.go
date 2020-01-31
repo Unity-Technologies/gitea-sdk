@@ -13,11 +13,8 @@ type ListMyFollowersOptions struct {
 
 // ListMyFollowers list all the followers of current user
 func (c *Client) ListMyFollowers(options *ListMyFollowersOptions) ([]*User, error) {
-	if options == nil {
-		options = &ListMyFollowersOptions{}
-	}
-
-	users := make([]*User, 0, options.getPageSize())
+	options.setDefaults()
+	users := make([]*User, 0, options.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/followers?%s", options.getURLQuery().Encode()), nil, nil, &users)
 }
 
@@ -28,7 +25,8 @@ type ListFollowersOptions struct {
 
 // ListFollowers list all the followers of one user
 func (c *Client) ListFollowers(user string, options ListFollowersOptions) ([]*User, error) {
-	users := make([]*User, 0, options.getPageSize())
+	options.setDefaults()
+	users := make([]*User, 0, options.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/followers?%s", user, options.getURLQuery().Encode()), nil, nil, &users)
 }
 
@@ -38,12 +36,9 @@ type ListMyFollowingOptions struct {
 }
 
 // ListMyFollowing list all the users current user followed
-func (c *Client) ListMyFollowing(options *ListMyFollowingOptions) ([]*User, error) {
-	if options == nil {
-		options = &ListMyFollowingOptions{}
-	}
-
-	users := make([]*User, 0, options.getPageSize())
+func (c *Client) ListMyFollowing(options ListMyFollowingOptions) ([]*User, error) {
+	options.setDefaults()
+	users := make([]*User, 0, options.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/following?%s", options.getURLQuery().Encode()), nil, nil, &users)
 }
 
@@ -54,11 +49,8 @@ type ListFollowingOptions struct {
 
 // ListFollowing list all the users the user followed
 func (c *Client) ListFollowing(user string, options *ListFollowingOptions) ([]*User, error) {
-	if options == nil {
-		options = &ListFollowingOptions{}
-	}
-
-	users := make([]*User, 0, options.getPageSize())
+	options.setDefaults()
+	users := make([]*User, 0, options.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/following?%s", user, options.getURLQuery().Encode()), nil, nil, &users)
 }
 

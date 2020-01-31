@@ -31,7 +31,8 @@ type ListReleaseAttachmentsOptions struct {
 
 // ListReleaseAttachments list release's attachments
 func (c *Client) ListReleaseAttachments(user, repo string, release int64, options ListReleaseAttachmentsOptions) ([]*Attachment, error) {
-	attachments := make([]*Attachment, 0, options.getPageSize())
+	options.setDefaults()
+	attachments := make([]*Attachment, 0, options.PageSize)
 	err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/releases/%d/assets?%s", user, repo, release, options.getURLQuery().Encode()),
 		nil, nil, &attachments)

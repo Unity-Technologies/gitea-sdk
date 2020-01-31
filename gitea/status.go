@@ -71,7 +71,8 @@ type ListStatusesOptions struct {
 //
 // GET /repos/:owner/:repo/commits/:ref/statuses
 func (c *Client) ListStatuses(owner, repo, sha string, options ListStatusesOptions) ([]*Status, error) {
-	statuses := make([]*Status, 0, options.getPageSize())
+	options.setDefaults()
+	statuses := make([]*Status, 0, options.PageSize)
 	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, options.getURLQuery().Encode()), nil, nil, &statuses)
 }
 

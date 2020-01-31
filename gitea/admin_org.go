@@ -18,7 +18,8 @@ type AdminListOrgsOptions struct {
 
 // AdminListOrgs lists all orgs
 func (c *Client) AdminListOrgs(options AdminListOrgsOptions) ([]*Organization, error) {
-	orgs := make([]*Organization, 0, options.getPageSize())
+	options.setDefaults()
+	orgs := make([]*Organization, 0, options.PageSize)
 	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 

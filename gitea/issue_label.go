@@ -27,7 +27,8 @@ type ListRepoLabelsOptions struct {
 
 // ListRepoLabels list labels of one repository
 func (c *Client) ListRepoLabels(owner, repo string, options ListRepoLabelsOptions) ([]*Label, error) {
-	labels := make([]*Label, 0, options.getPageSize())
+	options.setDefaults()
+	labels := make([]*Label, 0, options.PageSize)
 	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels?%s", owner, repo, options.getURLQuery().Encode()), nil, nil, &labels)
 }
 

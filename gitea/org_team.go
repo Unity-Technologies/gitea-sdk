@@ -29,7 +29,8 @@ type ListOrgTeamsOptions struct {
 
 // ListOrgTeams lists all teams of an organization
 func (c *Client) ListOrgTeams(org string, options ListOrgTeamsOptions) ([]*Team, error) {
-	teams := make([]*Team, 0, options.getPageSize())
+	options.setDefaults()
+	teams := make([]*Team, 0, options.PageSize)
 	return teams, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams?%s", org, options.getURLQuery().Encode()), nil, nil, &teams)
 }
 
@@ -40,11 +41,8 @@ type ListMyTeamsOptions struct {
 
 // ListMyTeams lists all the teams of the current user
 func (c *Client) ListMyTeams(options *ListMyOrgsOptions) ([]*Team, error) {
-	if options == nil {
-		options = &ListMyOrgsOptions{}
-	}
-
-	teams := make([]*Team, 0, options.getPageSize())
+	options.setDefaults()
+	teams := make([]*Team, 0, options.PageSize)
 	return teams, c.getParsedResponse("GET", fmt.Sprintf("/user/teams?%s", options.getURLQuery().Encode()), nil, nil, &teams)
 }
 
@@ -107,7 +105,8 @@ type ListTeamMembersOptions struct {
 
 // ListTeamMembers lists all members of a team
 func (c *Client) ListTeamMembers(id int64, options ListTeamMembersOptions) ([]*User, error) {
-	members := make([]*User, 0, options.getPageSize())
+	options.setDefaults()
+	members := make([]*User, 0, options.PageSize)
 	return members, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/members?%s", id, options.getURLQuery().Encode()), nil, nil, &members)
 }
 
@@ -136,7 +135,8 @@ type ListTeamRepositoriesOptions struct {
 
 // ListTeamRepositories lists all repositories of a team
 func (c *Client) ListTeamRepositories(id int64, options ListTeamRepositoriesOptions) ([]*Repository, error) {
-	repos := make([]*Repository, 0, options.getPageSize())
+	options.setDefaults()
+	repos := make([]*Repository, 0, options.PageSize)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/repos?%s", id, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 

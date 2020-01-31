@@ -29,12 +29,9 @@ type ListMyOrgsOptions struct {
 }
 
 // ListMyOrgs list all of current user's organizations
-func (c *Client) ListMyOrgs(options *ListMyOrgsOptions) ([]*Organization, error) {
-	if options == nil {
-		options = &ListMyOrgsOptions{}
-	}
-
-	orgs := make([]*Organization, 0, options.getPageSize())
+func (c *Client) ListMyOrgs(options ListMyOrgsOptions) ([]*Organization, error) {
+	options.setDefaults()
+	orgs := make([]*Organization, 0, options.PageSize)
 	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
@@ -45,7 +42,8 @@ type ListUserOrgsOptions struct {
 
 // ListUserOrgs list all of some user's organizations
 func (c *Client) ListUserOrgs(user string, options ListUserOrgsOptions) ([]*Organization, error) {
-	orgs := make([]*Organization, 0, options.getPageSize())
+	options.setDefaults()
+	orgs := make([]*Organization, 0, options.PageSize)
 	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", user, options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 

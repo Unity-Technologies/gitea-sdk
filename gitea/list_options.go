@@ -34,11 +34,3 @@ func (o ListOptions) setDefaults() {
 		o.PageSize = 10
 	}
 }
-
-func (o ListOptions) getPageSize() int {
-	if o.PageSize < 0 || o.PageSize > 50 {
-		o.PageSize = 10
-	}
-
-	return o.PageSize
-}

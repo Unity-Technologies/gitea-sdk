@@ -24,6 +24,7 @@ type ListRepoTagsOptions struct {
 
 // ListRepoTags list all the branches of one repository
 func (c *Client) ListRepoTags(user, repo string, options ListRepoTagsOptions) ([]*Tag, error) {
-	tags := make([]*Tag, 0, options.getPageSize())
+	options.setDefaults()
+	tags := make([]*Tag, 0, options.PageSize)
 	return tags, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/tags?%s", user, repo, options.getURLQuery().Encode()), nil, nil, &tags)
 }
