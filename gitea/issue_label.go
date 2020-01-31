@@ -80,7 +80,7 @@ func (c *Client) DeleteLabel(owner, repo string, id int64) error {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id), nil, nil)
 	return err
 }
-
+// ListIssueLabelsOptions options for listing issues' labels
 type ListIssueLabelsOptions struct {
 	ListOptions
 }
