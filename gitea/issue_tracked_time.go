@@ -74,8 +74,8 @@ type ListTrackedTimesOptions struct {
 
 // ListTrackedTimes list tracked times of a single issue for a given repository
 func (c *Client) ListTrackedTimes(options ListTrackedTimesOptions) ([]*TrackedTime, error) {
-	times := make([]*TrackedTime, 0, options.getPerPage())
-	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/times?%s", options.Owner, options.Repo, options.Index, options.getURLQueryEncoded()), nil, nil, &times)
+	times := make([]*TrackedTime, 0, options.getPageSize())
+	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/times?%s", options.Owner, options.Repo, options.Index, options.getURLQuery().Encode()), nil, nil, &times)
 }
 
 // ResetIssueTime reset tracked time of a single issue for a given repository

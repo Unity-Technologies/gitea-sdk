@@ -25,7 +25,7 @@ type TopicsList struct {
 // ListRepoTopics list all repository's topics
 func (c *Client) ListRepoTopics(options ListRepoTopics) (*TopicsList, error) {
 	var list TopicsList
-	return &list, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/topics?%s", options.User, options.Repo, options.getURLQueryEncoded()), nil, nil, &list)
+	return &list, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/topics?%s", options.User, options.Repo, options.getURLQuery().Encode()), nil, nil, &list)
 }
 
 // SetRepoTopics replaces the list of repo's topics

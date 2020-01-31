@@ -32,8 +32,8 @@ type ListPublicKeysOptions struct {
 
 // ListPublicKeys list all the public keys of the user
 func (c *Client) ListPublicKeys(options ListPublicKeysOptions) ([]*PublicKey, error) {
-	keys := make([]*PublicKey, 0, options.getPerPage())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", options.User, options.getURLQueryEncoded()), nil, nil, &keys)
+	keys := make([]*PublicKey, 0, options.getPageSize())
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", options.User, options.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // ListMyPublicKeysOptions options for listing current's user PublicKeys
@@ -47,8 +47,8 @@ func (c *Client) ListMyPublicKeys(options *ListMyPublicKeysOptions) ([]*PublicKe
 		options = &ListMyPublicKeysOptions{}
 	}
 
-	keys := make([]*PublicKey, 0, options.getPerPage())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/keys?%s", options.getURLQueryEncoded()), nil, nil, &keys)
+	keys := make([]*PublicKey, 0, options.getPageSize())
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/keys?%s", options.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // GetPublicKey get current user's public key by key id

@@ -38,9 +38,9 @@ type ListReleasesOptions struct {
 
 // ListReleases list releases of a repository
 func (c *Client) ListReleases(options ListReleasesOptions) ([]*Release, error) {
-	releases := make([]*Release, 0, options.getPerPage())
+	releases := make([]*Release, 0, options.getPageSize())
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases?%s", options.User, options.Repo, options.getURLQueryEncoded()),
+		fmt.Sprintf("/repos/%s/%s/releases?%s", options.User, options.Repo, options.getURLQuery().Encode()),
 		nil, nil, &releases)
 	return releases, err
 }

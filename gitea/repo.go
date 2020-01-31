@@ -67,8 +67,8 @@ func (c *Client) ListMyRepos(options *ListMyReposOptions) ([]*Repository, error)
 		options = &ListMyReposOptions{}
 	}
 
-	repos := make([]*Repository, 0, options.getPerPage())
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/repos?%s", options.getURLQueryEncoded()), nil, nil, &repos)
+	repos := make([]*Repository, 0, options.getPageSize())
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/repos?%s", options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
 // ListUserReposOptions options for listing a user's repositories
@@ -79,8 +79,8 @@ type ListUserReposOptions struct {
 
 // ListUserRepos list all repositories of one user by user's name
 func (c *Client) ListUserRepos(options ListUserReposOptions) ([]*Repository, error) {
-	repos := make([]*Repository, 0, options.getPerPage())
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", options.User, options.getURLQueryEncoded()), nil, nil, &repos)
+	repos := make([]*Repository, 0, options.getPageSize())
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", options.User, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
 // ListOrgReposOptions options for a organization's repositories
@@ -91,8 +91,8 @@ type ListOrgReposOptions struct {
 
 // ListOrgRepos list all repositories of one organization by organization's name
 func (c *Client) ListOrgRepos(options ListOrgReposOptions) ([]*Repository, error) {
-	repos := make([]*Repository, 0, options.getPerPage())
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", options.Org, options.getURLQueryEncoded()), nil, nil, &repos)
+	repos := make([]*Repository, 0, options.getPageSize())
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", options.Org, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
 // CreateRepoOption options when creating repository

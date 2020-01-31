@@ -34,8 +34,8 @@ func (c *Client) ListMyOrgs(options *ListMyOrgsOptions) ([]*Organization, error)
 		options = &ListMyOrgsOptions{}
 	}
 
-	orgs := make([]*Organization, 0, options.getPerPage())
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", options.getURLQueryEncoded()), nil, nil, &orgs)
+	orgs := make([]*Organization, 0, options.getPageSize())
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
 // ListUserOrgsOptions options for listing an user's organizations
@@ -46,8 +46,8 @@ type ListUserOrgsOptions struct {
 
 // ListUserOrgs list all of some user's organizations
 func (c *Client) ListUserOrgs(options ListUserOrgsOptions) ([]*Organization, error) {
-	orgs := make([]*Organization, 0, options.getPerPage())
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", options.User, options.getURLQueryEncoded()), nil, nil, &orgs)
+	orgs := make([]*Organization, 0, options.getPageSize())
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", options.User, options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
 // GetOrg get one organization by name

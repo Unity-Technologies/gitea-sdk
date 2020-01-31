@@ -1,3 +1,7 @@
+// Copyright 2020 The Gitea Authors. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
 package gitea
 
 import (
@@ -7,18 +11,8 @@ import (
 
 // ListOptions options for using Gitea's API pagination
 type ListOptions struct {
-	Page    int
-	PerPage int
-}
-
-func (o ListOptions) getURLQueryEncoded() string {
-	o.setDefaults()
-
-	query := make(url.Values)
-	query.Add("page", fmt.Sprintf("%d", o.Page))
-	query.Add("limit", fmt.Sprintf("%d", o.PerPage))
-
-	return query.Encode()
+	Page     int
+	PageSize int
 }
 
 func (o ListOptions) getURLQuery() url.Values {
@@ -26,7 +20,7 @@ func (o ListOptions) getURLQuery() url.Values {
 
 	query := make(url.Values)
 	query.Add("page", fmt.Sprintf("%d", o.Page))
-	query.Add("limit", fmt.Sprintf("%d", o.PerPage))
+	query.Add("limit", fmt.Sprintf("%d", o.PageSize))
 
 	return query
 }
@@ -36,15 +30,15 @@ func (o ListOptions) setDefaults() {
 		o.Page = 1
 	}
 
-	if o.PerPage < 0 || o.PerPage > 50 {
-		o.PerPage = 10
+	if o.PageSize < 0 || o.PageSize > 50 {
+		o.PageSize = 10
 	}
 }
 
-func (o ListOptions) getPerPage() int {
-	if o.PerPage < 0 || o.PerPage > 50 {
-		o.PerPage = 10
+func (o ListOptions) getPageSize() int {
+	if o.PageSize < 0 || o.PageSize > 50 {
+		o.PageSize = 10
 	}
 
-	return o.PerPage
+	return o.PageSize
 }

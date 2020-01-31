@@ -44,8 +44,8 @@ type ListRepoMilestonesOptions struct {
 
 // ListRepoMilestones list all the milestones of one repository
 func (c *Client) ListRepoMilestones(options ListRepoMilestonesOptions) ([]*Milestone, error) {
-	milestones := make([]*Milestone, 0, options.getPerPage())
-	return milestones, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones?%s", options.Owner, options.Repo, options.getURLQueryEncoded()), nil, nil, &milestones)
+	milestones := make([]*Milestone, 0, options.getPageSize())
+	return milestones, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones?%s", options.Owner, options.Repo, options.getURLQuery().Encode()), nil, nil, &milestones)
 }
 
 // GetMilestone get one milestone by repo name and milestone id

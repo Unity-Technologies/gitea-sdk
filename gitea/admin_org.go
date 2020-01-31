@@ -22,8 +22,8 @@ func (c *Client) AdminListOrgs(options *AdminListOrgsOptions) ([]*Organization, 
 		options = &AdminListOrgsOptions{}
 	}
 
-	orgs := make([]*Organization, 0, options.getPerPage())
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", options.getURLQueryEncoded()), nil, nil, &orgs)
+	orgs := make([]*Organization, 0, options.getPageSize())
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
 // AdminCreateOrg create an organization

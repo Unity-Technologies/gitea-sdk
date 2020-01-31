@@ -22,8 +22,8 @@ func (c *Client) AdminListUsers(options *AdminListUsersOptions) ([]*User, error)
 		options = &AdminListUsersOptions{}
 	}
 
-	users := make([]*User, 0, options.getPerPage())
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/admin/users?%s", options.getURLQueryEncoded()), nil, nil, &users)
+	users := make([]*User, 0, options.getPageSize())
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/admin/users?%s", options.getURLQuery().Encode()), nil, nil, &users)
 }
 
 // CreateUserOption create user options
