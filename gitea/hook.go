@@ -24,7 +24,7 @@ type Hook struct {
 	Created time.Time         `json:"created_at"`
 }
 
-// ListOrgHooksOptions options for listing hooks
+// ListHooksOptions options for listing hooks
 type ListHooksOptions struct {
 	ListOptions
 }
