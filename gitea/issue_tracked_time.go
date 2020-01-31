@@ -67,15 +67,12 @@ func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*T
 // ListTrackedTimesOptions options for listing repository's tracked times
 type ListTrackedTimesOptions struct {
 	ListOptions
-	Owner string
-	Repo  string
-	Index int64
 }
 
 // ListTrackedTimes list tracked times of a single issue for a given repository
-func (c *Client) ListTrackedTimes(options ListTrackedTimesOptions) ([]*TrackedTime, error) {
+func (c *Client) ListTrackedTimes(owner, repo string, index int64, options ListTrackedTimesOptions) ([]*TrackedTime, error) {
 	times := make([]*TrackedTime, 0, options.getPageSize())
-	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/times?%s", options.Owner, options.Repo, options.Index, options.getURLQuery().Encode()), nil, nil, &times)
+	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/times?%s", owner, repo, index, options.getURLQuery().Encode()), nil, nil, &times)
 }
 
 // ResetIssueTime reset tracked time of a single issue for a given repository

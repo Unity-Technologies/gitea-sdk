@@ -27,13 +27,12 @@ type PublicKey struct {
 // ListPublicKeysOptions options for listing a user's PublicKeys
 type ListPublicKeysOptions struct {
 	ListOptions
-	User string
 }
 
 // ListPublicKeys list all the public keys of the user
-func (c *Client) ListPublicKeys(options ListPublicKeysOptions) ([]*PublicKey, error) {
+func (c *Client) ListPublicKeys(user string, options ListPublicKeysOptions) ([]*PublicKey, error) {
 	keys := make([]*PublicKey, 0, options.getPageSize())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", options.User, options.getURLQuery().Encode()), nil, nil, &keys)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", user, options.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // ListMyPublicKeysOptions options for listing current's user PublicKeys

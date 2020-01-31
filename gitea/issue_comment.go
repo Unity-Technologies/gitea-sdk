@@ -28,31 +28,26 @@ type Comment struct {
 // ListIssueCommentsOptions options for listing issue's comments
 type ListIssueCommentsOptions struct {
 	ListOptions
-	Owner string
-	Repo  string
-	Index int64
 }
 
 // ListIssueComments list comments on an issue.
-func (c *Client) ListIssueComments(options ListIssueCommentsOptions) ([]*Comment, error) {
+func (c *Client) ListIssueComments(owner, repo string, index int64, options ListIssueCommentsOptions) ([]*Comment, error) {
 	comments := make([]*Comment, 0, options.getPageSize())
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments?%s", options.Owner, options.Repo, options.Index, options.getURLQuery().Encode()), nil, nil, &comments)
+	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments?%s", owner, repo, index, options.getURLQuery().Encode()), nil, nil, &comments)
 }
 
 // ListRepoIssueCommentsOptions options for listing repository's issue's comments
 type ListRepoIssueCommentsOptions struct {
 	ListOptions
-	Owner string
-	Repo  string
 }
 
 // ListRepoIssueComments list comments for a given repo.
-func (c *Client) ListRepoIssueComments(options ListRepoIssueCommentsOptions) ([]*Comment, error) {
+func (c *Client) ListRepoIssueComments(owner, repo string, options ListRepoIssueCommentsOptions) ([]*Comment, error) {
 	comments := make([]*Comment, 0, options.getPageSize())
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return comments, err
 	}
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments?%s", options.Owner, options.Repo, options.getURLQuery().Encode()), nil, nil, &comments)
+	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments?%s", owner, repo, options.getURLQuery().Encode()), nil, nil, &comments)
 }
 
 // CreateIssueCommentOption options for creating a comment on an issue

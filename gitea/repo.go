@@ -74,25 +74,23 @@ func (c *Client) ListMyRepos(options *ListMyReposOptions) ([]*Repository, error)
 // ListUserReposOptions options for listing a user's repositories
 type ListUserReposOptions struct {
 	ListOptions
-	User string
 }
 
 // ListUserRepos list all repositories of one user by user's name
-func (c *Client) ListUserRepos(options ListUserReposOptions) ([]*Repository, error) {
+func (c *Client) ListUserRepos(user string, options ListUserReposOptions) ([]*Repository, error) {
 	repos := make([]*Repository, 0, options.getPageSize())
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", options.User, options.getURLQuery().Encode()), nil, nil, &repos)
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", user, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
 // ListOrgReposOptions options for a organization's repositories
 type ListOrgReposOptions struct {
 	ListOptions
-	Org string
 }
 
 // ListOrgRepos list all repositories of one organization by organization's name
-func (c *Client) ListOrgRepos(options ListOrgReposOptions) ([]*Repository, error) {
+func (c *Client) ListOrgRepos(org string, options ListOrgReposOptions) ([]*Repository, error) {
 	repos := make([]*Repository, 0, options.getPageSize())
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", options.Org, options.getURLQuery().Encode()), nil, nil, &repos)
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", org, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
 // CreateRepoOption options when creating repository

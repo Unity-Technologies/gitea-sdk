@@ -24,13 +24,12 @@ func (c *Client) ListMyFollowers(options *ListMyFollowersOptions) ([]*User, erro
 // ListFollowersOptions options for listing a user's followers
 type ListFollowersOptions struct {
 	ListOptions
-	User string
 }
 
 // ListFollowers list all the followers of one user
-func (c *Client) ListFollowers(options ListFollowersOptions) ([]*User, error) {
+func (c *Client) ListFollowers(user string, options ListFollowersOptions) ([]*User, error) {
 	users := make([]*User, 0, options.getPageSize())
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/followers?%s", options.User, options.getURLQuery().Encode()), nil, nil, &users)
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/followers?%s", user, options.getURLQuery().Encode()), nil, nil, &users)
 }
 
 // ListMyFollowingOptions options for listing current's user's users being followed
@@ -51,17 +50,16 @@ func (c *Client) ListMyFollowing(options *ListMyFollowingOptions) ([]*User, erro
 // ListFollowingOptions options for listing a user's users being followed
 type ListFollowingOptions struct {
 	ListOptions
-	User string
 }
 
 // ListFollowing list all the users the user followed
-func (c *Client) ListFollowing(options *ListFollowingOptions) ([]*User, error) {
+func (c *Client) ListFollowing(user string, options *ListFollowingOptions) ([]*User, error) {
 	if options == nil {
 		options = &ListFollowingOptions{}
 	}
 
 	users := make([]*User, 0, options.getPageSize())
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/following?%s", options.User, options.getURLQuery().Encode()), nil, nil, &users)
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/following?%s", user, options.getURLQuery().Encode()), nil, nil, &users)
 }
 
 // IsFollowing if current user followed the target

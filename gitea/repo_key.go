@@ -27,14 +27,12 @@ type DeployKey struct {
 // ListDeployKeysOptions options for listing a repository's deploy keys
 type ListDeployKeysOptions struct {
 	ListOptions
-	User string
-	Repo string
 }
 
 // ListDeployKeys list all the deploy keys of one repository
-func (c *Client) ListDeployKeys(options ListDeployKeysOptions) ([]*DeployKey, error) {
+func (c *Client) ListDeployKeys(user, repo string, options ListDeployKeysOptions) ([]*DeployKey, error) {
 	keys := make([]*DeployKey, 0, options.getPageSize())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys?%s", options.User, options.Repo, options.getURLQuery().Encode()), nil, nil, &keys)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys?%s", user, repo, options.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // GetDeployKey get one deploy key with key id

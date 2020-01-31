@@ -25,13 +25,12 @@ type Team struct {
 // ListOrgTeamsOptions options for listing organization's teams
 type ListOrgTeamsOptions struct {
 	ListOptions
-	Org string
 }
 
 // ListOrgTeams lists all teams of an organization
-func (c *Client) ListOrgTeams(options ListOrgTeamsOptions) ([]*Team, error) {
+func (c *Client) ListOrgTeams(org string, options ListOrgTeamsOptions) ([]*Team, error) {
 	teams := make([]*Team, 0, options.getPageSize())
-	return teams, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams?%s", options.Org, options.getURLQuery().Encode()), nil, nil, &teams)
+	return teams, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams?%s", org, options.getURLQuery().Encode()), nil, nil, &teams)
 }
 
 // ListMyTeamsOptions options for current's user teams
@@ -104,13 +103,12 @@ func (c *Client) DeleteTeam(id int64) error {
 // ListTeamMembersOptions options for listing team's members
 type ListTeamMembersOptions struct {
 	ListOptions
-	ID int64
 }
 
 // ListTeamMembers lists all members of a team
-func (c *Client) ListTeamMembers(options ListTeamMembersOptions) ([]*User, error) {
+func (c *Client) ListTeamMembers(id int64, options ListTeamMembersOptions) ([]*User, error) {
 	members := make([]*User, 0, options.getPageSize())
-	return members, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/members?%s", options.ID, options.getURLQuery().Encode()), nil, nil, &members)
+	return members, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/members?%s", id, options.getURLQuery().Encode()), nil, nil, &members)
 }
 
 // GetTeamMember gets a member of a team
@@ -134,13 +132,12 @@ func (c *Client) RemoveTeamMember(id int64, user string) error {
 // ListTeamRepositoriesOptions options for listing team's repositories
 type ListTeamRepositoriesOptions struct {
 	ListOptions
-	ID int64
 }
 
 // ListTeamRepositories lists all repositories of a team
-func (c *Client) ListTeamRepositories(options ListTeamRepositoriesOptions) ([]*Repository, error) {
+func (c *Client) ListTeamRepositories(id int64, options ListTeamRepositoriesOptions) ([]*Repository, error) {
 	repos := make([]*Repository, 0, options.getPageSize())
-	return repos, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/repos?%s", options.ID, options.getURLQuery().Encode()), nil, nil, &repos)
+	return repos, c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/repos?%s", id, options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
 // AddTeamRepository adds a repository to a team

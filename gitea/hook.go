@@ -27,26 +27,23 @@ type Hook struct {
 // ListOrgHooksOptions options for listing organization's hooks
 type ListOrgHooksOptions struct {
 	ListOptions
-	Org string
 }
 
 // ListOrgHooks list all the hooks of one organization
-func (c *Client) ListOrgHooks(options ListOrgHooksOptions) ([]*Hook, error) {
+func (c *Client) ListOrgHooks(org string, options ListOrgHooksOptions) ([]*Hook, error) {
 	hooks := make([]*Hook, 0, options.getPageSize())
-	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/hooks?%s", options.Org, options.getURLQuery().Encode()), nil, nil, &hooks)
+	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/hooks?%s", org, options.getURLQuery().Encode()), nil, nil, &hooks)
 }
 
 // ListRepoHooksOptions options for listing repository's hooks
 type ListRepoHooksOptions struct {
 	ListOptions
-	User string
-	Repo string
 }
 
 // ListRepoHooks list all the hooks of one repository
-func (c *Client) ListRepoHooks(options ListRepoHooksOptions) ([]*Hook, error) {
+func (c *Client) ListRepoHooks(user, repo string, options ListRepoHooksOptions) ([]*Hook, error) {
 	hooks := make([]*Hook, 0, options.getPageSize())
-	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks?%s", options.User, options.Repo, options.getURLQuery().Encode()), nil, nil, &hooks)
+	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks?%s", user, repo, options.getURLQuery().Encode()), nil, nil, &hooks)
 }
 
 // GetOrgHook get a hook of an organization

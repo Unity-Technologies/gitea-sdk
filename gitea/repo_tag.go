@@ -20,12 +20,10 @@ type Tag struct {
 // ListRepoTagsOptions options for listing a repository's tags
 type ListRepoTagsOptions struct {
 	ListOptions
-	User string
-	Repo string
 }
 
 // ListRepoTags list all the branches of one repository
-func (c *Client) ListRepoTags(options ListRepoTagsOptions) ([]*Tag, error) {
+func (c *Client) ListRepoTags(user, repo string, options ListRepoTagsOptions) ([]*Tag, error) {
 	tags := make([]*Tag, 0, options.getPageSize())
-	return tags, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/tags?%s", options.User, options.Repo, options.getURLQuery().Encode()), nil, nil, &tags)
+	return tags, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/tags?%s", user, repo, options.getURLQuery().Encode()), nil, nil, &tags)
 }

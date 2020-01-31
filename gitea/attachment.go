@@ -27,16 +27,13 @@ type Attachment struct {
 // ListReleaseAttachmentsOptions options for listing release's attachments
 type ListReleaseAttachmentsOptions struct {
 	ListOptions
-	User    string
-	Repo    string
-	Release int64
 }
 
 // ListReleaseAttachments list release's attachments
-func (c *Client) ListReleaseAttachments(options ListReleaseAttachmentsOptions) ([]*Attachment, error) {
+func (c *Client) ListReleaseAttachments(user, repo string, release int64, options ListReleaseAttachmentsOptions) ([]*Attachment, error) {
 	attachments := make([]*Attachment, 0, options.getPageSize())
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases/%d/assets?%s", options.User, options.Repo, options.Release, options.getURLQuery().Encode()),
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets?%s", user, repo, release, options.getURLQuery().Encode()),
 		nil, nil, &attachments)
 	return attachments, err
 }

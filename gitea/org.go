@@ -41,13 +41,12 @@ func (c *Client) ListMyOrgs(options *ListMyOrgsOptions) ([]*Organization, error)
 // ListUserOrgsOptions options for listing an user's organizations
 type ListUserOrgsOptions struct {
 	ListOptions
-	User string
 }
 
 // ListUserOrgs list all of some user's organizations
-func (c *Client) ListUserOrgs(options ListUserOrgsOptions) ([]*Organization, error) {
+func (c *Client) ListUserOrgs(user string, options ListUserOrgsOptions) ([]*Organization, error) {
 	orgs := make([]*Organization, 0, options.getPageSize())
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", options.User, options.getURLQuery().Encode()), nil, nil, &orgs)
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", user, options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
 // GetOrg get one organization by name

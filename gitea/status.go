@@ -65,17 +65,14 @@ func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) 
 // ListStatusesOptions options for listing a repository's commit's statuses
 type ListStatusesOptions struct {
 	ListOptions
-	Owner string
-	Repo  string
-	SHA   string
 }
 
 // ListStatuses returns all statuses for a given Commit
 //
 // GET /repos/:owner/:repo/commits/:ref/statuses
-func (c *Client) ListStatuses(options ListStatusesOptions) ([]*Status, error) {
+func (c *Client) ListStatuses(owner, repo, sha string, options ListStatusesOptions) ([]*Status, error) {
 	statuses := make([]*Status, 0, options.getPageSize())
-	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", options.Owner, options.Repo, options.SHA, options.getURLQuery().Encode()), nil, nil, &statuses)
+	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, options.getURLQuery().Encode()), nil, nil, &statuses)
 }
 
 // CombinedStatus holds the combined state of several statuses for a single commit

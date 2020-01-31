@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -35,17 +36,28 @@ type Milestone struct {
 	Deadline     *time.Time `json:"due_on"`
 }
 
-// ListRepoMilestonesOptions options for listing repository's milestones
-type ListRepoMilestonesOptions struct {
+// ListMilestoneOption list milestone options
+type ListMilestoneOption struct {
 	ListOptions
-	Owner string
-	Repo  string
+	// open, closed, all
+	State StateType
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListMilestoneOption) QueryEncode() string {
+	query := opt.getURLQuery()
+	if opt.State != "" {
+		query.Add("state", string(opt.State))
+	}
+	return query.Encode()
 }
 
 // ListRepoMilestones list all the milestones of one repository
-func (c *Client) ListRepoMilestones(options ListRepoMilestonesOptions) ([]*Milestone, error) {
-	milestones := make([]*Milestone, 0, options.getPageSize())
-	return milestones, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones?%s", options.Owner, options.Repo, options.getURLQuery().Encode()), nil, nil, &milestones)
+func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption) ([]*Milestone, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/milestones", owner, repo))
+	link.RawQuery = opt.QueryEncode()
+	milestones := make([]*Milestone, 0, 10)
+	return milestones, c.getParsedResponse("GET", link.String(), nil, nil, &milestones)
 }
 
 // GetMilestone get one milestone by repo name and milestone id

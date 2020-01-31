@@ -13,15 +13,13 @@ import (
 // ListCollaboratorsOptions options for listing a repository's collaborators
 type ListCollaboratorsOptions struct {
 	ListOptions
-	User string
-	Repo string
 }
 
 // ListCollaborators list a repository's collaborators
-func (c *Client) ListCollaborators(options ListCollaboratorsOptions) ([]*User, error) {
+func (c *Client) ListCollaborators(user, repo string, options ListCollaboratorsOptions) ([]*User, error) {
 	collaborators := make([]*User, 0, options.getPageSize())
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/collaborators", options.User, options.Repo),
+		fmt.Sprintf("/repos/%s/%s/collaborators", user, repo),
 		nil, nil, &collaborators)
 	return collaborators, err
 }

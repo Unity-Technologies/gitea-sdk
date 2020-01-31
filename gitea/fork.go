@@ -13,15 +13,13 @@ import (
 // ListForksOptions options for listing repository's forks
 type ListForksOptions struct {
 	ListOptions
-	User string
-	Repo string
 }
 
 // ListForks list a repository's forks
-func (c *Client) ListForks(options ListForksOptions) ([]*Repository, error) {
+func (c *Client) ListForks(user string, repo string, options ListForksOptions) ([]*Repository, error) {
 	forks := make([]*Repository, options.getPageSize())
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/forks?%s", options.User, options.Repo, options.getURLQuery().Encode()),
+		fmt.Sprintf("/repos/%s/%s/forks?%s", user, repo, options.getURLQuery().Encode()),
 		nil, nil, &forks)
 	return forks, err
 }

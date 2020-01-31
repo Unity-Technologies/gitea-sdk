@@ -36,13 +36,12 @@ type GPGKeyEmail struct {
 // ListGPGKeys options for listing a user's GPGKeys
 type ListGPGKeys struct {
 	ListOptions
-	User string
 }
 
 // ListGPGKeys list all the GPG keys of the user
-func (c *Client) ListGPGKeys(options ListGPGKeys) ([]*GPGKey, error) {
+func (c *Client) ListGPGKeys(user string, options ListGPGKeys) ([]*GPGKey, error) {
 	keys := make([]*GPGKey, 0, options.getPageSize())
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", options.User, options.getURLQuery().Encode()), nil, nil, &keys)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", user, options.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // ListMyGPGKeysOptions options for listing current's user GPGKeys

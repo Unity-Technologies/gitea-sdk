@@ -29,15 +29,13 @@ type AccessToken struct {
 // ListAccessTokens options for listing a users's access tokens
 type ListAccessTokens struct {
 	ListOptions
-	User string
-	Pass string
 }
 
 // ListAccessTokens lista all the access tokens of user
-func (c *Client) ListAccessTokens(options ListAccessTokens) ([]*AccessToken, error) {
+func (c *Client) ListAccessTokens(user, pass string, options ListAccessTokens) ([]*AccessToken, error) {
 	tokens := make([]*AccessToken, 0, options.getPageSize())
-	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", options.User, options.getURLQuery().Encode()),
-		http.Header{"Authorization": []string{"Basic " + BasicAuthEncode(options.User, options.Pass)}}, nil, &tokens)
+	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, options.getURLQuery().Encode()),
+		http.Header{"Authorization": []string{"Basic " + BasicAuthEncode(user, pass)}}, nil, &tokens)
 }
 
 // CreateAccessTokenOption options when create access token
