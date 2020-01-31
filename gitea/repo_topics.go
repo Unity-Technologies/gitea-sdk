@@ -10,8 +10,8 @@ import (
 	"fmt"
 )
 
-// ListRepoTopics options for listing repo's topics
-type ListRepoTopics struct {
+// ListRepoTopicsOptions options for listing repo's topics
+type ListRepoTopicsOptions struct {
 	ListOptions
 }
 
@@ -20,8 +20,10 @@ type TopicsList struct {
 	Topics []string `json:"topics"`
 }
 
-// ListRepoTopics list all repository's topics
-func (c *Client) ListRepoTopics(user, repo string, opt ListRepoTopics) (*TopicsList, error) {
+// ListRepoTopicsOptions list all repository's topics
+func (c *Client) ListRepoTopics(user, repo string, opt ListRepoTopicsOptions) (*TopicsList, error) {
+	opt.setDefaults()
+
 	var list TopicsList
 	return &list, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/topics?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &list)
 }

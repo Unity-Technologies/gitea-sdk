@@ -20,7 +20,7 @@ func (c *Client) ListCollaborators(user, repo string, opt ListCollaboratorsOptio
 	opt.setDefaults()
 	collaborators := make([]*User, 0, opt.PageSize)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/collaborators", user, repo),
+		fmt.Sprintf("/repos/%s/%s/collaborators?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &collaborators)
 	return collaborators, err
 }
