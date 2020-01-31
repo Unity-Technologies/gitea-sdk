@@ -32,10 +32,10 @@ type ListAccessTokens struct {
 }
 
 // ListAccessTokens lista all the access tokens of user
-func (c *Client) ListAccessTokens(user, pass string, options ListAccessTokens) ([]*AccessToken, error) {
-	options.setDefaults()
-	tokens := make([]*AccessToken, 0, options.PageSize)
-	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, options.getURLQuery().Encode()),
+func (c *Client) ListAccessTokens(user, pass string, opt ListAccessTokens) ([]*AccessToken, error) {
+	opt.setDefaults()
+	tokens := make([]*AccessToken, 0, opt.PageSize)
+	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, opt.getURLQuery().Encode()),
 		http.Header{"Authorization": []string{"Basic " + BasicAuthEncode(user, pass)}}, nil, &tokens)
 }
 

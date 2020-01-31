@@ -35,11 +35,11 @@ type ListReleasesOptions struct {
 }
 
 // ListReleases list releases of a repository
-func (c *Client) ListReleases(user, repo string, options ListReleasesOptions) ([]*Release, error) {
-	options.setDefaults()
-	releases := make([]*Release, 0, options.PageSize)
+func (c *Client) ListReleases(user, repo string, opt ListReleasesOptions) ([]*Release, error) {
+	opt.setDefaults()
+	releases := make([]*Release, 0, opt.PageSize)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases?%s", user, repo, options.getURLQuery().Encode()),
+		fmt.Sprintf("/repos/%s/%s/releases?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &releases)
 	return releases, err
 }

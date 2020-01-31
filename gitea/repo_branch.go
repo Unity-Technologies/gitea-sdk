@@ -55,10 +55,10 @@ type ListRepoBranchesOptions struct {
 }
 
 // ListRepoBranches list all the branches of one repository
-func (c *Client) ListRepoBranches(user, repo string, options ListRepoBranchesOptions) ([]*Branch, error) {
-	options.setDefaults()
-	branches := make([]*Branch, 0, options.PageSize)
-	return branches, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches?%s", user, repo, options.getURLQuery().Encode()), nil, nil, &branches)
+func (c *Client) ListRepoBranches(user, repo string, opt ListRepoBranchesOptions) ([]*Branch, error) {
+	opt.setDefaults()
+	branches := make([]*Branch, 0, opt.PageSize)
+	return branches, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &branches)
 }
 
 // GetRepoBranch get one branch's information of one repository

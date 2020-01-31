@@ -16,9 +16,9 @@ type ListCollaboratorsOptions struct {
 }
 
 // ListCollaborators list a repository's collaborators
-func (c *Client) ListCollaborators(user, repo string, options ListCollaboratorsOptions) ([]*User, error) {
-	options.setDefaults()
-	collaborators := make([]*User, 0, options.PageSize)
+func (c *Client) ListCollaborators(user, repo string, opt ListCollaboratorsOptions) ([]*User, error) {
+	opt.setDefaults()
+	collaborators := make([]*User, 0, opt.PageSize)
 	err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/collaborators", user, repo),
 		nil, nil, &collaborators)

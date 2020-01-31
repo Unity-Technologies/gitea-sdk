@@ -16,11 +16,11 @@ type ListForksOptions struct {
 }
 
 // ListForks list a repository's forks
-func (c *Client) ListForks(user string, repo string, options ListForksOptions) ([]*Repository, error) {
-	options.setDefaults()
-	forks := make([]*Repository, options.PageSize)
+func (c *Client) ListForks(user string, repo string, opt ListForksOptions) ([]*Repository, error) {
+	opt.setDefaults()
+	forks := make([]*Repository, opt.PageSize)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/forks?%s", user, repo, options.getURLQuery().Encode()),
+		fmt.Sprintf("/repos/%s/%s/forks?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &forks)
 	return forks, err
 }

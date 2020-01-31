@@ -30,11 +30,11 @@ type ListReleaseAttachmentsOptions struct {
 }
 
 // ListReleaseAttachments list release's attachments
-func (c *Client) ListReleaseAttachments(user, repo string, release int64, options ListReleaseAttachmentsOptions) ([]*Attachment, error) {
-	options.setDefaults()
-	attachments := make([]*Attachment, 0, options.PageSize)
+func (c *Client) ListReleaseAttachments(user, repo string, release int64, opt ListReleaseAttachmentsOptions) ([]*Attachment, error) {
+	opt.setDefaults()
+	attachments := make([]*Attachment, 0, opt.PageSize)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases/%d/assets?%s", user, repo, release, options.getURLQuery().Encode()),
+		fmt.Sprintf("/repos/%s/%s/releases/%d/assets?%s", user, repo, release, opt.getURLQuery().Encode()),
 		nil, nil, &attachments)
 	return attachments, err
 }

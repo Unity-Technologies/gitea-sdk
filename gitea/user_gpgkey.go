@@ -39,17 +39,17 @@ type ListGPGKeys struct {
 }
 
 // ListGPGKeys list all the GPG keys of the user
-func (c *Client) ListGPGKeys(user string, options ListGPGKeys) ([]*GPGKey, error) {
-	options.setDefaults()
-	keys := make([]*GPGKey, 0, options.PageSize)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", user, options.getURLQuery().Encode()), nil, nil, &keys)
+func (c *Client) ListGPGKeys(user string, opt ListGPGKeys) ([]*GPGKey, error) {
+	opt.setDefaults()
+	keys := make([]*GPGKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", user, opt.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // ListMyGPGKeys list all the GPG keys of current user
-func (c *Client) ListMyGPGKeys(options *ListGPGKeys) ([]*GPGKey, error) {
-	options.setDefaults()
-	keys := make([]*GPGKey, 0, options.PageSize)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", options.getURLQuery().Encode()), nil, nil, &keys)
+func (c *Client) ListMyGPGKeys(opt *ListGPGKeys) ([]*GPGKey, error) {
+	opt.setDefaults()
+	keys := make([]*GPGKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", opt.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // GetGPGKey get current user's GPG key by key id

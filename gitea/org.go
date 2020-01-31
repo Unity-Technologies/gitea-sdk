@@ -29,17 +29,17 @@ type ListOrgsOptions struct {
 }
 
 // ListMyOrgs list all of current user's organizations
-func (c *Client) ListMyOrgs(options ListOrgsOptions) ([]*Organization, error) {
-	options.setDefaults()
-	orgs := make([]*Organization, 0, options.PageSize)
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", options.getURLQuery().Encode()), nil, nil, &orgs)
+func (c *Client) ListMyOrgs(opt ListOrgsOptions) ([]*Organization, error) {
+	opt.setDefaults()
+	orgs := make([]*Organization, 0, opt.PageSize)
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", opt.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
 // ListUserOrgs list all of some user's organizations
-func (c *Client) ListUserOrgs(user string, options ListOrgsOptions) ([]*Organization, error) {
-	options.setDefaults()
-	orgs := make([]*Organization, 0, options.PageSize)
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", user, options.getURLQuery().Encode()), nil, nil, &orgs)
+func (c *Client) ListUserOrgs(user string, opt ListOrgsOptions) ([]*Organization, error) {
+	opt.setDefaults()
+	orgs := make([]*Organization, 0, opt.PageSize)
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", user, opt.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
 // GetOrg get one organization by name

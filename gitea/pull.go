@@ -83,12 +83,12 @@ func (opt *ListPullRequestsOptions) QueryEncode() string {
 }
 
 // ListRepoPullRequests list PRs of one repository
-func (c *Client) ListRepoPullRequests(owner, repo string, options ListPullRequestsOptions) ([]*PullRequest, error) {
-	options.setDefaults()
-	prs := make([]*PullRequest, 0, options.PageSize)
+func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
+	opt.setDefaults()
+	prs := make([]*PullRequest, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
-	link.RawQuery = options.QueryEncode()
+	link.RawQuery = opt.QueryEncode()
 	return prs, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &prs)
 }
 

@@ -26,10 +26,10 @@ type ListRepoLabelsOptions struct {
 }
 
 // ListRepoLabels list labels of one repository
-func (c *Client) ListRepoLabels(owner, repo string, options ListRepoLabelsOptions) ([]*Label, error) {
-	options.setDefaults()
-	labels := make([]*Label, 0, options.PageSize)
-	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels?%s", owner, repo, options.getURLQuery().Encode()), nil, nil, &labels)
+func (c *Client) ListRepoLabels(owner, repo string, opt ListRepoLabelsOptions) ([]*Label, error) {
+	opt.setDefaults()
+	labels := make([]*Label, 0, opt.PageSize)
+	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels?%s", owner, repo, opt.getURLQuery().Encode()), nil, nil, &labels)
 }
 
 // GetRepoLabel get one label of repository by repo it

@@ -70,10 +70,10 @@ type ListStatusesOptions struct {
 // ListStatuses returns all statuses for a given Commit
 //
 // GET /repos/:owner/:repo/commits/:ref/statuses
-func (c *Client) ListStatuses(owner, repo, sha string, options ListStatusesOptions) ([]*Status, error) {
-	options.setDefaults()
-	statuses := make([]*Status, 0, options.PageSize)
-	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, options.getURLQuery().Encode()), nil, nil, &statuses)
+func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOptions) ([]*Status, error) {
+	opt.setDefaults()
+	statuses := make([]*Status, 0, opt.PageSize)
+	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, opt.getURLQuery().Encode()), nil, nil, &statuses)
 }
 
 // CombinedStatus holds the combined state of several statuses for a single commit

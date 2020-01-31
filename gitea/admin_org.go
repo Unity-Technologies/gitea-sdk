@@ -17,10 +17,10 @@ type AdminListOrgsOptions struct {
 }
 
 // AdminListOrgs lists all orgs
-func (c *Client) AdminListOrgs(options AdminListOrgsOptions) ([]*Organization, error) {
-	options.setDefaults()
-	orgs := make([]*Organization, 0, options.PageSize)
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", options.getURLQuery().Encode()), nil, nil, &orgs)
+func (c *Client) AdminListOrgs(opt AdminListOrgsOptions) ([]*Organization, error) {
+	opt.setDefaults()
+	orgs := make([]*Organization, 0, opt.PageSize)
+	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", opt.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
 // AdminCreateOrg create an organization

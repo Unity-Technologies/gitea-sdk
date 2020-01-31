@@ -17,10 +17,10 @@ type AdminListUsersOptions struct {
 }
 
 // AdminListUsers lists all users
-func (c *Client) AdminListUsers(options AdminListUsersOptions) ([]*User, error) {
-	options.setDefaults()
-	users := make([]*User, 0, options.PageSize)
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/admin/users?%s", options.getURLQuery().Encode()), nil, nil, &users)
+func (c *Client) AdminListUsers(opt AdminListUsersOptions) ([]*User, error) {
+	opt.setDefaults()
+	users := make([]*User, 0, opt.PageSize)
+	return users, c.getParsedResponse("GET", fmt.Sprintf("/admin/users?%s", opt.getURLQuery().Encode()), nil, nil, &users)
 }
 
 // CreateUserOption create user options

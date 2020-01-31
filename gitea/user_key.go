@@ -30,17 +30,17 @@ type ListPublicKeysOptions struct {
 }
 
 // ListPublicKeys list all the public keys of the user
-func (c *Client) ListPublicKeys(user string, options ListPublicKeysOptions) ([]*PublicKey, error) {
-	options.setDefaults()
-	keys := make([]*PublicKey, 0, options.PageSize)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", user, options.getURLQuery().Encode()), nil, nil, &keys)
+func (c *Client) ListPublicKeys(user string, opt ListPublicKeysOptions) ([]*PublicKey, error) {
+	opt.setDefaults()
+	keys := make([]*PublicKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", user, opt.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // ListMyPublicKeys list all the public keys of current user
-func (c *Client) ListMyPublicKeys(options ListPublicKeysOptions) ([]*PublicKey, error) {
-	options.setDefaults()
-	keys := make([]*PublicKey, 0, options.PageSize)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/keys?%s", options.getURLQuery().Encode()), nil, nil, &keys)
+func (c *Client) ListMyPublicKeys(opt ListPublicKeysOptions) ([]*PublicKey, error) {
+	opt.setDefaults()
+	keys := make([]*PublicKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/keys?%s", opt.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // GetPublicKey get current user's public key by key id

@@ -23,10 +23,10 @@ type ListEmailsOptions struct {
 }
 
 // ListEmails all the email addresses of user
-func (c *Client) ListEmails(options ListEmailsOptions) ([]*Email, error) {
-	options.setDefaults()
-	emails := make([]*Email, 0, options.PageSize)
-	return emails, c.getParsedResponse("GET", fmt.Sprintf("/user/emails?%s", options.getURLQuery().Encode()), nil, nil, &emails)
+func (c *Client) ListEmails(opt ListEmailsOptions) ([]*Email, error) {
+	opt.setDefaults()
+	emails := make([]*Email, 0, opt.PageSize)
+	return emails, c.getParsedResponse("GET", fmt.Sprintf("/user/emails?%s", opt.getURLQuery().Encode()), nil, nil, &emails)
 }
 
 // CreateEmailOption options when creating email addresses
