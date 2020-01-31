@@ -24,25 +24,20 @@ type Hook struct {
 	Created time.Time         `json:"created_at"`
 }
 
-// ListOrgHooksOptions options for listing organization's hooks
-type ListOrgHooksOptions struct {
+// ListOrgHooksOptions options for listing hooks
+type ListHooksOptions struct {
 	ListOptions
 }
 
 // ListOrgHooks list all the hooks of one organization
-func (c *Client) ListOrgHooks(org string, options ListOrgHooksOptions) ([]*Hook, error) {
+func (c *Client) ListOrgHooks(org string, options ListHooksOptions) ([]*Hook, error) {
 	options.setDefaults()
 	hooks := make([]*Hook, 0, options.PageSize)
 	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/hooks?%s", org, options.getURLQuery().Encode()), nil, nil, &hooks)
 }
 
-// ListRepoHooksOptions options for listing repository's hooks
-type ListRepoHooksOptions struct {
-	ListOptions
-}
-
 // ListRepoHooks list all the hooks of one repository
-func (c *Client) ListRepoHooks(user, repo string, options ListRepoHooksOptions) ([]*Hook, error) {
+func (c *Client) ListRepoHooks(user, repo string, options ListHooksOptions) ([]*Hook, error) {
 	options.setDefaults()
 	hooks := make([]*Hook, 0, options.PageSize)
 	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks?%s", user, repo, options.getURLQuery().Encode()), nil, nil, &hooks)

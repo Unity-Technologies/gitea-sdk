@@ -23,25 +23,20 @@ type Organization struct {
 	Visibility  string `json:"visibility"`
 }
 
-// ListMyOrgsOptions options for listing current user's organizations
-type ListMyOrgsOptions struct {
+// ListOrgsOptions options for listing organizations
+type ListOrgsOptions struct {
 	ListOptions
 }
 
 // ListMyOrgs list all of current user's organizations
-func (c *Client) ListMyOrgs(options ListMyOrgsOptions) ([]*Organization, error) {
+func (c *Client) ListMyOrgs(options ListOrgsOptions) ([]*Organization, error) {
 	options.setDefaults()
 	orgs := make([]*Organization, 0, options.PageSize)
 	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", options.getURLQuery().Encode()), nil, nil, &orgs)
 }
 
-// ListUserOrgsOptions options for listing an user's organizations
-type ListUserOrgsOptions struct {
-	ListOptions
-}
-
 // ListUserOrgs list all of some user's organizations
-func (c *Client) ListUserOrgs(user string, options ListUserOrgsOptions) ([]*Organization, error) {
+func (c *Client) ListUserOrgs(user string, options ListOrgsOptions) ([]*Organization, error) {
 	options.setDefaults()
 	orgs := make([]*Organization, 0, options.PageSize)
 	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", user, options.getURLQuery().Encode()), nil, nil, &orgs)

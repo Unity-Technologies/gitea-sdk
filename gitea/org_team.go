@@ -22,25 +22,20 @@ type Team struct {
 	Units []string `json:"units"`
 }
 
-// ListOrgTeamsOptions options for listing organization's teams
-type ListOrgTeamsOptions struct {
+// ListTeamsOptions options for listing teams
+type ListTeamsOptions struct {
 	ListOptions
 }
 
 // ListOrgTeams lists all teams of an organization
-func (c *Client) ListOrgTeams(org string, options ListOrgTeamsOptions) ([]*Team, error) {
+func (c *Client) ListOrgTeams(org string, options ListTeamsOptions) ([]*Team, error) {
 	options.setDefaults()
 	teams := make([]*Team, 0, options.PageSize)
 	return teams, c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams?%s", org, options.getURLQuery().Encode()), nil, nil, &teams)
 }
 
-// ListMyTeamsOptions options for current's user teams
-type ListMyTeamsOptions struct {
-	ListOptions
-}
-
 // ListMyTeams lists all the teams of the current user
-func (c *Client) ListMyTeams(options *ListMyOrgsOptions) ([]*Team, error) {
+func (c *Client) ListMyTeams(options *ListTeamsOptions) ([]*Team, error) {
 	options.setDefaults()
 	teams := make([]*Team, 0, options.PageSize)
 	return teams, c.getParsedResponse("GET", fmt.Sprintf("/user/teams?%s", options.getURLQuery().Encode()), nil, nil, &teams)

@@ -46,9 +46,6 @@ type ListRepoIssueCommentsOptions struct {
 func (c *Client) ListRepoIssueComments(owner, repo string, options ListRepoIssueCommentsOptions) ([]*Comment, error) {
 	options.setDefaults()
 	comments := make([]*Comment, 0, options.PageSize)
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
-		return comments, err
-	}
 	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments?%s", owner, repo, options.getURLQuery().Encode()), nil, nil, &comments)
 }
 

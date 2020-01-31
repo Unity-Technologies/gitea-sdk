@@ -56,25 +56,20 @@ type Repository struct {
 	AvatarURL                 string      `json:"avatar_url"`
 }
 
-// ListMyReposOptions options for listing current's user repositories
-type ListMyReposOptions struct {
+// ListReposOptions options for listing repositories
+type ListReposOptions struct {
 	ListOptions
 }
 
 // ListMyRepos lists all repositories for the authenticated user that has access to.
-func (c *Client) ListMyRepos(options *ListMyReposOptions) ([]*Repository, error) {
+func (c *Client) ListMyRepos(options *ListReposOptions) ([]*Repository, error) {
 	options.setDefaults()
 	repos := make([]*Repository, 0, options.PageSize)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/repos?%s", options.getURLQuery().Encode()), nil, nil, &repos)
 }
 
-// ListUserReposOptions options for listing a user's repositories
-type ListUserReposOptions struct {
-	ListOptions
-}
-
 // ListUserRepos list all repositories of one user by user's name
-func (c *Client) ListUserRepos(user string, options ListUserReposOptions) ([]*Repository, error) {
+func (c *Client) ListUserRepos(user string, options ListReposOptions) ([]*Repository, error) {
 	options.setDefaults()
 	repos := make([]*Repository, 0, options.PageSize)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", user, options.getURLQuery().Encode()), nil, nil, &repos)

@@ -59,7 +59,7 @@ type PullRequest struct {
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	ListOptions `json:"-"`
+	ListOptions
 	// open, closed, all
 	State string `json:"state"`
 	// oldest, recentupdate, leastupdate, mostcomment, leastcomment, priority

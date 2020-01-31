@@ -36,13 +36,8 @@ func (c *Client) ListPublicKeys(user string, options ListPublicKeysOptions) ([]*
 	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", user, options.getURLQuery().Encode()), nil, nil, &keys)
 }
 
-// ListMyPublicKeysOptions options for listing current's user PublicKeys
-type ListMyPublicKeysOptions struct {
-	ListOptions
-}
-
 // ListMyPublicKeys list all the public keys of current user
-func (c *Client) ListMyPublicKeys(options ListMyPublicKeysOptions) ([]*PublicKey, error) {
+func (c *Client) ListMyPublicKeys(options ListPublicKeysOptions) ([]*PublicKey, error) {
 	options.setDefaults()
 	keys := make([]*PublicKey, 0, options.PageSize)
 	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/keys?%s", options.getURLQuery().Encode()), nil, nil, &keys)

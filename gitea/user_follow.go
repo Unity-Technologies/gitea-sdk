@@ -6,21 +6,16 @@ package gitea
 
 import "fmt"
 
-// ListMyFollowersOptions options for listing current's user's followers
-type ListMyFollowersOptions struct {
+// ListFollowersOptions options for listing followers
+type ListFollowersOptions struct {
 	ListOptions
 }
 
 // ListMyFollowers list all the followers of current user
-func (c *Client) ListMyFollowers(options *ListMyFollowersOptions) ([]*User, error) {
+func (c *Client) ListMyFollowers(options *ListFollowersOptions) ([]*User, error) {
 	options.setDefaults()
 	users := make([]*User, 0, options.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/followers?%s", options.getURLQuery().Encode()), nil, nil, &users)
-}
-
-// ListFollowersOptions options for listing a user's followers
-type ListFollowersOptions struct {
-	ListOptions
 }
 
 // ListFollowers list all the followers of one user
@@ -30,21 +25,16 @@ func (c *Client) ListFollowers(user string, options ListFollowersOptions) ([]*Us
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/followers?%s", user, options.getURLQuery().Encode()), nil, nil, &users)
 }
 
-// ListMyFollowingOptions options for listing current's user's users being followed
-type ListMyFollowingOptions struct {
+// ListFollowingOptions options for listing a user's users being followed
+type ListFollowingOptions struct {
 	ListOptions
 }
 
 // ListMyFollowing list all the users current user followed
-func (c *Client) ListMyFollowing(options ListMyFollowingOptions) ([]*User, error) {
+func (c *Client) ListMyFollowing(options ListFollowingOptions) ([]*User, error) {
 	options.setDefaults()
 	users := make([]*User, 0, options.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/following?%s", options.getURLQuery().Encode()), nil, nil, &users)
-}
-
-// ListFollowingOptions options for listing a user's users being followed
-type ListFollowingOptions struct {
-	ListOptions
 }
 
 // ListFollowing list all the users the user followed
