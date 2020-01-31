@@ -77,7 +77,6 @@ func (c *Client) ListOrgRepos(org string) ([]*Repository, error) {
 
 // SearchRepoOptions options for searching repositories
 type SearchRepoOptions struct {
-	// https://try.gitea.io/api/swagger#/repository/repoSearch
 	Keyword         string
 	Topic           bool
 	IncludeDesc     bool
