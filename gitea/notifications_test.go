@@ -6,9 +6,10 @@ package gitea
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNotifications(t *testing.T) {
@@ -28,7 +29,7 @@ func TestNotifications(t *testing.T) {
 	c.sudo = user2.UserName
 	repoB, err := createTestRepo(t, "TestNotifications_B", c)
 	assert.NoError(t, err)
-	_, err = c.WatchRepo(user2.UserName, "password02", user1.UserName, repoA.Name)
+	err = c.WatchRepo(user1.UserName, repoA.Name)
 	c.sudo = ""
 	assert.NoError(t, err)
 
