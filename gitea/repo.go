@@ -90,6 +90,7 @@ func (c *Client) ListOrgRepos(org string, opt ListOrgReposOptions) ([]*Repositor
 
 // SearchRepoOptions options for searching repositories
 type SearchRepoOptions struct {
+	ListOptions
 	Keyword         string
 	Topic           bool
 	IncludeDesc     bool
@@ -105,7 +106,7 @@ type SearchRepoOptions struct {
 
 // QueryEncode turns options into querystring argument
 func (opt *SearchRepoOptions) QueryEncode() string {
-	query := make(url.Values)
+	query := opt.getURLQuery()
 	if opt.Keyword != "" {
 		query.Add("q", opt.Keyword)
 	}
@@ -147,6 +148,7 @@ type searchRepoResponse struct {
 
 // SearchRepos searches for repositories matching the given filters
 func (c *Client) SearchRepos(opt SearchRepoOptions) ([]*Repository, error) {
+	opt.setDefaults()
 	resp := new(searchRepoResponse)
 
 	link, _ := url.Parse("/repos/search")
