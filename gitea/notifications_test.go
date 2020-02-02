@@ -76,7 +76,7 @@ func TestNotifications(t *testing.T) {
 	assert.NoError(t, err)
 
 	// GetThread
-	n, err := c.GetThread(nList[0].ID)
+	n, err := c.GetNotification(nList[0].ID)
 	assert.NoError(t, err)
 	assert.EqualValues(t, false, n.Unread)
 	assert.EqualValues(t, "A Issue", n.Subject.Title)
@@ -97,6 +97,6 @@ func TestNotifications(t *testing.T) {
 	nList, err = c.ListNotifications(ListNotificationOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 1)
-	err = c.ReadThread(nList[0].ID)
+	err = c.ReadNotification(nList[0].ID)
 	assert.NoError(t, err)
 }
