@@ -46,6 +46,30 @@ func TestUserApp(t *testing.T) {
 	assert.Len(t, result, 1)
 }
 
+func TestUserSearch(t *testing.T) {
+	log.Println("== TestUserSearch ==")
+	c := newTestClient()
+
+	createTestUser(t, "tu1", c)
+	createTestUser(t, "eatIt_2", c)
+	createTestUser(t, "thirdIs3", c)
+	createTestUser(t, "advancedUser", c)
+	createTestUser(t, "1n2n3n", c)
+	createTestUser(t, "otherIt", c)
+
+	ul, err := c.SearchUsers(SearchUsersOption{KeyWord: "other"})
+	assert.NoError(t, err)
+	assert.Len(t, ul, 1)
+
+	ul, err = c.SearchUsers(SearchUsersOption{KeyWord: "notInTESTcase"})
+	assert.NoError(t, err)
+	assert.Len(t, ul, 0)
+
+	ul, err = c.SearchUsers(SearchUsersOption{KeyWord: "It"})
+	assert.NoError(t, err)
+	assert.Len(t, ul, 2)
+}
+
 func createTestUser(t *testing.T, username string, client *Client) *User {
 	bFalse := false
 	user, _ := client.GetUserInfo(username)
