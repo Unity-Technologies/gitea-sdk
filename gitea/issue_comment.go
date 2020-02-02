@@ -37,13 +37,8 @@ func (c *Client) ListIssueComments(owner, repo string, index int64, opt ListIssu
 	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments?%s", owner, repo, index, opt.getURLQuery().Encode()), nil, nil, &comments)
 }
 
-// ListRepoIssueCommentsOptions options for listing repository's issue's comments
-type ListRepoIssueCommentsOptions struct {
-	ListOptions
-}
-
 // ListRepoIssueComments list comments for a given repo.
-func (c *Client) ListRepoIssueComments(owner, repo string, opt ListRepoIssueCommentsOptions) ([]*Comment, error) {
+func (c *Client) ListRepoIssueComments(owner, repo string, opt ListIssueCommentsOptions) ([]*Comment, error) {
 	opt.setDefaults()
 	comments := make([]*Comment, 0, opt.PageSize)
 	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments?%s", owner, repo, opt.getURLQuery().Encode()), nil, nil, &comments)
