@@ -19,10 +19,9 @@ type ListForksOptions struct {
 func (c *Client) ListForks(user string, repo string, opt ListForksOptions) ([]*Repository, error) {
 	opt.setDefaults()
 	forks := make([]*Repository, opt.PageSize)
-	err := c.getParsedResponse("GET",
+	return forks, c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/forks?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &forks)
-	return forks, err
 }
 
 // CreateForkOption options for creating a fork
@@ -38,8 +37,5 @@ func (c *Client) CreateFork(user, repo string, form CreateForkOption) (*Reposito
 		return nil, err
 	}
 	fork := new(Repository)
-	err = c.getParsedResponse("POST",
-		fmt.Sprintf("/repos/%s/%s/forks", user, repo),
-		jsonHeader, bytes.NewReader(body), &fork)
-	return fork, err
+	return fork, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/forks", user, repo), jsonHeader, bytes.NewReader(body), &fork)
 }

@@ -19,17 +19,14 @@ type ListCollaboratorsOptions struct {
 func (c *Client) ListCollaborators(user, repo string, opt ListCollaboratorsOptions) ([]*User, error) {
 	opt.setDefaults()
 	collaborators := make([]*User, 0, opt.PageSize)
-	err := c.getParsedResponse("GET",
+	return collaborators, c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/collaborators?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &collaborators)
-	return collaborators, err
 }
 
 // IsCollaborator check if a user is a collaborator of a repository
 func (c *Client) IsCollaborator(user, repo, collaborator string) (bool, error) {
-	status, err := c.getStatusCode("GET",
-		fmt.Sprintf("/repos/%s/%s/collaborators/%s", user, repo, collaborator),
-		nil, nil)
+	status, err := c.getStatusCode("GET", fmt.Sprintf("/repos/%s/%s/collaborators/%s", user, repo, collaborator), nil, nil)
 	if err != nil {
 		return false, err
 	}
@@ -57,7 +54,6 @@ func (c *Client) AddCollaborator(user, repo, collaborator string, opt AddCollabo
 // DeleteCollaborator remove a collaborator from a repository
 func (c *Client) DeleteCollaborator(user, repo, collaborator string) error {
 	_, err := c.getResponse("DELETE",
-		fmt.Sprintf("/repos/%s/%s/collaborators/%s", user, repo, collaborator),
-		nil, nil)
+		fmt.Sprintf("/repos/%s/%s/collaborators/%s", user, repo, collaborator), nil, nil)
 	return err
 }
