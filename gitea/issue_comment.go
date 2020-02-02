@@ -60,6 +60,15 @@ func (c *Client) ListRepoIssueComments(owner, repo string, opt ListIssueCommentO
 	return comments, c.getParsedResponse("GET", link.String(), nil, nil, &comments)
 }
 
+// GetIssueComment get a comment for a given repo by id.
+func (c *Client) GetIssueComment(owner, repo string, id int64) (*Comment, error) {
+	comment := new(Comment)
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return comment, err
+	}
+	return comment, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, id), nil, nil, &comment)
+}
+
 // CreateIssueCommentOption options for creating a comment on an issue
 type CreateIssueCommentOption struct {
 	Body string `json:"body"`
