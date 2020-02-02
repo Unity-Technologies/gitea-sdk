@@ -51,7 +51,7 @@ func TestIssueComment(t *testing.T) {
 	assert.NoError(t, c.AdminDeleteUser(tUser3.UserName))
 
 	// ListRepoIssueComments
-	comments, err := c.ListRepoIssueComments(user.UserName, repo.Name, ListRepoIssueCommentsOptions{})
+	comments, err := c.ListRepoIssueComments(user.UserName, repo.Name, ListIssueCommentsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, comments, 7)
 
