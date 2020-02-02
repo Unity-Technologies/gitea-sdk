@@ -70,6 +70,67 @@ func TestUserSearch(t *testing.T) {
 	assert.Len(t, ul, 2)
 }
 
+func TestUserFollow(t *testing.T) {
+	log.Println("== TestUserFollow ==")
+	c := newTestClient()
+	me, _ := c.GetMyUserInfo()
+
+	uA := "uFollow_A"
+	uB := "uFollow_B"
+	uC := "uFollow_C"
+	createTestUser(t, uA, c)
+	createTestUser(t, uB, c)
+	createTestUser(t, uC, c)
+
+	// A follow ME
+	// B follow C & ME
+	// C follow A & B & ME
+	c.sudo = uA
+	err := c.Follow(me.UserName)
+	assert.NoError(t, err)
+	c.sudo = uB
+	err = c.Follow(me.UserName)
+	assert.NoError(t, err)
+	err = c.Follow(uC)
+	assert.NoError(t, err)
+	c.sudo = uC
+	err = c.Follow(me.UserName)
+	assert.NoError(t, err)
+	err = c.Follow(uA)
+	assert.NoError(t, err)
+	err = c.Follow(uB)
+	assert.NoError(t, err)
+
+	// C unfollow me
+	err = c.Unfollow(me.UserName)
+	assert.NoError(t, err)
+
+	// ListMyFollowers of me
+	c.sudo = ""
+	f, err := c.ListMyFollowers(1)
+	assert.NoError(t, err)
+	assert.Len(t, f, 2)
+
+	// ListFollowers of A
+	f, err = c.ListFollowers(uA, 1)
+	assert.NoError(t, err)
+	assert.Len(t, f, 1)
+
+	// ListMyFollowing of me
+	f, err = c.ListMyFollowing(1)
+	assert.NoError(t, err)
+	assert.Len(t, f, 0)
+
+	// ListFollowing of A
+	f, err = c.ListFollowing(uA, 1)
+	assert.NoError(t, err)
+	assert.Len(t, f, 1)
+	assert.EqualValues(t, me.ID, f[0].ID)
+
+	assert.False(t, c.IsFollowing(uA))
+	assert.True(t, c.IsUserFollowing(uB, uC))
+}
+
 func createTestUser(t *testing.T, username string, client *Client) *User {
 	bFalse := false
 	user, _ := client.GetUserInfo(username)
