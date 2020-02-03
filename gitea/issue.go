@@ -19,6 +19,14 @@ type PullRequestMeta struct {
 	Merged    *time.Time `json:"merged_at"`
 }
 
+// RepositoryMeta basic repository information
+type RepositoryMeta struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Owner    string `json:"owner"`
+	FullName string `json:"full_name"`
+}
+
 // Issue represents an issue in a repository
 type Issue struct {
 	ID               int64      `json:"id"`
@@ -41,7 +49,7 @@ type Issue struct {
 	Closed      *time.Time       `json:"closed_at"`
 	Deadline    *time.Time       `json:"due_date"`
 	PullRequest *PullRequestMeta `json:"pull_request"`
-	Repository  *Repository      `json:"repository"`
+	Repository  *RepositoryMeta  `json:"repository"`
 }
 
 // ListIssueOption list issue options
