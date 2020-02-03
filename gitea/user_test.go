@@ -131,6 +131,44 @@ func TestUserFollow(t *testing.T) {
 	assert.True(t, c.IsUserFollowing(uB, uC))
 }
 
+func TestUserEmail(t *testing.T) {
+	log.Println("== TestUserEmail ==")
+	c := newTestClient()
+	userN := "TestUserEmail"
+	createTestUser(t, userN, c)
+	c.sudo = userN
+
+	// ListEmails
+	el, err := c.ListEmails()
+	assert.NoError(t, err)
+	assert.Len(t, el, 1)
+	assert.EqualValues(t, "testuseremail@gitea.io", el[0].Email)
+	assert.True(t, el[0].Primary)
+
+	// AddEmail
+	mails := []string{"wow@mail.send", "speed@mail.me"}
+	el, err = c.AddEmail(CreateEmailOption{Emails: mails})
+	assert.NoError(t, err)
+	assert.Len(t, el, 2)
+	_, err = c.AddEmail(CreateEmailOption{Emails: []string{mails[1]}})
+	assert.Error(t, err)
+	el, err = c.ListEmails()
+	assert.NoError(t, err)
+	assert.Len(t, el, 3)
+
+	// DeleteEmail
+	err = c.DeleteEmail(DeleteEmailOption{Emails: []string{mails[1]}})
+	assert.NoError(t, err)
+	err = c.DeleteEmail(DeleteEmailOption{Emails: []string{"imaginary@e.de"}})
+	assert.Error(t, err)
+
+	el, err = c.ListEmails()
+	assert.NoError(t, err)
+	assert.Len(t, el, 2)
+	err = c.DeleteEmail(DeleteEmailOption{Emails: []string{mails[0]}})
+	assert.NoError(t, err)
+}
+
 func createTestUser(t *testing.T, username string, client *Client) *User {
 	bFalse := false
 	user, _ := client.GetUserInfo(username)
