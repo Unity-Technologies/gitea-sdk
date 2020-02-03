@@ -41,6 +41,7 @@ type Issue struct {
 	Closed      *time.Time       `json:"closed_at"`
 	Deadline    *time.Time       `json:"due_date"`
 	PullRequest *PullRequestMeta `json:"pull_request"`
+	Repository  *Repository      `json:"repository"`
 }
 
 // ListIssueOption list issue options
@@ -91,27 +92,6 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
 	issues := make([]*Issue, 0, 10)
 	link.RawQuery = opt.QueryEncode()
 	return issues, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
-}
-
-// ListUserIssues returns all issues assigned to the authenticated user
-func (c *Client) ListUserIssues(opt ListIssueOption) ([]*Issue, error) {
-	// WARNING: "/user/issues" API is not implemented jet!
-	allIssues, err := c.ListIssues(opt)
-	if err != nil {
-		return nil, err
-	}
-	user, err := c.GetMyUserInfo()
-	if err != nil {
-		return nil, err
-	}
-	// Workaround: client sort out non user related issues
-	issues := make([]*Issue, 0, 10)
-	for _, i := range allIssues {
-		if i.ID == user.ID {
-			issues = append(issues, i)
-		}
-	}
-	return issues, nil
 }
 
 // ListRepoIssues returns all issues for a given repository
