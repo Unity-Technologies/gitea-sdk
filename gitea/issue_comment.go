@@ -47,6 +47,7 @@ func (opt *ListIssueCommentOptions) QueryEncode() string {
 
 // ListIssueComments list comments on an issue.
 func (c *Client) ListIssueComments(owner, repo string, index int64, opt ListIssueCommentOptions) ([]*Comment, error) {
+	opt.setDefaults()
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index))
 	link.RawQuery = opt.QueryEncode()
 	comments := make([]*Comment, 0, opt.PageSize)
@@ -55,6 +56,7 @@ func (c *Client) ListIssueComments(owner, repo string, index int64, opt ListIssu
 
 // ListRepoIssueComments list comments for a given repo.
 func (c *Client) ListRepoIssueComments(owner, repo string, opt ListIssueCommentOptions) ([]*Comment, error) {
+	opt.setDefaults()
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/comments", owner, repo))
 	link.RawQuery = opt.QueryEncode()
 	comments := make([]*Comment, 0, opt.PageSize)
