@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -25,23 +26,39 @@ type Comment struct {
 	Updated          time.Time `json:"updated_at"`
 }
 
-// ListIssueCommentsOptions options for listing issue's comments
-type ListIssueCommentsOptions struct {
+// ListIssueCommentOptions list comment options
+type ListIssueCommentOptions struct {
 	ListOptions
+	Since  time.Time
+	Before time.Time
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListIssueCommentOptions) QueryEncode() string {
+	query := opt.getURLQuery()
+	if !opt.Since.IsZero() {
+		query.Add("since", opt.Since.Format(time.RFC3339))
+	}
+	if !opt.Before.IsZero() {
+		query.Add("before", opt.Before.Format(time.RFC3339))
+	}
+	return query.Encode()
 }
 
 // ListIssueComments list comments on an issue.
-func (c *Client) ListIssueComments(owner, repo string, index int64, opt ListIssueCommentsOptions) ([]*Comment, error) {
-	opt.setDefaults()
+func (c *Client) ListIssueComments(owner, repo string, index int64, opt ListIssueCommentOptions) ([]*Comment, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index))
+	link.RawQuery = opt.QueryEncode()
 	comments := make([]*Comment, 0, opt.PageSize)
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments?%s", owner, repo, index, opt.getURLQuery().Encode()), nil, nil, &comments)
+	return comments, c.getParsedResponse("GET", link.String(), nil, nil, &comments)
 }
 
 // ListRepoIssueComments list comments for a given repo.
-func (c *Client) ListRepoIssueComments(owner, repo string, opt ListIssueCommentsOptions) ([]*Comment, error) {
-	opt.setDefaults()
+func (c *Client) ListRepoIssueComments(owner, repo string, opt ListIssueCommentOptions) ([]*Comment, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/comments", owner, repo))
+	link.RawQuery = opt.QueryEncode()
 	comments := make([]*Comment, 0, opt.PageSize)
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments?%s", owner, repo, opt.getURLQuery().Encode()), nil, nil, &comments)
+	return comments, c.getParsedResponse("GET", link.String(), nil, nil, &comments)
 }
 
 // GetIssueComment get a comment for a given repo by id.
