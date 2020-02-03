@@ -31,5 +31,5 @@ func TestRepoTransfer(t *testing.T) {
 
 	assert.NoError(t, c.DeleteRepo(repo.Owner.UserName, repo.Name))
 	assert.NoError(t, c.DeleteRepo(newRepo.Owner.UserName, newRepo.Name))
-	assert.NoError(t, c.AdminDeleteUser(org.UserName))
+	assert.NoError(t, c.DeleteOrg(org.UserName))
 }
