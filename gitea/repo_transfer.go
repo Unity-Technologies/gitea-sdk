@@ -20,6 +20,9 @@ type TransferRepoOption struct {
 
 // TransferRepo transfers the ownership of a repository
 func (c *Client) TransferRepo(owner, reponame string, opt TransferRepoOption) (*Repository, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, err
+	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
