@@ -12,7 +12,7 @@ type ListFollowersOptions struct {
 }
 
 // ListMyFollowers list all the followers of current user
-func (c *Client) ListMyFollowers(opt *ListFollowersOptions) ([]*User, error) {
+func (c *Client) ListMyFollowers(opt ListFollowersOptions) ([]*User, error) {
 	opt.setDefaults()
 	users := make([]*User, 0, opt.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/followers?%s", opt.getURLQuery().Encode()), nil, nil, &users)
@@ -38,7 +38,7 @@ func (c *Client) ListMyFollowing(opt ListFollowingOptions) ([]*User, error) {
 }
 
 // ListFollowing list all the users the user followed
-func (c *Client) ListFollowing(user string, opt *ListFollowingOptions) ([]*User, error) {
+func (c *Client) ListFollowing(user string, opt ListFollowingOptions) ([]*User, error) {
 	opt.setDefaults()
 	users := make([]*User, 0, opt.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/following?%s", user, opt.getURLQuery().Encode()), nil, nil, &users)

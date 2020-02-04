@@ -60,8 +60,7 @@ type PullRequest struct {
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
 	ListOptions
-	// open, closed, all
-	State string
+	State StateType `json:"state"`
 	// oldest, recentupdate, leastupdate, mostcomment, leastcomment, priority
 	Sort      string
 	Milestone int64
@@ -70,8 +69,8 @@ type ListPullRequestsOptions struct {
 // QueryEncode turns options into querystring argument
 func (opt *ListPullRequestsOptions) QueryEncode() string {
 	query := opt.getURLQuery()
-	if opt.State != "" {
-		query.Add("state", opt.State)
+	if len(opt.State) > 0 {
+		query.Add("state", string(opt.State))
 	}
 	if len(opt.Sort) > 0 {
 		query.Add("sort", opt.Sort)
@@ -130,7 +129,7 @@ type EditPullRequestOption struct {
 	Assignees []string   `json:"assignees"`
 	Milestone int64      `json:"milestone"`
 	Labels    []int64    `json:"labels"`
-	State     *string    `json:"state"`
+	State     *StateType `json:"state"`
 	Deadline  *time.Time `json:"due_date"`
 }
 

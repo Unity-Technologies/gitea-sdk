@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -17,6 +18,14 @@ import (
 type PullRequestMeta struct {
 	HasMerged bool       `json:"merged"`
 	Merged    *time.Time `json:"merged_at"`
+}
+
+// RepositoryMeta basic repository information
+type RepositoryMeta struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Owner    string `json:"owner"`
+	FullName string `json:"full_name"`
 }
 
 // Issue represents an issue in a repository
@@ -41,23 +50,34 @@ type Issue struct {
 	Closed      *time.Time       `json:"closed_at"`
 	Deadline    *time.Time       `json:"due_date"`
 	PullRequest *PullRequestMeta `json:"pull_request"`
-	Repository  *Repository      `json:"repository"`
+	Repository  *RepositoryMeta  `json:"repository"`
 }
 
 // ListIssueOption list issue options
 type ListIssueOption struct {
 	ListOptions
-	// open, closed, all
-	State   string
+	State   StateType
 	Labels  []string
 	KeyWord string
 }
+
+// StateType issue state type
+type StateType string
+
+const (
+	// StateOpen pr is opend
+	StateOpen StateType = "open"
+	// StateClosed pr is closed
+	StateClosed StateType = "closed"
+	// StateAll is all
+	StateAll StateType = "all"
+)
 
 // QueryEncode turns options into querystring argument
 func (opt *ListIssueOption) QueryEncode() string {
 	query := opt.getURLQuery()
 	if len(opt.State) > 0 {
-		query.Add("state", opt.State)
+		query.Add("state", string(opt.State))
 	}
 	if len(opt.Labels) > 0 {
 		var lq string
@@ -83,7 +103,15 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
 
 	link, _ := url.Parse("/repos/issues/search")
 	link.RawQuery = opt.QueryEncode()
-	return issues, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
+	err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
+		for i := 0; i < len(issues); i++ {
+			if issues[i].Repository != nil {
+				issues[i].Repository.Owner = strings.Split(issues[i].Repository.FullName, "/")[0]
+			}
+		}
+	}
+	return issues, err
 }
 
 // ListRepoIssues returns all issues for a given repository
@@ -93,13 +121,25 @@ func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Iss
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
 	link.RawQuery = opt.QueryEncode()
-	return issues, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
+	err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
+		for i := 0; i < len(issues); i++ {
+			if issues[i].Repository != nil {
+				issues[i].Repository.Owner = strings.Split(issues[i].Repository.FullName, "/")[0]
+			}
+		}
+	}
+	return issues, err
 }
 
 // GetIssue returns a single issue for a given repository
 func (c *Client) GetIssue(owner, repo string, index int64) (*Issue, error) {
 	issue := new(Issue)
-	return issue, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index), nil, nil, issue)
+	err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index), nil, nil, issue)
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil && issue.Repository != nil {
+		issue.Repository.Owner = strings.Split(issue.Repository.FullName, "/")[0]
+	}
+	return issue, err
 }
 
 // CreateIssueOption options to create one issue
@@ -135,7 +175,7 @@ type EditIssueOption struct {
 	Assignee  *string    `json:"assignee"`
 	Assignees []string   `json:"assignees"`
 	Milestone *int64     `json:"milestone"`
-	State     *string    `json:"state"`
+	State     *StateType `json:"state"`
 	Deadline  *time.Time `json:"due_date"`
 }
 
