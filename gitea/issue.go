@@ -108,8 +108,7 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
 	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
 		for i := 0; i < len(issues); i++ {
 			if issues[i].Repository != nil {
-				r := strings.Split(issues[i].Repository.FullName, "/")
-				issues[i].Repository.Owner = r[0]
+				issues[i].Repository.Owner = strings.Split(issues[i].Repository.FullName, "/")[0]
 			}
 		}
 	}
@@ -125,8 +124,7 @@ func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Iss
 	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
 		for i := 0; i < len(issues); i++ {
 			if issues[i].Repository != nil {
-				r := strings.Split(issues[i].Repository.FullName, "/")
-				issues[i].Repository.Owner = r[0]
+				issues[i].Repository.Owner = strings.Split(issues[i].Repository.FullName, "/")[0]
 			}
 		}
 	}
@@ -138,8 +136,7 @@ func (c *Client) GetIssue(owner, repo string, index int64) (*Issue, error) {
 	issue := new(Issue)
 	err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index), nil, nil, issue)
 	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil && issue.Repository != nil {
-		r := strings.Split(issue.Repository.FullName, "/")
-		issue.Repository.Owner = r[0]
+		issue.Repository.Owner = strings.Split(issue.Repository.FullName, "/")[0]
 	}
 	return issue, err
 }
