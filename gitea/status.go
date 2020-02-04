@@ -59,13 +59,13 @@ func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) 
 	return status, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/statuses/%s", owner, repo, sha), jsonHeader, bytes.NewReader(body), status)
 }
 
-// ListStatusesOptions options for listing a repository's commit's statuses
-type ListStatusesOptions struct {
+// ListStatusesOption options for listing a repository's commit's statuses
+type ListStatusesOption struct {
 	ListOptions
 }
 
 // ListStatuses returns all statuses for a given Commit
-func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOptions) ([]*Status, error) {
+func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOption) ([]*Status, error) {
 	opt.setDefaults()
 	statuses := make([]*Status, 0, opt.PageSize)
 	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, opt.getURLQuery().Encode()), nil, nil, &statuses)
