@@ -31,11 +31,11 @@ type ListAccessTokensOptions struct {
 	ListOptions
 }
 
-// ListAccessTokensOptions lists all the access tokens of user
-func (c *Client) ListAccessTokens(user, pass string, opt ListAccessTokensOptions) ([]*AccessToken, error) {
-	opt.setDefaults()
-	tokens := make([]*AccessToken, 0, opt.PageSize)
-	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, opt.getURLQuery().Encode()),
+// ListAccessTokens lists all the access tokens of user
+func (c *Client) ListAccessTokens(user, pass string, opts ListAccessTokensOptions) ([]*AccessToken, error) {
+	opts.setDefaults()
+	tokens := make([]*AccessToken, 0, opts.PageSize)
+	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, opts.getURLQuery().Encode()),
 		http.Header{"Authorization": []string{"Basic " + basicAuthEncode(user, pass)}}, nil, &tokens)
 }
 
