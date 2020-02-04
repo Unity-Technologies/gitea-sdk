@@ -63,7 +63,7 @@ type ListReposOptions struct {
 }
 
 // ListMyRepos lists all repositories for the authenticated user that has access to.
-func (c *Client) ListMyRepos(opt *ListReposOptions) ([]*Repository, error) {
+func (c *Client) ListMyRepos(opt ListReposOptions) ([]*Repository, error) {
 	opt.setDefaults()
 	repos := make([]*Repository, 0, opt.PageSize)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/repos?%s", opt.getURLQuery().Encode()), nil, nil, &repos)
