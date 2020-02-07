@@ -24,3 +24,9 @@ _testmain.go
 *.prof
 
 coverage.out
+
+# JetBrains
+.idea
+
+#integrations
+test

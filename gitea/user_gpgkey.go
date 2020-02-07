@@ -23,44 +23,46 @@ type GPGKey struct {
 	CanEncryptComms   bool           `json:"can_encrypt_comms"`
 	CanEncryptStorage bool           `json:"can_encrypt_storage"`
 	CanCertify        bool           `json:"can_certify"`
-	// swagger:strfmt date-time
-	Created time.Time `json:"created_at,omitempty"`
-	// swagger:strfmt date-time
-	Expires time.Time `json:"expires_at,omitempty"`
+	Created           time.Time      `json:"created_at,omitempty"`
+	Expires           time.Time      `json:"expires_at,omitempty"`
 }
 
 // GPGKeyEmail an email attached to a GPGKey
-// swagger:model GPGKeyEmail
 type GPGKeyEmail struct {
 	Email    string `json:"email"`
 	Verified bool   `json:"verified"`
 }
 
-// CreateGPGKeyOption options create user GPG key
-type CreateGPGKeyOption struct {
-	// An armored GPG key to add
-	//
-	// required: true
-	// unique: true
-	ArmoredKey string `json:"armored_public_key" binding:"Required"`
+// ListGPGKeysOptions options for listing a user's GPGKeys
+type ListGPGKeysOptions struct {
+	ListOptions
 }
 
 // ListGPGKeys list all the GPG keys of the user
-func (c *Client) ListGPGKeys(user string) ([]*GPGKey, error) {
-	keys := make([]*GPGKey, 0, 10)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys", user), nil, nil, &keys)
+func (c *Client) ListGPGKeys(user string, opt ListGPGKeysOptions) ([]*GPGKey, error) {
+	opt.setDefaults()
+	keys := make([]*GPGKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", user, opt.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // ListMyGPGKeys list all the GPG keys of current user
-func (c *Client) ListMyGPGKeys() ([]*GPGKey, error) {
-	keys := make([]*GPGKey, 0, 10)
-	return keys, c.getParsedResponse("GET", "/user/gpg_keys", nil, nil, &keys)
+func (c *Client) ListMyGPGKeys(opt *ListGPGKeysOptions) ([]*GPGKey, error) {
+	opt.setDefaults()
+	keys := make([]*GPGKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", opt.getURLQuery().Encode()), nil, nil, &keys)
 }
 
 // GetGPGKey get current user's GPG key by key id
 func (c *Client) GetGPGKey(keyID int64) (*GPGKey, error) {
 	key := new(GPGKey)
 	return key, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys/%d", keyID), nil, nil, &key)
+}
+
+// CreateGPGKeyOption options create user GPG key
+type CreateGPGKeyOption struct {
+	// An armored GPG key to add
+	//
+	ArmoredKey string `json:"armored_public_key"`
 }
 
 // CreateGPGKey create GPG key with options

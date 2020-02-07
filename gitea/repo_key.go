@@ -8,48 +8,55 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
 // DeployKey a deploy key
 type DeployKey struct {
-	ID    int64  `json:"id"`
-	Key   string `json:"key"`
-	URL   string `json:"url"`
-	Title string `json:"title"`
-	// swagger:strfmt date-time
-	Created  time.Time `json:"created_at"`
-	ReadOnly bool      `json:"read_only"`
+	ID          int64       `json:"id"`
+	KeyID       int64       `json:"key_id"`
+	Key         string      `json:"key"`
+	URL         string      `json:"url"`
+	Title       string      `json:"title"`
+	Fingerprint string      `json:"fingerprint"`
+	Created     time.Time   `json:"created_at"`
+	ReadOnly    bool        `json:"read_only"`
+	Repository  *Repository `json:"repository,omitempty"`
+}
+
+// ListDeployKeysOptions options for listing a repository's deploy keys
+type ListDeployKeysOptions struct {
+	ListOptions
+	KeyID       int64
+	Fingerprint string
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListDeployKeysOptions) QueryEncode() string {
+	query := opt.getURLQuery()
+	if opt.KeyID > 0 {
+		query.Add("key_id", fmt.Sprintf("%d", opt.KeyID))
+	}
+	if len(opt.Fingerprint) > 0 {
+		query.Add("fingerprint", opt.Fingerprint)
+	}
+	return query.Encode()
 }
 
 // ListDeployKeys list all the deploy keys of one repository
-func (c *Client) ListDeployKeys(user, repo string) ([]*DeployKey, error) {
-	keys := make([]*DeployKey, 0, 10)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys", user, repo), nil, nil, &keys)
+func (c *Client) ListDeployKeys(user, repo string, opt ListDeployKeysOptions) ([]*DeployKey, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/keys", user, repo))
+	opt.setDefaults()
+	link.RawQuery = opt.QueryEncode()
+	keys := make([]*DeployKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", link.String(), nil, nil, &keys)
 }
 
 // GetDeployKey get one deploy key with key id
 func (c *Client) GetDeployKey(user, repo string, keyID int64) (*DeployKey, error) {
 	key := new(DeployKey)
 	return key, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys/%d", user, repo, keyID), nil, nil, &key)
-}
-
-// CreateKeyOption options when creating a key
-type CreateKeyOption struct {
-	// Title of the key to add
-	//
-	// required: true
-	// unique: true
-	Title string `json:"title" binding:"Required"`
-	// An armored SSH key to add
-	//
-	// required: true
-	// unique: true
-	Key string `json:"key" binding:"Required"`
-	// Describe if the key has only read access or read/write
-	//
-	// required: false
-	ReadOnly bool `json:"read_only"`
 }
 
 // CreateDeployKey options when create one deploy key

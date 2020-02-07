@@ -1,4 +1,5 @@
 // Copyright 2016 The Gogs Authors. All rights reserved.
+// Copyright 2019 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -8,8 +9,57 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 	"time"
 )
+
+// PullRequestMeta PR info if an issue is a PR
+type PullRequestMeta struct {
+	HasMerged bool       `json:"merged"`
+	Merged    *time.Time `json:"merged_at"`
+}
+
+// RepositoryMeta basic repository information
+type RepositoryMeta struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Owner    string `json:"owner"`
+	FullName string `json:"full_name"`
+}
+
+// Issue represents an issue in a repository
+type Issue struct {
+	ID               int64      `json:"id"`
+	URL              string     `json:"url"`
+	Index            int64      `json:"number"`
+	Poster           *User      `json:"user"`
+	OriginalAuthor   string     `json:"original_author"`
+	OriginalAuthorID int64      `json:"original_author_id"`
+	Title            string     `json:"title"`
+	Body             string     `json:"body"`
+	Labels           []*Label   `json:"labels"`
+	Milestone        *Milestone `json:"milestone"`
+	Assignee         *User      `json:"assignee"`
+	Assignees        []*User    `json:"assignees"`
+	// Whether the issue is open or closed
+	State       StateType        `json:"state"`
+	Comments    int              `json:"comments"`
+	Created     time.Time        `json:"created_at"`
+	Updated     time.Time        `json:"updated_at"`
+	Closed      *time.Time       `json:"closed_at"`
+	Deadline    *time.Time       `json:"due_date"`
+	PullRequest *PullRequestMeta `json:"pull_request"`
+	Repository  *RepositoryMeta  `json:"repository"`
+}
+
+// ListIssueOption list issue options
+type ListIssueOption struct {
+	ListOptions
+	State   StateType
+	Labels  []string
+	KeyWord string
+}
 
 // StateType issue state type
 type StateType string
@@ -19,85 +69,87 @@ const (
 	StateOpen StateType = "open"
 	// StateClosed pr is closed
 	StateClosed StateType = "closed"
+	// StateAll is all
+	StateAll StateType = "all"
 )
 
-// PullRequestMeta PR info if an issue is a PR
-type PullRequestMeta struct {
-	HasMerged bool       `json:"merged"`
-	Merged    *time.Time `json:"merged_at"`
-}
+// QueryEncode turns options into querystring argument
+func (opt *ListIssueOption) QueryEncode() string {
+	query := opt.getURLQuery()
+	if len(opt.State) > 0 {
+		query.Add("state", string(opt.State))
+	}
+	if len(opt.Labels) > 0 {
+		var lq string
+		for _, l := range opt.Labels {
+			if len(lq) > 0 {
+				lq += ","
+			}
+			lq += l
+		}
+		query.Add("labels", lq)
+	}
+	if len(opt.KeyWord) > 0 {
+		query.Add("q", opt.KeyWord)
+	}
 
-// Issue represents an issue in a repository
-// swagger:model
-type Issue struct {
-	ID        int64      `json:"id"`
-	URL       string     `json:"url"`
-	Index     int64      `json:"number"`
-	Poster    *User      `json:"user"`
-	Title     string     `json:"title"`
-	Body      string     `json:"body"`
-	Labels    []*Label   `json:"labels"`
-	Milestone *Milestone `json:"milestone"`
-	Assignee  *User      `json:"assignee"`
-	Assignees []*User    `json:"assignees"`
-	// Whether the issue is open or closed
-	//
-	// type: string
-	// enum: open,closed
-	State    StateType `json:"state"`
-	Comments int       `json:"comments"`
-	// swagger:strfmt date-time
-	Created time.Time `json:"created_at"`
-	// swagger:strfmt date-time
-	Updated time.Time `json:"updated_at"`
-	// swagger:strfmt date-time
-	Closed *time.Time `json:"closed_at"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
-
-	PullRequest *PullRequestMeta `json:"pull_request"`
-}
-
-// ListIssueOption list issue options
-type ListIssueOption struct {
-	Page  int
-	State string
+	return query.Encode()
 }
 
 // ListIssues returns all issues assigned the authenticated user
 func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, error) {
-	issues := make([]*Issue, 0, 10)
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/issues?page=%d", opt.Page), nil, nil, &issues)
-}
+	opt.setDefaults()
+	issues := make([]*Issue, 0, opt.PageSize)
 
-// ListUserIssues returns all issues assigned to the authenticated user
-func (c *Client) ListUserIssues(opt ListIssueOption) ([]*Issue, error) {
-	issues := make([]*Issue, 0, 10)
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/user/issues?page=%d", opt.Page), nil, nil, &issues)
+	link, _ := url.Parse("/repos/issues/search")
+	link.RawQuery = opt.QueryEncode()
+	err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
+		for i := 0; i < len(issues); i++ {
+			if issues[i].Repository != nil {
+				issues[i].Repository.Owner = strings.Split(issues[i].Repository.FullName, "/")[0]
+			}
+		}
+	}
+	return issues, err
 }
 
 // ListRepoIssues returns all issues for a given repository
 func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Issue, error) {
-	issues := make([]*Issue, 0, 10)
-	return issues, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues?page=%d", owner, repo, opt.Page), nil, nil, &issues)
+	opt.setDefaults()
+	issues := make([]*Issue, 0, opt.PageSize)
+
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
+	link.RawQuery = opt.QueryEncode()
+	err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
+		for i := 0; i < len(issues); i++ {
+			if issues[i].Repository != nil {
+				issues[i].Repository.Owner = strings.Split(issues[i].Repository.FullName, "/")[0]
+			}
+		}
+	}
+	return issues, err
 }
 
 // GetIssue returns a single issue for a given repository
 func (c *Client) GetIssue(owner, repo string, index int64) (*Issue, error) {
 	issue := new(Issue)
-	return issue, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index), nil, nil, issue)
+	err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index), nil, nil, issue)
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil && issue.Repository != nil {
+		issue.Repository.Owner = strings.Split(issue.Repository.FullName, "/")[0]
+	}
+	return issue, err
 }
 
 // CreateIssueOption options to create one issue
 type CreateIssueOption struct {
-	// required:true
-	Title string `json:"title" binding:"Required"`
+	Title string `json:"title"`
 	Body  string `json:"body"`
 	// username of assignee
-	Assignee  string   `json:"assignee"`
-	Assignees []string `json:"assignees"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
+	Assignee  string     `json:"assignee"`
+	Assignees []string   `json:"assignees"`
+	Deadline  *time.Time `json:"due_date"`
 	// milestone id
 	Milestone int64 `json:"milestone"`
 	// list of label ids
@@ -118,14 +170,13 @@ func (c *Client) CreateIssue(owner, repo string, opt CreateIssueOption) (*Issue,
 
 // EditIssueOption options for editing an issue
 type EditIssueOption struct {
-	Title     string   `json:"title"`
-	Body      *string  `json:"body"`
-	Assignee  *string  `json:"assignee"`
-	Assignees []string `json:"assignees"`
-	Milestone *int64   `json:"milestone"`
-	State     *string  `json:"state"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
+	Title     string     `json:"title"`
+	Body      *string    `json:"body"`
+	Assignee  *string    `json:"assignee"`
+	Assignees []string   `json:"assignees"`
+	Milestone *int64     `json:"milestone"`
+	State     *StateType `json:"state"`
+	Deadline  *time.Time `json:"due_date"`
 }
 
 // EditIssue modify an existing issue for a given repository
@@ -137,18 +188,4 @@ func (c *Client) EditIssue(owner, repo string, index int64, opt EditIssueOption)
 	issue := new(Issue)
 	return issue, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index),
 		jsonHeader, bytes.NewReader(body), issue)
-}
-
-// EditDeadlineOption options for creating a deadline
-type EditDeadlineOption struct {
-	// required:true
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
-}
-
-// IssueDeadline represents an issue deadline
-// swagger:model
-type IssueDeadline struct {
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
 }

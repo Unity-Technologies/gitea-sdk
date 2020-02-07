@@ -1,4 +1,5 @@
 // Copyright 2016 The Gogs Authors. All rights reserved.
+// Copyright 2019 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -8,8 +9,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
+
+// PRBranchInfo information about a branch
+type PRBranchInfo struct {
+	Name       string      `json:"label"`
+	Ref        string      `json:"ref"`
+	Sha        string      `json:"sha"`
+	RepoID     int64       `json:"repo_id"`
+	Repository *Repository `json:"repo"`
+}
 
 // PullRequest represents a pull request
 type PullRequest struct {
@@ -30,9 +41,8 @@ type PullRequest struct {
 	DiffURL  string `json:"diff_url"`
 	PatchURL string `json:"patch_url"`
 
-	Mergeable bool `json:"mergeable"`
-	HasMerged bool `json:"merged"`
-	// swagger:strfmt date-time
+	Mergeable      bool       `json:"mergeable"`
+	HasMerged      bool       `json:"merged"`
 	Merged         *time.Time `json:"merged_at"`
 	MergedCommitID *string    `json:"merge_commit_sha"`
 	MergedBy       *User      `json:"merged_by"`
@@ -41,40 +51,44 @@ type PullRequest struct {
 	Head      *PRBranchInfo `json:"head"`
 	MergeBase string        `json:"merge_base"`
 
-	// swagger:strfmt date-time
 	Deadline *time.Time `json:"due_date"`
-
-	// swagger:strfmt date-time
-	Created *time.Time `json:"created_at"`
-	// swagger:strfmt date-time
-	Updated *time.Time `json:"updated_at"`
-	// swagger:strfmt date-time
-	Closed *time.Time `json:"closed_at"`
-}
-
-// PRBranchInfo information about a branch
-type PRBranchInfo struct {
-	Name       string      `json:"label"`
-	Ref        string      `json:"ref"`
-	Sha        string      `json:"sha"`
-	RepoID     int64       `json:"repo_id"`
-	Repository *Repository `json:"repo"`
+	Created  *time.Time `json:"created_at"`
+	Updated  *time.Time `json:"updated_at"`
+	Closed   *time.Time `json:"closed_at"`
 }
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	Page  int    `json:"page"`
-	State string `json:"state"`
+	ListOptions
+	State StateType `json:"state"`
+	// oldest, recentupdate, leastupdate, mostcomment, leastcomment, priority
+	Sort      string
+	Milestone int64
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListPullRequestsOptions) QueryEncode() string {
+	query := opt.getURLQuery()
+	if len(opt.State) > 0 {
+		query.Add("state", string(opt.State))
+	}
+	if len(opt.Sort) > 0 {
+		query.Add("sort", opt.Sort)
+	}
+	if opt.Milestone > 0 {
+		query.Add("milestone", fmt.Sprintf("%d", opt.Milestone))
+	}
+	return query.Encode()
 }
 
 // ListRepoPullRequests list PRs of one repository
 func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return nil, err
-	}
-	prs := make([]*PullRequest, 0, 10)
-	return prs, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls", owner, repo), jsonHeader, bytes.NewReader(body), &prs)
+	opt.setDefaults()
+	prs := make([]*PullRequest, 0, opt.PageSize)
+
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
+	link.RawQuery = opt.QueryEncode()
+	return prs, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &prs)
 }
 
 // GetPullRequest get information of one PR
@@ -85,16 +99,15 @@ func (c *Client) GetPullRequest(owner, repo string, index int64) (*PullRequest, 
 
 // CreatePullRequestOption options when creating a pull request
 type CreatePullRequestOption struct {
-	Head      string   `json:"head" binding:"Required"`
-	Base      string   `json:"base" binding:"Required"`
-	Title     string   `json:"title" binding:"Required"`
-	Body      string   `json:"body"`
-	Assignee  string   `json:"assignee"`
-	Assignees []string `json:"assignees"`
-	Milestone int64    `json:"milestone"`
-	Labels    []int64  `json:"labels"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
+	Head      string     `json:"head"`
+	Base      string     `json:"base"`
+	Title     string     `json:"title"`
+	Body      string     `json:"body"`
+	Assignee  string     `json:"assignee"`
+	Assignees []string   `json:"assignees"`
+	Milestone int64      `json:"milestone"`
+	Labels    []int64    `json:"labels"`
+	Deadline  *time.Time `json:"due_date"`
 }
 
 // CreatePullRequest create pull request with options
@@ -110,15 +123,14 @@ func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOpti
 
 // EditPullRequestOption options when modify pull request
 type EditPullRequestOption struct {
-	Title     string   `json:"title"`
-	Body      string   `json:"body"`
-	Assignee  string   `json:"assignee"`
-	Assignees []string `json:"assignees"`
-	Milestone int64    `json:"milestone"`
-	Labels    []int64  `json:"labels"`
-	State     *string  `json:"state"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
+	Title     string     `json:"title"`
+	Body      string     `json:"body"`
+	Assignee  string     `json:"assignee"`
+	Assignees []string   `json:"assignees"`
+	Milestone int64      `json:"milestone"`
+	Labels    []int64    `json:"labels"`
+	State     *StateType `json:"state"`
+	Deadline  *time.Time `json:"due_date"`
 }
 
 // EditPullRequest modify pull request with PR id and options
@@ -128,14 +140,32 @@ func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRe
 		return nil, err
 	}
 	pr := new(PullRequest)
-	return pr, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index),
+	return pr, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/pulls/%d", owner, repo, index),
 		jsonHeader, bytes.NewReader(body), pr)
 }
 
+// MergePullRequestOption options when merging a pull request
+type MergePullRequestOption struct {
+	// required: true
+	// enum: merge,rebase,rebase-merge,squash
+	Do                string `json:"Do" binding:"Required;In(merge,rebase,rebase-merge,squash)"`
+	MergeTitleField   string `json:"MergeTitleField"`
+	MergeMessageField string `json:"MergeMessageField"`
+}
+
+// MergePullRequestResponse response when merging a pull request
+type MergePullRequestResponse struct {
+}
+
 // MergePullRequest merge a PR to repository by PR id
-func (c *Client) MergePullRequest(owner, repo string, index int64) error {
-	_, err := c.getResponse("POST", fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index), nil, nil)
-	return err
+func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (*MergePullRequestResponse, error) {
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	response := new(MergePullRequestResponse)
+	return response, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index),
+		jsonHeader, bytes.NewReader(body), response)
 }
 
 // IsPullRequestMerged test if one PR is merged to one repository
@@ -147,5 +177,4 @@ func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, err
 	}
 
 	return statusCode == 204, nil
-
 }

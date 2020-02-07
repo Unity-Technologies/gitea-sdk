@@ -12,7 +12,7 @@ import (
 
 // AddOrgMembershipOption add user to organization options
 type AddOrgMembershipOption struct {
-	Role string `json:"role" binding:"Required"`
+	Role string `json:"role"`
 }
 
 // AddOrgMembership add some one to an organization's member

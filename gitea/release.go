@@ -13,29 +13,33 @@ import (
 
 // Release represents a repository release
 type Release struct {
-	ID           int64  `json:"id"`
-	TagName      string `json:"tag_name"`
-	Target       string `json:"target_commitish"`
-	Title        string `json:"name"`
-	Note         string `json:"body"`
-	URL          string `json:"url"`
-	TarURL       string `json:"tarball_url"`
-	ZipURL       string `json:"zipball_url"`
-	IsDraft      bool   `json:"draft"`
-	IsPrerelease bool   `json:"prerelease"`
-	// swagger:strfmt date-time
-	CreatedAt time.Time `json:"created_at"`
-	// swagger:strfmt date-time
-	PublishedAt time.Time     `json:"published_at"`
-	Publisher   *User         `json:"author"`
-	Attachments []*Attachment `json:"assets"`
+	ID           int64         `json:"id"`
+	TagName      string        `json:"tag_name"`
+	Target       string        `json:"target_commitish"`
+	Title        string        `json:"name"`
+	Note         string        `json:"body"`
+	URL          string        `json:"url"`
+	TarURL       string        `json:"tarball_url"`
+	ZipURL       string        `json:"zipball_url"`
+	IsDraft      bool          `json:"draft"`
+	IsPrerelease bool          `json:"prerelease"`
+	CreatedAt    time.Time     `json:"created_at"`
+	PublishedAt  time.Time     `json:"published_at"`
+	Publisher    *User         `json:"author"`
+	Attachments  []*Attachment `json:"assets"`
+}
+
+// ListReleasesOptions options for listing repository's releases
+type ListReleasesOptions struct {
+	ListOptions
 }
 
 // ListReleases list releases of a repository
-func (c *Client) ListReleases(user, repo string) ([]*Release, error) {
-	releases := make([]*Release, 0, 10)
+func (c *Client) ListReleases(user, repo string, opt ListReleasesOptions) ([]*Release, error) {
+	opt.setDefaults()
+	releases := make([]*Release, 0, opt.PageSize)
 	err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases", user, repo),
+		fmt.Sprintf("/repos/%s/%s/releases?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &releases)
 	return releases, err
 }
@@ -51,8 +55,7 @@ func (c *Client) GetRelease(user, repo string, id int64) (*Release, error) {
 
 // CreateReleaseOption options when creating a release
 type CreateReleaseOption struct {
-	// required: true
-	TagName      string `json:"tag_name" binding:"Required"`
+	TagName      string `json:"tag_name"`
 	Target       string `json:"target_commitish"`
 	Title        string `json:"name"`
 	Note         string `json:"body"`
