@@ -75,7 +75,7 @@ func (c *Client) CreateAccessToken(user, pass string, opt CreateAccessTokenOptio
 	return t, c.getParsedResponse("POST", fmt.Sprintf("/users/%s/tokens", user),
 		http.Header{
 			"content-type":                []string{"application/json"},
-			"Authorization":               []string{"Basic " + BasicAuthEncode(user, pass)},
+			"Authorization":               []string{"Basic " + basicAuthEncode(user, pass)},
 			"X-Gitea-Server-Access-Token": []string{opt.GiteaServerAccessToken},
 		},
 		bytes.NewReader(body), t)
