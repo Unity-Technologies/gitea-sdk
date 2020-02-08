@@ -43,7 +43,7 @@ func (c *Client) ListPublicOrgMembership(org string, opt ListOrgMembershipOption
 
 // CheckOrgMembership Check if a user is a member of an organization
 func (c *Client) CheckOrgMembership(org, user string) (bool, error) {
-	status, err := c.getStatusCode("GET", fmt.Sprintf("/orgs/%s/public_members/%s", url.PathEscape(org), url.PathEscape(user)), nil, nil)
+	status, err := c.getStatusCode("GET", fmt.Sprintf("/orgs/%s/members/%s", url.PathEscape(org), url.PathEscape(user)), nil, nil)
 	if err != nil {
 		return false, err
 	}
