@@ -28,7 +28,7 @@ func (c *Client) SetRepoTopics(user, repo string, list TopicsList) error {
 		return err
 	}
 
-	_, err = c.getResponse("PUT", fmt.Sprintf("/repos/%s/%s/topics", user, repo), nil, bytes.NewReader(body))
+	_, err = c.getResponse("PUT", fmt.Sprintf("/repos/%s/%s/topics", user, repo), jsonHeader, bytes.NewReader(body))
 	return err
 }
 
