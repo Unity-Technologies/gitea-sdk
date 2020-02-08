@@ -22,7 +22,7 @@ func (c *Client) ListRepoTopics(user, repo string) (*TopicsList, error) {
 }
 
 // SetRepoTopics replaces the list of repo's topics
-func (c *Client) SetRepoTopics(user, repo, list TopicsList) error {
+func (c *Client) SetRepoTopics(user, repo string, list TopicsList) error {
 	body, err := json.Marshal(&list)
 	if err != nil {
 		return err
