@@ -6,6 +6,7 @@ package gitea
 
 import (
 	"log"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -46,6 +47,9 @@ func TestRepoTopics(t *testing.T) {
 	err = c.SetRepoTopics(repo.Owner.UserName, repo.Name, newTopics)
 	assert.NoError(t, err)
 	tl, _ = c.ListRepoTopics(repo.Owner.UserName, repo.Name, ListRepoTopicsOptions{})
-	assert.Len(t, tl, 5)
+	assert.Len(t, tl, 3)
 
+	sort.Strings(tl)
+	sort.Strings(newTopics)
+	assert.EqualValues(t, newTopics, tl)
 }

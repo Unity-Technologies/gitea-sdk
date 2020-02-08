@@ -41,7 +41,8 @@ func (c *Client) SetRepoTopics(user, repo string, list []string) error {
 	if err != nil {
 		return err
 	}
-	_, err = c.getResponse("PUT", fmt.Sprintf("/repos/%s/%s/topics", user, repo), nil, bytes.NewReader(body))
+	fmt.Println(body)
+	_, err = c.getResponse("PUT", fmt.Sprintf("/repos/%s/%s/topics", user, repo), jsonHeader, bytes.NewReader(body))
 	return err
 }
 
