@@ -55,13 +55,14 @@ func (c *Client) GetSingleCommit(user, repo, commitID string) (*Commit, error) {
 
 // ListCommitOptions list commit options
 type ListCommitOptions struct {
+	ListOptions
 	//SHA or branch to start listing commits from (usually 'master')
 	SHA string
 }
 
 // QueryEncode turns options into querystring argument
 func (opt *ListCommitOptions) QueryEncode() string {
-	query := make(url.Values)
+	query := opt.ListOptions.getURLQuery()
 	if opt.SHA != "" {
 		query.Add("sha", opt.SHA)
 	}
@@ -71,7 +72,8 @@ func (opt *ListCommitOptions) QueryEncode() string {
 // ListRepoCommits return list of commits from a repo
 func (c *Client) ListRepoCommits(user, repo string, opt ListCommitOptions) ([]*Commit, error) {
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/commits", user, repo))
-	commits := make([]*Commit, 0, 10)
+	opt.setDefaults()
+	commits := make([]*Commit, 0, opt.PageSize)
 	link.RawQuery = opt.QueryEncode()
 	return commits, c.getParsedResponse("GET", link.String(), nil, nil, &commits)
 }
