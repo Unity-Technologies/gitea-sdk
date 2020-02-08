@@ -16,7 +16,7 @@ func (c *Client) DeleteOrgMembership(org, user string) error {
 	return err
 }
 
-// ListIssueOption list issue options
+// ListOrgMembershipOption list OrgMembership options
 type ListOrgMembershipOption struct {
 	ListOptions
 }
