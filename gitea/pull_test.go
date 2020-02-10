@@ -17,11 +17,18 @@ func TestPull(t *testing.T) {
 	user, err := c.GetMyUserInfo()
 	assert.NoError(t, err)
 
+	clean(c)
+
 	var repoName = "repo_pull_test"
-	_, err = createTestRepo(t, repoName, c)
+	origRepo, err := createTestRepo(t, repoName, c)
 	if err != nil {
 		return
 	}
+	forkOrg, err := c.CreateOrg(CreateOrgOption{UserName: "ForkOrg"})
+	assert.NoError(t, err)
+	forkRepo, err := c.CreateFork(origRepo.Owner.UserName, origRepo.Name, CreateForkOption{Organization: &forkOrg.UserName})
+	assert.NoError(t, err)
+	assert.NotNil(t, forkRepo)
 
 	// ListRepoPullRequests list PRs of one repository
 	pulls, err := c.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{
@@ -48,4 +55,10 @@ func TestPull(t *testing.T) {
 
 	// IsPullRequestMerged test if one PR is merged to one repository
 	//func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, error)
+}
+
+func clean(c *Client) {
+	_ = c.DeleteRepo("ForkOrg", "repo_pull_test")
+	_ = c.DeleteRepo("test01", "repo_pull_test")
+	c.DeleteOrg("ForkOrg")
 }
