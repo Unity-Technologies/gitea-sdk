@@ -17,7 +17,7 @@ func TestPull(t *testing.T) {
 	user, err := c.GetMyUserInfo()
 	assert.NoError(t, err)
 
-	clean(c)
+	preparePullTest(c)
 
 	var repoName = "repo_pull_test"
 	origRepo, err := createTestRepo(t, repoName, c)
@@ -39,6 +39,9 @@ func TestPull(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, pulls, 0)
 
+	// alter forked repo
+	// ToDo need file change Function!
+
 	//ToDo add git stuff to have different branches witch can be used to create PRs and test merge etc ...
 
 	// GetPullRequest get information of one PR
@@ -57,7 +60,7 @@ func TestPull(t *testing.T) {
 	//func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, error)
 }
 
-func clean(c *Client) {
+func preparePullTest(c *Client) {
 	_ = c.DeleteRepo("ForkOrg", "repo_pull_test")
 	_ = c.DeleteRepo("test01", "repo_pull_test")
 	c.DeleteOrg("ForkOrg")
