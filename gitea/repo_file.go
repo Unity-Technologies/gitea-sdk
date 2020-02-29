@@ -6,6 +6,8 @@
 package gitea
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -111,4 +113,32 @@ type FileDeleteResponse struct {
 // e.g.: ref -> master, tree -> macaron.go(no leading slash)
 func (c *Client) GetFile(user, repo, ref, tree string) ([]byte, error) {
 	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s/%s", user, repo, ref, tree), nil, nil)
+}
+
+// GetContents get the metadata and contents (if a file) of an entry in a repository, or a list of entries if a dir
+// ref is optional
+func (c *Client) GetContents(owner, repo, ref, filepath string) (*ContentsResponse, error) {
+	cr := new(ContentsResponse)
+	return cr, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/contents/%s?ref=%s", owner, repo, filepath, ref), jsonHeader, nil, cr)
+
+}
+
+// CreateFile create a file in a repository
+func (c *Client) CreateFile(owner, repo, filepath string, opt CreateFileOptions) (*FileResponse, error) {
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	fr := new(FileResponse)
+	return fr, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/contents/%s", owner, repo, filepath), jsonHeader, bytes.NewReader(body), fr)
+}
+
+// UpdateFile update a file in a repository
+func (c *Client) UpdateFile(owner, repo, filepath string, opt UpdateFileOptions) (*FileResponse, error) {
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	fr := new(FileResponse)
+	return fr, c.getParsedResponse("PUT", fmt.Sprintf("/repos/%s/%s/contents/%s", owner, repo, filepath), jsonHeader, bytes.NewReader(body), fr)
 }
