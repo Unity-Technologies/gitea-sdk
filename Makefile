@@ -6,6 +6,8 @@ GITEA_SDK_TEST_URL ?= http://localhost:3000
 GITEA_SDK_TEST_USERNAME ?= test01
 GITEA_SDK_TEST_PASSWORD ?= test01
 
+export GO111MODULE=on
+
 .PHONY: all
 all: clean test build
 
@@ -42,7 +44,7 @@ lint:
 .PHONY: revive
 revive:
 	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/mgechev/revive; \
+		cd /tmp && $(GO) get -u github.com/mgechev/revive; \
 	fi
 	revive -config .revive.toml -exclude=./vendor/... ./... || exit 1
 
