@@ -96,6 +96,9 @@ func TestNotifications(t *testing.T) {
 	c.sudo = user2.UserName
 	nList, err = c.ListNotifications(ListNotificationOptions{})
 	assert.NoError(t, err)
+	count, err = c.CheckNotifications()
+	assert.NoError(t, err)
+	assert.EqualValues(t, 1, count)
 	assert.Len(t, nList, 1)
 	if len(nList) > 0 {
 		assert.NoError(t, c.ReadNotification(nList[0].ID))
