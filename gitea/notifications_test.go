@@ -97,6 +97,7 @@ func TestNotifications(t *testing.T) {
 	nList, err = c.ListNotifications(ListNotificationOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 1)
-	err = c.ReadNotification(nList[0].ID)
-	assert.NoError(t, err)
+	if len(nList) > 0 {
+		assert.NoError(t, c.ReadNotification(nList[0].ID))
+	}
 }
