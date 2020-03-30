@@ -1,7 +1,9 @@
 GO ?= go
 
 WORK_DIR   := $(shell pwd)
+RUNNING_DIR := $(WORK_DIR)/docker_test
 
+GITEA_SDK_IMPORT = code.gitea.io/sdk/gitea
 GITEA_SDK_TEST_URL ?= http://localhost:3000
 GITEA_SDK_TEST_USERNAME ?= test01
 GITEA_SDK_TEST_PASSWORD ?= test01
@@ -52,8 +54,21 @@ revive:
 test:
 	@export GITEA_SDK_TEST_URL=${GITEA_SDK_TEST_URL}; export GITEA_SDK_TEST_USERNAME=${GITEA_SDK_TEST_USERNAME}; export GITEA_SDK_TEST_PASSWORD=${GITEA_SDK_TEST_PASSWORD}; \
 	if [ -z "$(shell curl --noproxy "*" "${GITEA_SDK_TEST_URL}/api/v1/version" 2> /dev/null)" ]; then \echo "No test-instance detected!"; exit 1; else \
-	    cd gitea && $(GO) test -race -cover -coverprofile coverage.out; \
+	    $(GO) test $(GITEA_SDK_IMPORT) -race -cover -coverprofile coverage.out; \
 	fi
+
+.PHONY: test\#%
+test\#%:
+	@export GITEA_SDK_TEST_URL=${GITEA_SDK_TEST_URL}; export GITEA_SDK_TEST_USERNAME=${GITEA_SDK_TEST_USERNAME}; export GITEA_SDK_TEST_PASSWORD=${GITEA_SDK_TEST_PASSWORD}; \
+	if [ -z "$(shell curl --noproxy "*" "${GITEA_SDK_TEST_URL}/api/v1/version" 2> /dev/null)" ]; then \echo "No test-instance detected!"; exit 1; else \
+	    $(GO) test $(GITEA_SDK_IMPORT) -run=$* -race -cover -coverprofile coverage.out; \
+	fi
+
+.PHONY: test-docker
+test-docker:
+	mkdir -p ${RUNNING_DIR}/gitea/gitea/conf/
+	cp ./docker/app.ini ${RUNNING_DIR}/gitea/gitea/conf/
+	docker run -d -p 3000:3000 -v ${RUNNING_DIR}/gitea:/data gitea/gitea:latest > gitea_docker_container_id
 
 .PHONY: test-instance
 test-instance:

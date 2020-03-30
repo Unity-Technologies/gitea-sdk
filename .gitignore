@@ -30,3 +30,4 @@ coverage.out
 
 #integrations
 test
+docker_test
