@@ -39,7 +39,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 			FileOptions: FileOptions{
 				Message: "add a new line",
 			},
-			SHA: newFile.Commit.SHA,
+			SHA: newFile.Content.SHA,
 		},
 		Content: "ZmlsZUEKCmFuZCBhIG5ldyBsaW5lCg==",
 	})
@@ -48,6 +48,6 @@ func TestFileCreateUpdateGet(t *testing.T) {
 
 	file, err := c.GetContents(repo.Owner.UserName, repo.Name, "master", "A")
 	assert.NoError(t, err)
-	assert.EqualValues(t, updatedFile.Commit.SHA, file.SHA)
-	assert.EqualValues(t, updatedFile.Content.SHA, file.Content)
+	assert.EqualValues(t, updatedFile.Content.SHA, file.SHA)
+	assert.EqualValues(t, &updatedFile.Content.Content, &file.Content)
 }
