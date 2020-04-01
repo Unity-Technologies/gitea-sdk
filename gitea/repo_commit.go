@@ -50,9 +50,7 @@ type Commit struct {
 
 // CommitDateOptions store dates for GIT_AUTHOR_DATE and GIT_COMMITTER_DATE
 type CommitDateOptions struct {
-	// swagger:strfmt date-time
-	Author time.Time `json:"author"`
-	// swagger:strfmt date-time
+	Author    time.Time `json:"author"`
 	Committer time.Time `json:"committer"`
 }
 

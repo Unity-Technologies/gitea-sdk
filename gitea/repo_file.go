@@ -16,9 +16,9 @@ type FileOptions struct {
 	// message (optional) for the commit of this file. if not supplied, a default message will be used
 	Message string `json:"message"`
 	// branch (optional) to base this file from. if not given, the default branch is used
-	BranchName string `json:"branch" binding:"GitRefName;MaxSize(100)"`
+	BranchName string `json:"branch"`
 	// new_branch (optional) will make a new branch from `branch` before creating the file
-	NewBranchName string `json:"new_branch" binding:"GitRefName;MaxSize(100)"`
+	NewBranchName string `json:"new_branch"`
 	// `author` and `committer` are optional (if only one is given, it will be used for the other, otherwise the authenticated user will be used)
 	Author    Identity          `json:"author"`
 	Committer Identity          `json:"committer"`
@@ -40,7 +40,7 @@ type DeleteFileOptions struct {
 	FileOptions
 	// sha is the SHA for the file that already exists
 	// required: true
-	SHA string `json:"sha" binding:"Required"`
+	SHA string `json:"sha"`
 }
 
 // UpdateFileOptions options for updating files
@@ -51,7 +51,7 @@ type UpdateFileOptions struct {
 	// required: true
 	Content string `json:"content"`
 	// from_path (optional) is the path of the original file which will be moved/renamed to the path in the URL
-	FromPath string `json:"from_path" binding:"MaxSize(500)"`
+	FromPath string `json:"from_path"`
 }
 
 // FileLinksResponse contains the links for a repo's file
