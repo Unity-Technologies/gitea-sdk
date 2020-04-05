@@ -30,6 +30,8 @@ func TestPull(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, forkRepo)
 
+	prepareFork(t, c, forkRepo)
+
 	// ListRepoPullRequests list PRs of one repository
 	pulls, err := c.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{
 		ListOptions: ListOptions{Page: 1},
@@ -41,6 +43,9 @@ func TestPull(t *testing.T) {
 
 	// alter forked repo
 	// ToDo need file change Function!
+
+
+
 
 	//ToDo add git stuff to have different branches witch can be used to create PRs and test merge etc ...
 
@@ -64,4 +69,49 @@ func preparePullTest(c *Client) {
 	_ = c.DeleteRepo("ForkOrg", "repo_pull_test")
 	_ = c.DeleteRepo("test01", "repo_pull_test")
 	c.DeleteOrg("ForkOrg")
+}
+
+func prepareFork(t *testing.T, c *Client, fork *Repository) {
+
+	updatedFile, err := c.UpdateFile(fork.Owner.UserName, fork.Name, "LICENCE", UpdateFileOptions{
+		DeleteFileOptions: DeleteFileOptions{
+			FileOptions: FileOptions{
+				Message: "Overwrite",
+				BranchName: "overwrite_licence",
+			},
+			SHA: "204b93da48d02900098ced21c54062ffbff36b9c",
+		},
+		Content: "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo=",
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, updatedFile)
+
+	/**
+
+	raw, err := c.GetFile(fork.Owner.UserName, fork.Name, "master", "README.md")
+	assert.NoError(t, err)
+	assert.EqualValues(t, "IyBDaGFuZ2VGaWxlcwoKQSB0ZXN0IFJlcG86IENoYW5nZUZpbGVz", base64.StdEncoding.EncodeToString(raw))
+
+	newFile, err := c.CreateFile(fork.Owner.UserName, fork.Name, "A", CreateFileOptions{
+		FileOptions: FileOptions{
+			Message: "create file A",
+		},
+		Content: "ZmlsZUEK",
+	})
+	assert.NoError(t, err)
+	raw, _ = c.GetFile(fork.Owner.UserName, fork.Name, "master", "A")
+	assert.EqualValues(t, "ZmlsZUEK", base64.StdEncoding.EncodeToString(raw))
+
+	updatedFile, err := c.UpdateFile(fork.Owner.UserName, fork.Name, "A", UpdateFileOptions{
+		DeleteFileOptions: DeleteFileOptions{
+			FileOptions: FileOptions{
+				Message: "add a new line",
+			},
+			SHA: newFile.Content.SHA,
+		},
+		Content: "ZmlsZUEKCmFuZCBhIG5ldyBsaW5lCg==",
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, updatedFile)
+	 */
 }
