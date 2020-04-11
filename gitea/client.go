@@ -127,21 +127,6 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 	return data, nil
 }
 
-func (c *Client) getResponseWithStatus(method, path string, header http.Header, body io.Reader) ([]byte, int, error) {
-	resp, err := c.doRequest(method, path, header, body)
-	if err != nil {
-		return nil, 0, err
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, resp.StatusCode, err
-	}
-
-	return data, resp.StatusCode, nil
-}
-
 func (c *Client) getParsedResponse(method, path string, header http.Header, body io.Reader, obj interface{}) error {
 	data, err := c.getResponse(method, path, header, body)
 	if err != nil {
