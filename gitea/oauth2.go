@@ -45,6 +45,28 @@ func (c *Client) CreateOauth2(opt CreateOauth2Option) (*Oauth2, error) {
 	return oauth, c.getParsedResponse("POST", "/user/applications/oauth2", jsonHeader, bytes.NewReader(body), oauth)
 }
 
+// UpdateOauth2 a specific Oauth2 Application by ID and return a completed Oauth2 object.
+func (c *Client) UpdateOauth2(id int64, opt CreateOauth2Option) (*Oauth2, error) {
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
+		return nil, e
+	}
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	oauth := new(Oauth2)
+	return oauth, c.getParsedResponse("PATCH", fmt.Sprintf("/user/applications/oauth2/%d", id), jsonHeader, bytes.NewReader(body), oauth)
+}
+
+// GetOauth2 a specific Oauth2 Application by ID.
+func (c *Client) GetOauth2(id int64) (*Oauth2, error) {
+	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
+		return nil, e
+	}
+	oauth2s := &Oauth2{}
+	return oauth2s, c.getParsedResponse("GET", fmt.Sprintf("/user/applications/oauth2/%d", id), nil, nil, &oauth2s)
+}
+
 // ListOauth2 all of your Oauth2 Applications.
 func (c *Client) ListOauth2(opt ListOauth2Option) ([]*Oauth2, error) {
 	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
