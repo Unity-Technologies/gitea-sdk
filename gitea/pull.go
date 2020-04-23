@@ -153,10 +153,6 @@ type MergePullRequestOption struct {
 	MergeMessageField string `json:"MergeMessageField"`
 }
 
-// MergePullRequestResponse response when merging a pull request
-type MergePullRequestResponse struct {
-}
-
 // MergePullRequest merge a PR to repository by PR id
 func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (bool, error) {
 	body, err := json.Marshal(&opt)
