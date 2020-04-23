@@ -17,101 +17,169 @@ func TestPull(t *testing.T) {
 	user, err := c.GetMyUserInfo()
 	assert.NoError(t, err)
 
-	preparePullTest(c)
-
 	var repoName = "repo_pull_test"
-	origRepo, err := createTestRepo(t, repoName, c)
-	if err != nil {
+	var forkOrg = "ForkOrg"
+	if !preparePullTest(t, c, repoName, forkOrg) {
 		return
 	}
-	forkOrg, err := c.CreateOrg(CreateOrgOption{UserName: "ForkOrg"})
-	assert.NoError(t, err)
-	forkRepo, err := c.CreateFork(origRepo.Owner.UserName, origRepo.Name, CreateForkOption{Organization: &forkOrg.UserName})
-	assert.NoError(t, err)
-	assert.NotNil(t, forkRepo)
-
-	prepareFork(t, c, forkRepo)
 
 	// ListRepoPullRequests list PRs of one repository
-	pulls, err := c.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{
-		ListOptions: ListOptions{Page: 1},
-		State:       StateAll,
-		Sort:        "leastupdate",
-	})
+	pulls, err := c.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, pulls, 0)
 
-	// alter forked repo
-	// ToDo need file change Function!
+	pullUpdateFile, err := c.CreatePullRequest(c.username, repoName, CreatePullRequestOption{
+		Base:  "master",
+		Head:  forkOrg + ":overwrite_licence",
+		Title: "overwrite a file",
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, pullUpdateFile)
 
+	pullNewFile, err := c.CreatePullRequest(c.username, repoName, CreatePullRequestOption{
+		Base:  "master",
+		Head:  forkOrg + ":new_file",
+		Title: "create a file",
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, pullNewFile)
 
+	pullConflict, err := c.CreatePullRequest(c.username, repoName, CreatePullRequestOption{
+		Base:  "master",
+		Head:  forkOrg + ":will_conflict",
+		Title: "this pull will conflict",
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, pullConflict)
 
+	pulls, err = c.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{})
+	assert.NoError(t, err)
+	assert.Len(t, pulls, 3)
 
-	//ToDo add git stuff to have different branches witch can be used to create PRs and test merge etc ...
+	// test Update pull
+	pr, err := c.GetPullRequest(user.UserName, repoName, pullUpdateFile.Index)
+	assert.NoError(t, err)
+	assert.False(t, pullUpdateFile.HasMerged)
+	assert.True(t, pullUpdateFile.Mergeable)
+	_, err = c.MergePullRequest(user.UserName, repoName, pullUpdateFile.Index, MergePullRequestOption{
+		Do:                "squash",
+		MergeTitleField:   pullUpdateFile.Title,
+		MergeMessageField: "squash: " + pullUpdateFile.Title,
+	})
+	assert.NoError(t, err)
+	merged, err := c.IsPullRequestMerged(user.UserName, repoName, pullConflict.Index)
+	assert.NoError(t, err)
+	assert.True(t, merged)
+	pr, err = c.GetPullRequest(user.UserName, repoName, pullUpdateFile.Index)
+	assert.NoError(t, err)
+	assert.EqualValues(t, pullUpdateFile.Head.Name, pr.Head.Name)
+	assert.EqualValues(t, pullUpdateFile.Base.Name, pr.Base.Name)
+	assert.NotEqual(t, pullUpdateFile.Base.Sha, pr.Base.Sha)
+	assert.Len(t, *pr.MergedCommitID, 40)
+	assert.True(t, pr.HasMerged)
 
-	// GetPullRequest get information of one PR
-	//func (c *Client) GetPullRequest(owner, repo string, index int64) (*PullRequest, error)
+	// test conflict pull
+	pr, err = c.GetPullRequest(user.UserName, repoName, pullConflict.Index)
+	assert.NoError(t, err)
+	assert.False(t, pullConflict.HasMerged)
+	assert.False(t, pullConflict.Mergeable)
+	_, err = c.MergePullRequest(user.UserName, repoName, pullConflict.Index, MergePullRequestOption{
+		Do:                "merge",
+		MergeTitleField:   "pullConflict",
+		MergeMessageField: "pullConflict Msg",
+	})
+	assert.Error(t, err)
+	merged, err = c.IsPullRequestMerged(user.UserName, repoName, pullConflict.Index)
+	assert.NoError(t, err)
+	assert.False(t, merged)
+	pr, err = c.GetPullRequest(user.UserName, repoName, pullConflict.Index)
+	assert.NoError(t, err)
+	assert.Nil(t, pr.MergedCommitID)
+	assert.False(t, pr.HasMerged)
 
-	// CreatePullRequest create pull request with options
-	//func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOption) (*PullRequest, error)
+	state := StateClosed
+	pr, err = c.EditPullRequest(user.UserName, repoName, pullConflict.Index, EditPullRequestOption{
+		Title: "confl",
+		State: &state,
+	})
 
-	// EditPullRequest modify pull request with PR id and options
-	//func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRequestOption) (*PullRequest, error)
-
-	// MergePullRequest merge a PR to repository by PR id
-	//func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (*MergePullRequestResponse, error)
-
-	// IsPullRequestMerged test if one PR is merged to one repository
-	//func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, error)
+	pulls, err = c.ListRepoPullRequests(user.UserName, repoName, ListPullRequestsOptions{
+		State: StateClosed,
+		Sort:  "leastupdate",
+	})
+	assert.NoError(t, err)
+	assert.Len(t, pulls, 2)
 }
 
-func preparePullTest(c *Client) {
-	_ = c.DeleteRepo("ForkOrg", "repo_pull_test")
-	_ = c.DeleteRepo("test01", "repo_pull_test")
-	c.DeleteOrg("ForkOrg")
-}
+func preparePullTest(t *testing.T, c *Client, repoName, forkOrg string) bool {
+	_ = c.DeleteRepo(forkOrg, repoName)
+	_ = c.DeleteRepo(c.username, repoName)
+	_ = c.DeleteOrg(forkOrg)
 
-func prepareFork(t *testing.T, c *Client, fork *Repository) {
+	origRepo, err := createTestRepo(t, repoName, c)
+	if !assert.NoError(t, err) {
+		return false
+	}
+	org, err := c.CreateOrg(CreateOrgOption{UserName: forkOrg})
+	assert.NoError(t, err)
+	forkRepo, err := c.CreateFork(origRepo.Owner.UserName, origRepo.Name, CreateForkOption{Organization: &org.UserName})
+	assert.NoError(t, err)
+	assert.NotNil(t, forkRepo)
 
-	updatedFile, err := c.UpdateFile(fork.Owner.UserName, fork.Name, "LICENCE", UpdateFileOptions{
+	masterLicence, err := c.GetContents(forkRepo.Owner.UserName, forkRepo.Name, "master", "LICENSE")
+	if !assert.NoError(t, err) || !assert.NotNil(t, masterLicence) {
+		return false
+	}
+
+	updatedFile, err := c.UpdateFile(forkRepo.Owner.UserName, forkRepo.Name, "LICENSE", UpdateFileOptions{
 		DeleteFileOptions: DeleteFileOptions{
 			FileOptions: FileOptions{
-				Message: "Overwrite",
-				BranchName: "overwrite_licence",
+				Message:       "Overwrite",
+				BranchName:    "master",
+				NewBranchName: "overwrite_licence",
 			},
-			SHA: "204b93da48d02900098ced21c54062ffbff36b9c",
+			SHA: masterLicence.SHA,
 		},
 		Content: "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo=",
 	})
-	assert.NoError(t, err)
-	assert.NotNil(t, updatedFile)
+	if !assert.NoError(t, err) || !assert.NotNil(t, updatedFile) {
+		return false
+	}
 
-	/**
-
-	raw, err := c.GetFile(fork.Owner.UserName, fork.Name, "master", "README.md")
-	assert.NoError(t, err)
-	assert.EqualValues(t, "IyBDaGFuZ2VGaWxlcwoKQSB0ZXN0IFJlcG86IENoYW5nZUZpbGVz", base64.StdEncoding.EncodeToString(raw))
-
-	newFile, err := c.CreateFile(fork.Owner.UserName, fork.Name, "A", CreateFileOptions{
+	newFile, err := c.CreateFile(forkRepo.Owner.UserName, forkRepo.Name, "WOW-file", CreateFileOptions{
+		Content: "QSBuZXcgRmlsZQo=",
 		FileOptions: FileOptions{
-			Message: "create file A",
+			Message:       "creat a new file",
+			BranchName:    "master",
+			NewBranchName: "new_file",
 		},
-		Content: "ZmlsZUEK",
 	})
-	assert.NoError(t, err)
-	raw, _ = c.GetFile(fork.Owner.UserName, fork.Name, "master", "A")
-	assert.EqualValues(t, "ZmlsZUEK", base64.StdEncoding.EncodeToString(raw))
+	if !assert.NoError(t, err) || !assert.NotNil(t, newFile) {
+		return false
+	}
 
-	updatedFile, err := c.UpdateFile(fork.Owner.UserName, fork.Name, "A", UpdateFileOptions{
-		DeleteFileOptions: DeleteFileOptions{
-			FileOptions: FileOptions{
-				Message: "add a new line",
-			},
-			SHA: newFile.Content.SHA,
+	conflictFile1, err := c.CreateFile(origRepo.Owner.UserName, origRepo.Name, "bad-file", CreateFileOptions{
+		Content: "U3RhcnQgQ29uZmxpY3QK",
+		FileOptions: FileOptions{
+			Message:    "Start Conflict",
+			BranchName: "master",
 		},
-		Content: "ZmlsZUEKCmFuZCBhIG5ldyBsaW5lCg==",
 	})
-	assert.NoError(t, err)
-	assert.NotNil(t, updatedFile)
-	 */
+	if !assert.NoError(t, err) || !assert.NotNil(t, conflictFile1) {
+		return false
+	}
+
+	conflictFile2, err := c.CreateFile(forkRepo.Owner.UserName, forkRepo.Name, "bad-file", CreateFileOptions{
+		Content: "V2lsbEhhdmUgQ29uZmxpY3QK",
+		FileOptions: FileOptions{
+			Message:       "creat a new file witch will conflict",
+			BranchName:    "master",
+			NewBranchName: "will_conflict",
+		},
+	})
+	if !assert.NoError(t, err) || !assert.NotNil(t, conflictFile2) {
+		return false
+	}
+
+	return true
 }
