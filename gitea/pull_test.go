@@ -18,8 +18,8 @@ func TestPull(t *testing.T) {
 	assert.NoError(t, err)
 
 	var repoName = "repo_pull_test"
-	var forkOrg = "ForkOrg"
-	if !preparePullTest(t, c, repoName, forkOrg) {
+	_, err = createTestRepo(t, repoName, c)
+	if err != nil {
 		return
 	}
 
