@@ -18,8 +18,8 @@ func TestPull(t *testing.T) {
 	assert.NoError(t, err)
 
 	var repoName = "repo_pull_test"
-	_, err = createTestRepo(t, repoName, c)
-	if err != nil {
+	var forkOrg = "ForkOrg"
+	if !preparePullTest(t, c, repoName, forkOrg) {
 		return
 	}
 
@@ -31,21 +31,4 @@ func TestPull(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Len(t, pulls, 0)
-
-	//ToDo add git stuff to have different branches witch can be used to create PRs and test merge etc ...
-
-	// GetPullRequest get information of one PR
-	//func (c *Client) GetPullRequest(owner, repo string, index int64) (*PullRequest, error)
-
-	// CreatePullRequest create pull request with options
-	//func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOption) (*PullRequest, error)
-
-	// EditPullRequest modify pull request with PR id and options
-	//func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRequestOption) (*PullRequest, error)
-
-	// MergePullRequest merge a PR to repository by PR id
-	//func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (*MergePullRequestResponse, error)
-
-	// IsPullRequestMerged test if one PR is merged to one repository
-	//func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, error)
 }
