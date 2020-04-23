@@ -158,14 +158,16 @@ type MergePullRequestResponse struct {
 }
 
 // MergePullRequest merge a PR to repository by PR id
-func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (*MergePullRequestResponse, error) {
+func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (bool, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	response := new(MergePullRequestResponse)
-	return response, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index),
-		jsonHeader, bytes.NewReader(body), response)
+	status, err := c.getStatusCode("POST", fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index), jsonHeader, bytes.NewReader(body))
+	if err != nil {
+		return false, err
+	}
+	return status == 200, nil
 }
 
 // IsPullRequestMerged test if one PR is merged to one repository

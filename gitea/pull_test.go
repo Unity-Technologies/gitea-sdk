@@ -61,13 +61,14 @@ func TestPull(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, pullUpdateFile.HasMerged)
 	assert.True(t, pullUpdateFile.Mergeable)
-	_, err = c.MergePullRequest(user.UserName, repoName, pullUpdateFile.Index, MergePullRequestOption{
+	merged, err := c.MergePullRequest(user.UserName, repoName, pullUpdateFile.Index, MergePullRequestOption{
 		Do:                "squash",
 		MergeTitleField:   pullUpdateFile.Title,
 		MergeMessageField: "squash: " + pullUpdateFile.Title,
 	})
 	assert.NoError(t, err)
-	merged, err := c.IsPullRequestMerged(user.UserName, repoName, pullConflict.Index)
+	assert.True(t, merged)
+	merged, err = c.IsPullRequestMerged(user.UserName, repoName, pullUpdateFile.Index)
 	assert.NoError(t, err)
 	assert.True(t, merged)
 	pr, err = c.GetPullRequest(user.UserName, repoName, pullUpdateFile.Index)
@@ -83,12 +84,13 @@ func TestPull(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, pullConflict.HasMerged)
 	assert.False(t, pullConflict.Mergeable)
-	_, err = c.MergePullRequest(user.UserName, repoName, pullConflict.Index, MergePullRequestOption{
+	merged, err = c.MergePullRequest(user.UserName, repoName, pullConflict.Index, MergePullRequestOption{
 		Do:                "merge",
 		MergeTitleField:   "pullConflict",
 		MergeMessageField: "pullConflict Msg",
 	})
-	assert.Error(t, err)
+	assert.NoError(t, err)
+	assert.False(t, merged)
 	merged, err = c.IsPullRequestMerged(user.UserName, repoName, pullConflict.Index)
 	assert.NoError(t, err)
 	assert.False(t, merged)
