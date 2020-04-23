@@ -5,9 +5,10 @@
 package gitea
 
 import (
-	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestIssueComment creat a issue and test comment creation/edit/deletion on it

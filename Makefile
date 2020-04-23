@@ -6,6 +6,8 @@ GITEA_SDK_TEST_URL ?= http://localhost:3000
 GITEA_SDK_TEST_USERNAME ?= test01
 GITEA_SDK_TEST_PASSWORD ?= test01
 
+PACKAGE := code.gitea.io/sdk/gitea
+
 .PHONY: all
 all: clean test build
 
@@ -33,7 +35,12 @@ fmt:
 
 .PHONY: vet
 vet:
-	cd gitea && $(GO) vet ./...
+	# Default vet
+	cd gitea && $(GO) vet $(PACKAGE)
+	# Custom vet
+	$(GO) get gitea.com/jolheiser/gitea-vet
+	$(GO) build gitea.com/jolheiser/gitea-vet
+	cd gitea && $(GO) vet -vettool=../gitea-vet $(PACKAGE)
 
 .PHONY: lint
 lint:
