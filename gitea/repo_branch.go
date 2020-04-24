@@ -71,8 +71,8 @@ func (c *Client) GetRepoBranch(user, repo, branch string) (*Branch, error) {
 	return b, nil
 }
 
-// DeleteBranch delete a branch in a repository
-func (c *Client) DeleteBranch(user, repo, branch string) (bool, error) {
+// DeleteRepoBranch delete a branch in a repository
+func (c *Client) DeleteRepoBranch(user, repo, branch string) (bool, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return false, err
 	}

@@ -33,10 +33,10 @@ func TestRepoBranches(t *testing.T) {
 	assert.EqualValues(t, bl[2].Commit.ID, b.Commit.ID)
 	assert.EqualValues(t, bl[2].Commit.Added, b.Commit.Added)
 
-	s, err := c.DeleteBranch(repo.Owner.UserName, repo.Name, "master")
+	s, err := c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "master")
 	assert.NoError(t, err)
 	assert.False(t, s)
-	s, err = c.DeleteBranch(repo.Owner.UserName, repo.Name, "feature")
+	s, err = c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "feature")
 	assert.NoError(t, err)
 	assert.True(t, s)
 
