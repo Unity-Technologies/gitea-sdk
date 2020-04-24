@@ -42,7 +42,7 @@ func (c *Client) DeleteIssueSubscription(owner, repo string, index int64, user s
 	if err != nil {
 		return err
 	}
-	if status == http.StatusNoContent {
+	if status == http.StatusCreated {
 		return nil
 	}
 	return fmt.Errorf("unexpected Status: %d", status)
