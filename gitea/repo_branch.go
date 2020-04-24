@@ -65,7 +65,10 @@ func (c *Client) ListRepoBranches(user, repo string, opt ListRepoBranchesOptions
 // GetRepoBranch get one branch's information of one repository
 func (c *Client) GetRepoBranch(user, repo, branch string) (*Branch, error) {
 	b := new(Branch)
-	return b, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches/%s", user, repo, branch), nil, nil, &b)
+	if err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches/%s", user, repo, branch), nil, nil, &b); err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 // DeleteBranch delete a branch in a repository
