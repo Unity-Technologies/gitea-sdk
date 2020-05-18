@@ -56,10 +56,11 @@ type Issue struct {
 // ListIssueOption list issue options
 type ListIssueOption struct {
 	ListOptions
-	State   StateType
-	Type    IssueType
-	Labels  []string
-	KeyWord string
+	State     StateType
+	Type      IssueType
+	Labels    []string
+	Milestone []string
+	KeyWord   string
 }
 
 // StateType issue state type
@@ -106,6 +107,16 @@ func (opt *ListIssueOption) QueryEncode() string {
 		query.Add("q", opt.KeyWord)
 	}
 	query.Add("type", string(opt.Type))
+	if len(opt.Milestone) > 0 {
+		var miles string
+		for i := range opt.Milestone {
+			if len(miles) > 0 {
+				miles += ","
+			}
+			miles += opt.Milestone[i]
+		}
+		query.Add("milestones", miles)
+	}
 
 	return query.Encode()
 }
