@@ -86,6 +86,18 @@ func listIssues(t *testing.T, c *Client) {
 	assert.NoError(t, err)
 	assert.Len(t, issues, 1)
 
+	issues, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
+		Milestone: []string{"mile1"},
+		State:     "all",
+	})
+	assert.NoError(t, err)
+	assert.Len(t, issues, 3)
+	for i := range issues {
+		if assert.NotNil(t, issues[i].Milestone) {
+			assert.EqualValues(t, "mile1", issues[i].Milestone.Title)
+		}
+	}
+
 	issues, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 3)
