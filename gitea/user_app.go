@@ -36,7 +36,7 @@ func (c *Client) ListAccessTokens(user, pass string, opts ListAccessTokensOption
 	opts.setDefaults()
 	tokens := make([]*AccessToken, 0, opts.PageSize)
 	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, opts.getURLQuery().Encode()),
-		http.Header{"Authorization": []string{"Basic " + basicAuthEncode(user, pass)}}, nil, &tokens)
+		userAppHeader(user, pass, ""), nil, &tokens)
 }
 
 // CreateAccessTokenOption options when create access token
@@ -52,15 +52,24 @@ func (c *Client) CreateAccessToken(user, pass string, opt CreateAccessTokenOptio
 	}
 	t := new(AccessToken)
 	return t, c.getParsedResponse("POST", fmt.Sprintf("/users/%s/tokens", user),
-		http.Header{
-			"content-type":  []string{"application/json"},
-			"Authorization": []string{"Basic " + basicAuthEncode(user, pass)}},
+		userAppHeader(user, pass, ""),
 		bytes.NewReader(body), t)
 }
 
 // DeleteAccessToken delete token with key id
 func (c *Client) DeleteAccessToken(user, pass string, keyID int64) error {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/users/%s/tokens/%d", user, keyID),
-		http.Header{"Authorization": []string{"Basic " + basicAuthEncode(user, pass)}}, nil)
+		userAppHeader(user, pass, ""), nil)
 	return err
+}
+
+func userAppHeader(user, pass, otp string) http.Header {
+	header := http.Header{
+		"content-type":  []string{"application/json"},
+		"Authorization": []string{"Basic " + basicAuthEncode(user, pass)},
+	}
+	if len(otp) != 0 {
+		header.Set("X-GITEA-OTP", otp)
+	}
+	return header
 }
