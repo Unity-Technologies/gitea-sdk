@@ -62,7 +62,7 @@ func TestPull(t *testing.T) {
 	assert.False(t, pullUpdateFile.HasMerged)
 	assert.True(t, pullUpdateFile.Mergeable)
 	merged, err := c.MergePullRequest(user.UserName, repoName, pullUpdateFile.Index, MergePullRequestOption{
-		Do:                "squash",
+		MergeStyle:        MergeStyleSquash,
 		MergeTitleField:   pullUpdateFile.Title,
 		MergeMessageField: "squash: " + pullUpdateFile.Title,
 	})
@@ -85,7 +85,7 @@ func TestPull(t *testing.T) {
 	assert.False(t, pullConflict.HasMerged)
 	assert.False(t, pullConflict.Mergeable)
 	merged, err = c.MergePullRequest(user.UserName, repoName, pullConflict.Index, MergePullRequestOption{
-		Do:                "merge",
+		MergeStyle:        MergeStyleMerge,
 		MergeTitleField:   "pullConflict",
 		MergeMessageField: "pullConflict Msg",
 	})
