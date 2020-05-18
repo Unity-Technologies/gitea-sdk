@@ -10,7 +10,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 // basicAuthEncode generate base64 of basic auth head
@@ -35,8 +34,7 @@ type ListAccessTokensOptions struct {
 func (c *Client) ListAccessTokens(user, pass string, opts ListAccessTokensOptions) ([]*AccessToken, error) {
 	opts.setDefaults()
 	tokens := make([]*AccessToken, 0, opts.PageSize)
-	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, opts.getURLQuery().Encode()),
-		userAppHeader(user, pass, ""), nil, &tokens)
+	return tokens, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", user, opts.getURLQuery().Encode()), jsonHeader, nil, &tokens)
 }
 
 // CreateAccessTokenOption options when create access token
@@ -46,30 +44,18 @@ type CreateAccessTokenOption struct {
 
 // CreateAccessToken create one access token with options
 func (c *Client) CreateAccessToken(user, pass string, opt CreateAccessTokenOption) (*AccessToken, error) {
+	c.SetBasicAuth(user, pass)
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
 	}
 	t := new(AccessToken)
-	return t, c.getParsedResponse("POST", fmt.Sprintf("/users/%s/tokens", user),
-		userAppHeader(user, pass, ""),
-		bytes.NewReader(body), t)
+	return t, c.getParsedResponse("POST", fmt.Sprintf("/users/%s/tokens", user), jsonHeader, bytes.NewReader(body), t)
 }
 
 // DeleteAccessToken delete token with key id
 func (c *Client) DeleteAccessToken(user, pass string, keyID int64) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/users/%s/tokens/%d", user, keyID),
-		userAppHeader(user, pass, ""), nil)
+	c.SetBasicAuth(user, pass)
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/users/%s/tokens/%d", user, keyID), jsonHeader, nil)
 	return err
-}
-
-func userAppHeader(user, pass, otp string) http.Header {
-	header := http.Header{
-		"content-type":  []string{"application/json"},
-		"Authorization": []string{"Basic " + basicAuthEncode(user, pass)},
-	}
-	if len(otp) != 0 {
-		header.Set("X-GITEA-OTP", otp)
-	}
-	return header
 }
