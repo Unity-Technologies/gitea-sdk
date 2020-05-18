@@ -90,23 +90,28 @@ const (
 // QueryEncode turns options into querystring argument
 func (opt *ListIssueOption) QueryEncode() string {
 	query := opt.getURLQuery()
+
 	if len(opt.State) > 0 {
 		query.Add("state", string(opt.State))
 	}
+
 	if len(opt.Labels) > 0 {
 		var lq string
-		for _, l := range opt.Labels {
+		for i := range opt.Labels {
 			if len(lq) > 0 {
 				lq += ","
 			}
-			lq += l
+			lq += opt.Labels[i]
 		}
 		query.Add("labels", lq)
 	}
+
 	if len(opt.KeyWord) > 0 {
 		query.Add("q", opt.KeyWord)
 	}
+
 	query.Add("type", string(opt.Type))
+
 	if len(opt.Milestone) > 0 {
 		var miles string
 		for i := range opt.Milestone {
