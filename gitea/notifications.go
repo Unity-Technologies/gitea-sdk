@@ -75,10 +75,10 @@ func (c *Client) CheckNotifications() (int64, error) {
 
 // GetNotification get notification thread by ID
 func (c *Client) GetNotification(id int64) (*NotificationThread, error) {
-	thread := new(NotificationThread)
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
-		return thread, err
+		return nil, err
 	}
+	thread := new(NotificationThread)
 	return thread, c.getParsedResponse("GET", fmt.Sprintf("/notifications/threads/%d", id), nil, nil, thread)
 }
 
