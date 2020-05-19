@@ -71,12 +71,12 @@ func listIssues(t *testing.T, c *Client) {
 	log.Println("== TestListIssues ==")
 
 	issues, err := c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
-		Labels:  []string{"Label2"},
+		Labels:  []string{"Label1", "Label2"},
 		KeyWord: "",
 		State:   "all",
 	})
 	assert.NoError(t, err)
-	assert.Len(t, issues, 2)
+	assert.Len(t, issues, 1)
 
 	issues, err = c.ListIssues(ListIssueOption{
 		Labels:  []string{"Label2"},
@@ -87,8 +87,8 @@ func listIssues(t *testing.T, c *Client) {
 	assert.Len(t, issues, 1)
 
 	issues, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
-		Milestone: []string{"mile1"},
-		State:     "all",
+		Milestones: []string{"mile1"},
+		State:      "all",
 	})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 3)
