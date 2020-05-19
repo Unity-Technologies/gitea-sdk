@@ -72,7 +72,7 @@ type PullReviewComment struct {
 
 // CreatePullReviewOptions are options to create a pull review
 type CreatePullReviewOptions struct {
-	Event    ReviewStateType           `json:"event"`
+	State    ReviewStateType           `json:"event"`
 	Body     string                    `json:"body"`
 	CommitID string                    `json:"commit_id"`
 	Comments []CreatePullReviewComment `json:"comments"`
@@ -91,7 +91,7 @@ type CreatePullReviewComment struct {
 
 // SubmitPullReviewOptions are options to submit a pending pull review
 type SubmitPullReviewOptions struct {
-	Event ReviewStateType `json:"event"`
+	State ReviewStateType `json:"event"`
 	Body  string          `json:"body"`
 }
 
