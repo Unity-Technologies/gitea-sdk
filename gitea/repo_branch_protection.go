@@ -100,7 +100,7 @@ func (c *Client) ListBranchProtections(owner, repo string, opt ListBranchProtect
 	bps := make([]*BranchProtection, 0, 5)
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/branch_protections", owner, repo))
 	link.RawQuery = opt.getURLQuery().Encode()
-	return bps, c.getParsedResponse("GET", link.String(), jsonHeader, nil, bps)
+	return bps, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &bps)
 }
 
 // GetBranchProtection gets a branch protection
