@@ -31,6 +31,7 @@ type NotificationSubject struct {
 
 // ListNotificationOptions represents the filter options
 type ListNotificationOptions struct {
+	ListOptions
 	Since  time.Time
 	Before time.Time
 }
@@ -42,7 +43,7 @@ type MarkNotificationOptions struct {
 
 // QueryEncode encode options to url query
 func (opt *ListNotificationOptions) QueryEncode() string {
-	query := make(url.Values)
+	query := opt.getURLQuery()
 	if !opt.Since.IsZero() {
 		query.Add("since", opt.Since.Format(time.RFC3339))
 	}
