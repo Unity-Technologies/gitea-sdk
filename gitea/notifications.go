@@ -95,7 +95,7 @@ func (c *Client) ReadNotification(id int64) error {
 // ListNotifications list users's notification threads
 func (c *Client) ListNotifications(opt ListNotificationOptions) ([]*NotificationThread, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
-		return make([]*NotificationThread, 0, 1), err
+		return nil, err
 	}
 	link, _ := url.Parse("/notifications")
 	link.RawQuery = opt.QueryEncode()
@@ -117,7 +117,7 @@ func (c *Client) ReadNotifications(opt MarkNotificationOptions) error {
 // ListRepoNotifications list users's notification threads on a specific repo
 func (c *Client) ListRepoNotifications(owner, reponame string, opt ListNotificationOptions) ([]*NotificationThread, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
-		return make([]*NotificationThread, 0, 1), err
+		return nil, err
 	}
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/notifications", owner, reponame))
 	link.RawQuery = opt.QueryEncode()
