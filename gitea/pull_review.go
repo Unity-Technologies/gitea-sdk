@@ -5,7 +5,10 @@
 package gitea
 
 import (
-	"code.gitea.io/gitea/modules/context"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -92,93 +95,90 @@ type SubmitPullReviewOptions struct {
 	Body  string          `json:"body"`
 }
 
+// ListPullReviewsOptions options for listing PullReviews
+type ListPullReviewsOptions struct {
+	ListOptions
+}
+
 // ListPullReviews lists all reviews of a pull request
-func (c *Client) ListPullReviews() ([]*PullReview, error) {
+func (c *Client) ListPullReviews(owner, repo string, index int64, opt ListPullReviewsOptions) ([]*PullReview, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return nil, err
 	}
-	// swagger:operation GET /repos/{owner}/{repo}/pulls/{index}/reviews repository repoListPullReviews
+	opt.setDefaults()
+	rs := make([]*PullReview, 0, opt.PageSize)
 
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/PullReviewList"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews", owner, repo, index))
+	link.RawQuery = opt.ListOptions.getURLQuery().Encode()
+
+	return rs, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &rs)
 }
 
 // GetPullReview gets a specific review of a pull request
-func (c *Client) GetPullReview() (*PullReview, error) {
+func (c *Client) GetPullReview(owner, repo string, index, id int64) (*PullReview, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return nil, err
 	}
-	// swagger:operation GET /repos/{owner}/{repo}/pulls/{index}/reviews/{id} repository repoGetPullReview
 
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/PullReview"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
+	r := new(PullReview)
+	return r, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d", owner, repo, index, id), jsonHeader, nil, &r)
 }
 
-// GetPullReviewComments lists all comments of a pull request review
-func (c *Client) GetPullReviewComments() ([]*PullReviewComment, error) {
+// ListPullReviewsCommentsOptions options for listing PullReviewsComments
+type ListPullReviewsCommentsOptions struct {
+	ListOptions
+}
+
+// ListPullReviewComments lists all comments of a pull request review
+func (c *Client) ListPullReviewComments(owner, repo string, index, id int64, opt ListPullReviewsCommentsOptions) ([]*PullReviewComment, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return nil, err
 	}
-	// swagger:operation GET /repos/{owner}/{repo}/pulls/{index}/reviews/{id}/comments repository repoGetPullReviewComments
-	// ---
+	opt.setDefaults()
+	rcl := make([]*PullReviewComment, 0, opt.PageSize)
 
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/PullReviewCommentList"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d/comments", owner, repo, index, id))
+	link.RawQuery = opt.ListOptions.getURLQuery().Encode()
+
+	return rcl, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &rcl)
 }
 
 // DeletePullReview delete a specific review from a pull request
-func (c *Client) DeletePullReview() error {
+func (c *Client) DeletePullReview(owner, repo string, index, id int64) error {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return err
 	}
-	// swagger:operation DELETE /repos/{owner}/{repo}/pulls/{index}/reviews/{id} repository repoDeletePullReview
 
-	// responses:
-	//   "204":
-	//     "$ref": "#/responses/empty"
-	//   "403":
-	//     "$ref": "#/responses/forbidden"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d", owner, repo, index, id), jsonHeader, nil)
+	return err
 }
 
 // CreatePullReview create a review to an pull request
-func (c *Client) CreatePullReview() (*PullReview, error) {
+func (c *Client) CreatePullReview(owner, repo string, index int64, opt CreatePullReviewOptions) (*PullReview, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return nil, err
 	}
-	// swagger:operation POST /repos/{owner}/{repo}/pulls/{index}/reviews repository repoCreatePullReview
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
 
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/PullReview"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
-	//   "422":
-	//     "$ref": "#/responses/validationError"
+	r := new(PullReview)
+	return r, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews", owner, repo, index),
+		jsonHeader, bytes.NewReader(body), r)
 }
 
 // SubmitPullReview submit a pending review to an pull request
-func (c *Client) SubmitPullReview() (*PullReview, error) {
+func (c *Client) SubmitPullReview(owner, repo string, index, id int64, opt SubmitPullReviewOptions) (*PullReview, error) {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return nil, err
 	}
-	// swagger:operation POST /repos/{owner}/{repo}/pulls/{index}/reviews/{id} repository repoSubmitPullReview
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
 
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/PullReview"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
-	//   "422":
-	//     "$ref": "#/responses/validationError"
+	r := new(PullReview)
+	return r, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews/%d", owner, repo, index, id),
+		jsonHeader, bytes.NewReader(body), r)
 }
