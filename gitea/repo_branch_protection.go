@@ -5,6 +5,10 @@
 package gitea
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -83,158 +87,62 @@ type EditBranchProtectionOption struct {
 	ProtectedFilePatterns       *string  `json:"protected_file_patterns"`
 }
 
+// ListBranchProtectionsOptions list branch protection options
+type ListBranchProtectionsOptions struct {
+	ListOptions
+}
+
 // ListBranchProtections list branch protections for a repo
-func ListBranchProtections() {
-	// swagger:operation GET /repos/{owner}/{repo}/branch_protections repository repoListBranchProtection
-	// ---
-	// summary: List branch protections for a repository
-	// produces:
-	// - application/json
-	// parameters:
-	// - name: owner
-	//   in: path
-	//   description: owner of the repo
-	//   type: string
-	//   required: true
-	// - name: repo
-	//   in: path
-	//   description: name of the repo
-	//   type: string
-	//   required: true
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/BranchProtectionList"
+func (c *Client) ListBranchProtections(owner, repo string, opt ListBranchProtectionsOptions) ([]*BranchProtection, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, err
+	}
+	bps := make([]*BranchProtection, 0, 5)
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/branch_protections", owner, repo))
+	link.RawQuery = opt.getURLQuery().Encode()
+	return bps, c.getParsedResponse("GET", link.String(), jsonHeader, nil, bps)
 }
 
 // GetBranchProtection gets a branch protection
-func GetBranchProtection() {
-	// swagger:operation GET /repos/{owner}/{repo}/branch_protections/{name} repository repoGetBranchProtection
-	// ---
-	// summary: Get a specific branch protection for the repository
-	// produces:
-	// - application/json
-	// parameters:
-	// - name: owner
-	//   in: path
-	//   description: owner of the repo
-	//   type: string
-	//   required: true
-	// - name: repo
-	//   in: path
-	//   description: name of the repo
-	//   type: string
-	//   required: true
-	// - name: name
-	//   in: path
-	//   description: name of protected branch
-	//   type: string
-	//   required: true
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/BranchProtection"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
+func (c *Client) GetBranchProtection(owner, repo, name string) (*BranchProtection, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, err
+	}
+	bp := new(BranchProtection)
+	return bp, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branch_protections/%s", owner, repo, name), jsonHeader, nil, bp)
 }
 
 // CreateBranchProtection creates a branch protection for a repo
-func CreateBranchProtection(opt CreateBranchProtectionOption) {
-	// swagger:operation POST /repos/{owner}/{repo}/branch_protections repository repoCreateBranchProtection
-	// ---
-	// summary: Create a branch protections for a repository
-	// consumes:
-	// - application/json
-	// produces:
-	// - application/json
-	// parameters:
-	// - name: owner
-	//   in: path
-	//   description: owner of the repo
-	//   type: string
-	//   required: true
-	// - name: repo
-	//   in: path
-	//   description: name of the repo
-	//   type: string
-	//   required: true
-	// - name: body
-	//   in: body
-	//   schema:
-	//     "$ref": "#/definitions/CreateBranchProtectionOption"
-	// responses:
-	//   "201":
-	//     "$ref": "#/responses/BranchProtection"
-	//   "403":
-	//     "$ref": "#/responses/forbidden"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
-	//   "422":
-	//     "$ref": "#/responses/validationError"
+func (c *Client) CreateBranchProtection(owner, repo string, opt CreateBranchProtectionOption) (*BranchProtection, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, err
+	}
+	bp := new(BranchProtection)
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	return bp, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/branch_protections", owner, repo), jsonHeader, bytes.NewReader(body), bp)
 }
 
 // EditBranchProtection edits a branch protection for a repo
-func EditBranchProtection(opt EditBranchProtectionOption) {
-	// swagger:operation PATCH /repos/{owner}/{repo}/branch_protections/{name} repository repoEditBranchProtection
-	// ---
-	// summary: Edit a branch protections for a repository. Only fields that are set will be changed
-	// consumes:
-	// - application/json
-	// produces:
-	// - application/json
-	// parameters:
-	// - name: owner
-	//   in: path
-	//   description: owner of the repo
-	//   type: string
-	//   required: true
-	// - name: repo
-	//   in: path
-	//   description: name of the repo
-	//   type: string
-	//   required: true
-	// - name: name
-	//   in: path
-	//   description: name of protected branch
-	//   type: string
-	//   required: true
-	// - name: body
-	//   in: body
-	//   schema:
-	//     "$ref": "#/definitions/EditBranchProtectionOption"
-	// responses:
-	//   "200":
-	//     "$ref": "#/responses/BranchProtection"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
-	//   "422":
-	//     "$ref": "#/responses/validationError"
+func (c *Client) EditBranchProtection(owner, repo, name string, opt EditBranchProtectionOption) (*BranchProtection, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, err
+	}
+	bp := new(BranchProtection)
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	return bp, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/branch_protections/%s", owner, repo, name), jsonHeader, bytes.NewReader(body), bp)
 }
 
 // DeleteBranchProtection deletes a branch protection for a repo
-func DeleteBranchProtection() {
-	// swagger:operation DELETE /repos/{owner}/{repo}/branch_protections/{name} repository repoDeleteBranchProtection
-	// ---
-	// summary: Delete a specific branch protection for the repository
-	// produces:
-	// - application/json
-	// parameters:
-	// - name: owner
-	//   in: path
-	//   description: owner of the repo
-	//   type: string
-	//   required: true
-	// - name: repo
-	//   in: path
-	//   description: name of the repo
-	//   type: string
-	//   required: true
-	// - name: name
-	//   in: path
-	//   description: name of protected branch
-	//   type: string
-	//   required: true
-	// responses:
-	//   "204":
-	//     "$ref": "#/responses/empty"
-	//   "404":
-	//     "$ref": "#/responses/notFound"
+func (c *Client) DeleteBranchProtection(owner, repo, name string) error {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return err
+	}
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/branch_protections/%s", owner, repo, name), jsonHeader, nil)
+	return err
 }
