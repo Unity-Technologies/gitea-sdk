@@ -160,14 +160,14 @@ func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRe
 
 // MergePullRequestOption options when merging a pull request
 type MergePullRequestOption struct {
-	MergeStyle        MergeStyle `json:"Do"`
-	MergeTitleField   string     `json:"MergeTitleField"`
-	MergeMessageField string     `json:"MergeMessageField"`
+	Style   MergeStyle `json:"Do"`
+	Title   string     `json:"MergeTitleField"`
+	Message string     `json:"MergeMessageField"`
 }
 
 // MergePullRequest merge a PR to repository by PR id
 func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (bool, error) {
-	if opt.MergeStyle == MergeStyleSquash {
+	if opt.Style == MergeStyleSquash {
 		if err := c.CheckServerVersionConstraint(">=1.11.5"); err != nil {
 			return false, err
 		}
