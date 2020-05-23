@@ -91,17 +91,34 @@ func (c *Client) ListOrgRepos(org string, opt ListOrgReposOptions) ([]*Repositor
 // SearchRepoOptions options for searching repositories
 type SearchRepoOptions struct {
 	ListOptions
-	Keyword         string
-	Topic           bool
-	IncludeDesc     bool
-	UID             int64
+	// The keyword to query
+	Keyword string
+	// Limit search to repositories with keyword as topic
+	Topic bool
+	// Include search of keyword within repository description
+	IncludeDesc bool
+	// Search only for repos that the user with the given id owns or contributes to
+	UID int64
+	// Repo owner to prioritize in the results
 	PriorityOwnerID int64
-	StarredBy       int64
-	Private         bool
-	Template        bool
-	Mode            string
-	Exclusive       bool
-	Sort            string
+	// Search only for repos that the user with the given id has starred
+	StarredBy int64
+	// Include private repositories this user has access to (defaults to true)
+	Private bool
+	// (>=1.12.0) Show only pubic, private or all repositories (defaults to all)
+	IsPrivate *bool
+	// Include template repositories this user has access to (defaults to true)
+	Template bool
+	// Show only archived, non-archived or all repositories (defaults to all)
+	Archived *bool
+	// type of repository to search for. Supported values are "fork", "source", "mirror" and "collaborative"
+	Mode string
+	// If uid is given, search only for repos that the user owns
+	Exclusive bool
+	// sort repos by attribute. Supported values are "alpha", "created", "updated", "size", and "id". Default is "alpha"
+	Sort string
+	// sort order, either "asc" (ascending) or "desc" (descending). Default is "asc", ignored if "sort" is not specified.
+	Order string
 }
 
 // QueryEncode turns options into querystring argument
