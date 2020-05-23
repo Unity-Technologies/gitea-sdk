@@ -145,6 +145,12 @@ type SearchRepoOptions struct {
 	Order string
 	// Repo owner to prioritize in the results
 	PrioritizedByOwnerID int64
+
+	/*
+		Cover EdgeCases
+	*/
+	// if set all other options are ignored and this string is used as query
+	RawQuery string
 }
 
 // QueryEncode turns options into querystring argument
@@ -207,15 +213,19 @@ func (c *Client) SearchRepos(opt SearchRepoOptions) ([]*Repository, error) {
 	resp := new(searchRepoResponse)
 
 	link, _ := url.Parse("/repos/search")
-	link.RawQuery = opt.QueryEncode()
 
-	// IsPrivate only works on gitea >= 1.12.0
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil && opt.IsPrivate != nil {
-		if *opt.IsPrivate {
-			// private repos only not supported on gitea <= 1.11.x
-			return nil, err
+	if len(opt.RawQuery) != 0 {
+		link.RawQuery = opt.RawQuery
+	} else {
+		link.RawQuery = opt.QueryEncode()
+		// IsPrivate only works on gitea >= 1.12.0
+		if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil && opt.IsPrivate != nil {
+			if *opt.IsPrivate {
+				// private repos only not supported on gitea <= 1.11.x
+				return nil, err
+			}
+			link.Query().Add("private", "false")
 		}
-		link.Query().Add("private", "false")
 	}
 
 	err := c.getParsedResponse("GET", link.String(), nil, nil, &resp)
