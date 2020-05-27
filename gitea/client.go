@@ -110,6 +110,8 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 		return nil, err
 	}
 
+	errMap := make(map[string]interface{})
+
 	switch resp.StatusCode {
 	case 403:
 		return nil, errors.New("403 Forbidden")
@@ -120,11 +122,14 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 	case 422:
 		return nil, fmt.Errorf("422 Unprocessable Entity: %s", string(data))
 	case 500:
-		return nil, fmt.Errorf("500 Internal Server Error, request: '%s' with '%s' method and '%s' header", path, method, header)
+		if err = json.Unmarshal(data, &errMap); err != nil {
+			return nil, fmt.Errorf("500 Internal Server Error, request: '%s' with '%s' method '%s' header and '%s' body", path, method, header, string(data))
+		}
+		return nil, errors.New(errMap["message"].(string))
 	}
 
 	if resp.StatusCode/100 != 2 {
-		errMap := make(map[string]interface{})
+
 		if err = json.Unmarshal(data, &errMap); err != nil {
 			// when the JSON can't be parsed, data was probably empty or a plain string,
 			// so we try to return a helpful error anyway
