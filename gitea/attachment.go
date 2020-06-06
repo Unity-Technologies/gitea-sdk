@@ -30,47 +30,56 @@ type ListReleaseAttachmentsOptions struct {
 }
 
 // ListReleaseAttachments list release's attachments
-func (c *Client) ListReleaseAttachments(user, repo string, release int64, opt ListReleaseAttachmentsOptions) ([]*Attachment, error) {
+func (c *Client) ListReleaseAttachments(user, repo string, release int64, opt ListReleaseAttachmentsOptions) ([]*Attachment, *Response, error) {
 	opt.setDefaults()
 	attachments := make([]*Attachment, 0, opt.PageSize)
-	err := c.getParsedResponse("GET",
+	resp, err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/releases/%d/assets?%s", user, repo, release, opt.getURLQuery().Encode()),
 		nil, nil, &attachments)
-	return attachments, err
+	if err != nil {
+		return nil, nil, err
+	}
+	return attachments, resp, nil
 }
 
 // GetReleaseAttachment returns the requested attachment
-func (c *Client) GetReleaseAttachment(user, repo string, release int64, id int64) (*Attachment, error) {
-	a := new(Attachment)
-	err := c.getParsedResponse("GET",
+func (c *Client) GetReleaseAttachment(user, repo string, release int64, id int64) (*Attachment, *Response, error) {
+	attachment := new(Attachment)
+	resp, err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, id),
-		nil, nil, &a)
-	return a, err
+		nil, nil, &attachment)
+	if err != nil {
+		return nil, nil, err
+	}
+	return attachment, resp, err
 }
 
 // CreateReleaseAttachment creates an attachment for the given release
-func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file io.Reader, filename string) (*Attachment, error) {
+func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file io.Reader, filename string) (*Attachment, *Response, error) {
 	// Write file to body
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("attachment", filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if _, err = io.Copy(part, file); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err = writer.Close(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Send request
 	attachment := new(Attachment)
-	err = c.getParsedResponse("POST",
+	resp, err := c.getParsedResponse("POST",
 		fmt.Sprintf("/repos/%s/%s/releases/%d/assets", user, repo, release),
 		http.Header{"Content-Type": {writer.FormDataContentType()}}, body, &attachment)
-	return attachment, err
+	if err != nil {
+		return nil, nil, err
+	}
+	return attachment, resp, nil
 }
 
 // EditAttachmentOptions options for editing attachments
@@ -79,17 +88,24 @@ type EditAttachmentOptions struct {
 }
 
 // EditReleaseAttachment updates the given attachment with the given options
-func (c *Client) EditReleaseAttachment(user, repo string, release int64, attachment int64, form EditAttachmentOptions) (*Attachment, error) {
+func (c *Client) EditReleaseAttachment(user, repo string, release int64, attachment int64, form EditAttachmentOptions) (*Attachment, *Response, error) {
 	body, err := json.Marshal(&form)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	attach := new(Attachment)
-	return attach, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, attachment), jsonHeader, bytes.NewReader(body), attach)
+	resp, err := c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, attachment), jsonHeader, bytes.NewReader(body), attach)
+	if err != nil {
+		return nil, nil, err
+	}
+	return attach, resp, nil
 }
 
 // DeleteReleaseAttachment deletes the given attachment including the uploaded file
-func (c *Client) DeleteReleaseAttachment(user, repo string, release int64, id int64) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, id), nil, nil)
-	return err
+func (c *Client) DeleteReleaseAttachment(user, repo string, release int64, id int64) (*Response, error) {
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, id), nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

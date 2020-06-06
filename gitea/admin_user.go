@@ -17,10 +17,19 @@ type AdminListUsersOptions struct {
 }
 
 // AdminListUsers lists all users
-func (c *Client) AdminListUsers(opt AdminListUsersOptions) ([]*User, error) {
+func (c *Client) AdminListUsers(opt AdminListUsersOptions) ([]*User, *Response, error) {
 	opt.setDefaults()
 	users := make([]*User, 0, opt.PageSize)
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/admin/users?%s", opt.getURLQuery().Encode()), nil, nil, &users)
+
+	data, resp, err := c.getResponse("GET", fmt.Sprintf("/admin/users?%s", opt.getURLQuery().Encode()), nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = json.Unmarshal(data, &users)
+	if err != nil {
+		return nil, nil, err
+	}
+	return users, resp, nil
 }
 
 // CreateUserOption create user options
@@ -36,13 +45,18 @@ type CreateUserOption struct {
 }
 
 // AdminCreateUser create a user
-func (c *Client) AdminCreateUser(opt CreateUserOption) (*User, error) {
+func (c *Client) AdminCreateUser(opt CreateUserOption) (*User, *Response, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	user := new(User)
-	return user, c.getParsedResponse("POST", "/admin/users", jsonHeader, bytes.NewReader(body), user)
+	resp, err := c.getParsedResponse("POST", "/admin/users", jsonHeader, bytes.NewReader(body), user)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return user, resp, nil
 }
 
 // EditUserOption edit user options
@@ -65,33 +79,46 @@ type EditUserOption struct {
 }
 
 // AdminEditUser modify user informations
-func (c *Client) AdminEditUser(user string, opt EditUserOption) error {
-	body, err := json.Marshal(&opt)
-	if err != nil {
-		return err
-	}
-	_, err = c.getResponse("PATCH", fmt.Sprintf("/admin/users/%s", user), jsonHeader, bytes.NewReader(body))
-	return err
-}
-
-// AdminDeleteUser delete one user according name
-func (c *Client) AdminDeleteUser(user string) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/admin/users/%s", user), nil, nil)
-	return err
-}
-
-// AdminCreateUserPublicKey adds a public key for the user
-func (c *Client) AdminCreateUserPublicKey(user string, opt CreateKeyOption) (*PublicKey, error) {
+func (c *Client) AdminEditUser(user string, opt EditUserOption) (*Response, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
 	}
+	_, resp, err := c.getResponse("PATCH", fmt.Sprintf("/admin/users/%s", user), jsonHeader, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// AdminDeleteUser delete one user according name
+func (c *Client) AdminDeleteUser(user string) (*Response, error) {
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/admin/users/%s", user), nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// AdminCreateUserPublicKey adds a public key for the user
+func (c *Client) AdminCreateUserPublicKey(user string, opt CreateKeyOption) (*PublicKey, *Response, error) {
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, nil, err
+	}
 	key := new(PublicKey)
-	return key, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/keys", user), jsonHeader, bytes.NewReader(body), key)
+	resp, err := c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/keys", user), jsonHeader, bytes.NewReader(body), key)
+	if err != nil {
+		return nil, nil, err
+	}
+	return key, resp, nil
 }
 
 // AdminDeleteUserPublicKey deletes a user's public key
-func (c *Client) AdminDeleteUserPublicKey(user string, keyID int) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/admin/users/%s/keys/%d", user, keyID), nil, nil)
-	return err
+func (c *Client) AdminDeleteUserPublicKey(user string, keyID int) (*Response, error) {
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/admin/users/%s/keys/%d", user, keyID), nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

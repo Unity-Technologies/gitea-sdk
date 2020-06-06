@@ -7,8 +7,6 @@ package gitea
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -23,6 +21,11 @@ var jsonHeader = http.Header{"content-type": []string{"application/json"}}
 // Version return the library version
 func Version() string {
 	return "0.13.0"
+}
+
+// Response represents the gitea response
+type Response struct {
+	*http.Response
 }
 
 // Client represents a Gitea API client.
@@ -74,7 +77,7 @@ func (c *Client) SetSudo(sudo string) {
 	c.sudo = sudo
 }
 
-func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*http.Response, error) {
+func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
 	req, err := http.NewRequest(method, c.url+"/api/v1"+path, body)
 	if err != nil {
 		return nil, err
@@ -95,53 +98,38 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 		req.Header[k] = v
 	}
 
-	return c.client.Do(req)
-}
-
-func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, error) {
-	resp, err := c.doRequest(method, path, header, body)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	return &Response{resp}, nil
+}
+
+func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {
+	resp, err := c.doRequest(method, path, header, body)
+	if err != nil {
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	switch resp.StatusCode {
-	case 403:
-		return nil, errors.New("403 Forbidden")
-	case 404:
-		return nil, errors.New("404 Not Found")
-	case 409:
-		return nil, errors.New("409 Conflict")
-	case 422:
-		return nil, fmt.Errorf("422 Unprocessable Entity: %s", string(data))
-	case 500:
-		return nil, fmt.Errorf("500 Internal Server Error, request: '%s' with '%s' method and '%s' header", path, method, header)
-	}
-
-	if resp.StatusCode/100 != 2 {
-		errMap := make(map[string]interface{})
-		if err = json.Unmarshal(data, &errMap); err != nil {
-			// when the JSON can't be parsed, data was probably empty or a plain string,
-			// so we try to return a helpful error anyway
-			return nil, fmt.Errorf("Unknown API Error: %d %s", resp.StatusCode, string(data))
-		}
-		return nil, errors.New(errMap["message"].(string))
-	}
-
-	return data, nil
+	return data, resp, nil
 }
 
-func (c *Client) getParsedResponse(method, path string, header http.Header, body io.Reader, obj interface{}) error {
-	data, err := c.getResponse(method, path, header, body)
+func (c *Client) getParsedResponse(method, path string, header http.Header, body io.Reader, obj interface{}) (*Response, error) {
+	data, resp, err := c.getResponse(method, path, header, body)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return json.Unmarshal(data, obj)
+	err = json.Unmarshal(data, obj)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func (c *Client) getStatusCode(method, path string, header http.Header, body io.Reader) (int, error) {

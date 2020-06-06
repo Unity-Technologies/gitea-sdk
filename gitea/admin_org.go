@@ -17,19 +17,27 @@ type AdminListOrgsOptions struct {
 }
 
 // AdminListOrgs lists all orgs
-func (c *Client) AdminListOrgs(opt AdminListOrgsOptions) ([]*Organization, error) {
+func (c *Client) AdminListOrgs(opt AdminListOrgsOptions) ([]*Organization, *Response, error) {
 	opt.setDefaults()
 	orgs := make([]*Organization, 0, opt.PageSize)
-	return orgs, c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", opt.getURLQuery().Encode()), nil, nil, &orgs)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", opt.getURLQuery().Encode()), nil, nil, &orgs)
+	if err != nil {
+		return nil, nil, err
+	}
+	return orgs, resp, nil
 }
 
 // AdminCreateOrg create an organization
-func (c *Client) AdminCreateOrg(user string, opt CreateOrgOption) (*Organization, error) {
+func (c *Client) AdminCreateOrg(user string, opt CreateOrgOption) (*Organization, *Response, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	org := new(Organization)
-	return org, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/orgs", user),
+	resp, err := c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/orgs", user),
 		jsonHeader, bytes.NewReader(body), org)
+	if err != nil {
+		return nil, nil, err
+	}
+	return org, resp, nil
 }

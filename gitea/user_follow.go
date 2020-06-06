@@ -12,10 +12,14 @@ type ListFollowersOptions struct {
 }
 
 // ListMyFollowers list all the followers of current user
-func (c *Client) ListMyFollowers(opt ListFollowersOptions) ([]*User, error) {
+func (c *Client) ListMyFollowers(opt ListFollowersOptions) ([]*User, *Response, error) {
 	opt.setDefaults()
 	users := make([]*User, 0, opt.PageSize)
-	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/followers?%s", opt.getURLQuery().Encode()), nil, nil, &users)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/followers?%s", opt.getURLQuery().Encode()), nil, nil, &users)
+	if err != nil {
+		return nil, nil, err
+	}
+	return users, resp, nil
 }
 
 // ListFollowers list all the followers of one user

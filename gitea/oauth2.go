@@ -33,44 +33,56 @@ type CreateOauth2Option struct {
 }
 
 // CreateOauth2 create an Oauth2 Application and returns a completed Oauth2 object.
-func (c *Client) CreateOauth2(opt CreateOauth2Option) (*Oauth2, error) {
-	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
-		return nil, e
+func (c *Client) CreateOauth2(opt CreateOauth2Option) (*Oauth2, *Response, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
+		return nil, nil, err
 	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	oauth := new(Oauth2)
-	return oauth, c.getParsedResponse("POST", "/user/applications/oauth2", jsonHeader, bytes.NewReader(body), oauth)
+	resp, err := c.getParsedResponse("POST", "/user/applications/oauth2", jsonHeader, bytes.NewReader(body), oauth)
+	if err != nil {
+		return nil, nil, err
+	}
+	return oauth, resp, nil
 }
 
 // UpdateOauth2 a specific Oauth2 Application by ID and return a completed Oauth2 object.
-func (c *Client) UpdateOauth2(oauth2id int64, opt CreateOauth2Option) (*Oauth2, error) {
+func (c *Client) UpdateOauth2(oauth2id int64, opt CreateOauth2Option) (*Oauth2, *Response, error) {
 	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
 		return nil, e
 	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	oauth := new(Oauth2)
-	return oauth, c.getParsedResponse("PATCH", fmt.Sprintf("/user/applications/oauth2/%d", oauth2id), jsonHeader, bytes.NewReader(body), oauth)
+	resp, err := c.getParsedResponse("PATCH", fmt.Sprintf("/user/applications/oauth2/%d", oauth2id), jsonHeader, bytes.NewReader(body), oauth)
+	if err != nil {
+		return nil, nil, err
+	}
+	return oauth, resp, nil
 }
 
 // GetOauth2 a specific Oauth2 Application by ID.
-func (c *Client) GetOauth2(oauth2id int64) (*Oauth2, error) {
-	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
-		return nil, e
+func (c *Client) GetOauth2(oauth2id int64) (*Oauth2, *Response, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, nil, err
 	}
 	oauth2s := &Oauth2{}
-	return oauth2s, c.getParsedResponse("GET", fmt.Sprintf("/user/applications/oauth2/%d", oauth2id), nil, nil, &oauth2s)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/applications/oauth2/%d", oauth2id), nil, nil, &oauth2s)
+	if err != nil {
+		return nil, nil, err
+	}
+	return oauth2s, resp, nil
 }
 
 // ListOauth2 all of your Oauth2 Applications.
-func (c *Client) ListOauth2(opt ListOauth2Option) ([]*Oauth2, error) {
-	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
-		return nil, e
+func (c *Client) ListOauth2(opt ListOauth2Option) ([]*Oauth2, *Response, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, nil, err
 	}
 	opt.setDefaults()
 	oauth2s := make([]*Oauth2, 0, opt.PageSize)
@@ -78,10 +90,13 @@ func (c *Client) ListOauth2(opt ListOauth2Option) ([]*Oauth2, error) {
 }
 
 // DeleteOauth2 delete an Oauth2 application by ID
-func (c *Client) DeleteOauth2(oauth2id int64) error {
-	if e := c.CheckServerVersionConstraint(">=1.12.0"); e != nil {
-		return e
+func (c *Client) DeleteOauth2(oauth2id int64) (*Response, error) {
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return nil, err
 	}
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/user/applications/oauth2/%d", oauth2id), nil, nil)
-	return err
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/user/applications/oauth2/%d", oauth2id), nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return resp, err
 }

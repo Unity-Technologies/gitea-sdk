@@ -63,19 +63,24 @@ type ListRepoBranchesOptions struct {
 }
 
 // ListRepoBranches list all the branches of one repository
-func (c *Client) ListRepoBranches(user, repo string, opt ListRepoBranchesOptions) ([]*Branch, error) {
+func (c *Client) ListRepoBranches(user, repo string, opt ListRepoBranchesOptions) ([]*Branch, *Response, error) {
 	opt.setDefaults()
 	branches := make([]*Branch, 0, opt.PageSize)
-	return branches, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &branches)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &branches)
+	if err != nil {
+		return nil, nil, err
+	}
+	return branches, resp, nil
 }
 
 // GetRepoBranch get one branch's information of one repository
-func (c *Client) GetRepoBranch(user, repo, branch string) (*Branch, error) {
+func (c *Client) GetRepoBranch(user, repo, branch string) (*Branch, *Response, error) {
 	b := new(Branch)
-	if err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches/%s", user, repo, branch), nil, nil, &b); err != nil {
-		return nil, err
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches/%s", user, repo, branch), nil, nil, &b)
+	if err != nil {
+		return nil, nil, err
 	}
-	return b, nil
+	return b, resp, nil
 }
 
 // DeleteRepoBranch delete a branch in a repository
