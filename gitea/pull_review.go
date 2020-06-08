@@ -100,8 +100,8 @@ type ListPullReviewsOptions struct {
 
 // Validate the CreatePullReviewOptions struct
 func (opt CreatePullReviewOptions) Validate() error {
-	if opt.State != ReviewStateUnknown {
-		return fmt.Errorf("review state is unknown")
+	if opt.State != ReviewStateApproved && len(strings.TrimSpace(opt.Body)) == 0 {
+		return fmt.Errorf("body is empty")
 	}
 	for i := range opt.Comments {
 		if err := opt.Comments[i].Validate(); err != nil {
