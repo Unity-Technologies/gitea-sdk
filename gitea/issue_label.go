@@ -33,7 +33,6 @@ func (c *Client) ListRepoLabels(owner, repo string, opt ListLabelsOptions) ([]*L
 }
 
 // GetRepoLabel get one label of repository by repo it
-// TODO: maybe we need get a label by name
 func (c *Client) GetRepoLabel(owner, repo string, id int64) (*Label, error) {
 	label := new(Label)
 	return label, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id), nil, nil, label)
@@ -76,7 +75,6 @@ func (c *Client) EditLabel(owner, repo string, id int64, opt EditLabelOption) (*
 }
 
 // DeleteLabel delete one label of repository by id
-// TODO: maybe we need delete by name
 func (c *Client) DeleteLabel(owner, repo string, id int64) error {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/labels/%d", owner, repo, id), nil, nil)
 	return err
