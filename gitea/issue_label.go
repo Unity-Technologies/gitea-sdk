@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strings"
 )
 
 // Label a label to an issue or a pr
@@ -46,8 +48,25 @@ type CreateLabelOption struct {
 	Description string `json:"description"`
 }
 
+func (opt CreateLabelOption) Validate() error {
+	aw, err := regexp.MatchString("^#?[0-9,a-f,A-F]{6}$", opt.Color)
+	if err != nil {
+		return err
+	}
+	if !aw {
+		return fmt.Errorf("invalide color format")
+	}
+	if len(strings.TrimSpace(opt.Name)) == 0 {
+		return fmt.Errorf("empty name not allowed")
+	}
+	return nil
+}
+
 // CreateLabel create one label of repository
 func (c *Client) CreateLabel(owner, repo string, opt CreateLabelOption) (*Label, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
