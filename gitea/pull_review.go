@@ -113,9 +113,6 @@ func (opt CreatePullReviewOptions) Validate() error {
 
 // Validate the SubmitPullReviewOptions struct
 func (opt SubmitPullReviewOptions) Validate() error {
-	if opt.State != ReviewStateUnknown {
-		return fmt.Errorf("review state is unknown")
-	}
 	if opt.State != ReviewStateApproved && len(strings.TrimSpace(opt.Body)) == 0 {
 		return fmt.Errorf("body is empty")
 	}
