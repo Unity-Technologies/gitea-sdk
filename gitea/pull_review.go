@@ -41,8 +41,7 @@ type PullReview struct {
 	Stale             bool            `json:"stale"`
 	Official          bool            `json:"official"`
 	CodeCommentsCount int             `json:"comments_count"`
-	// swagger:strfmt date-time
-	Submitted time.Time `json:"submitted_at"`
+	Submitted         time.Time       `json:"submitted_at"`
 
 	HTMLURL     string `json:"html_url"`
 	HTMLPullURL string `json:"pull_request_url"`
@@ -55,9 +54,7 @@ type PullReviewComment struct {
 	Reviewer *User  `json:"user"`
 	ReviewID int64  `json:"pull_request_review_id"`
 
-	// swagger:strfmt date-time
 	Created time.Time `json:"created_at"`
-	// swagger:strfmt date-time
 	Updated time.Time `json:"updated_at"`
 
 	Path         string `json:"path"`

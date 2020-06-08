@@ -162,7 +162,6 @@ func (c *Client) SearchRepos(opt SearchRepoOptions) ([]*Repository, error) {
 // CreateRepoOption options when creating repository
 type CreateRepoOption struct {
 	// Name of the repository to create
-	//
 	Name string `json:"name"`
 	// Description of the repository to create
 	Description string `json:"description"`

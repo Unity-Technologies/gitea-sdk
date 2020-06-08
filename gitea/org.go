@@ -121,6 +121,6 @@ func (c *Client) EditOrg(orgname string, opt EditOrgOption) error {
 
 // DeleteOrg deletes an organization
 func (c *Client) DeleteOrg(orgname string) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/orgs/%s", orgname), nil, nil)
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/orgs/%s", orgname), jsonHeader, nil)
 	return err
 }
