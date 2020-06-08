@@ -48,13 +48,14 @@ type CreateLabelOption struct {
 	Description string `json:"description"`
 }
 
+// Validate the CreateLabelOption struct
 func (opt CreateLabelOption) Validate() error {
 	aw, err := regexp.MatchString("^#?[0-9,a-f,A-F]{6}$", opt.Color)
 	if err != nil {
 		return err
 	}
 	if !aw {
-		return fmt.Errorf("invalide color format")
+		return fmt.Errorf("invalid color format")
 	}
 	if len(strings.TrimSpace(opt.Name)) == 0 {
 		return fmt.Errorf("empty name not allowed")
@@ -83,8 +84,30 @@ type EditLabelOption struct {
 	Description *string `json:"description"`
 }
 
+// Validate the EditLabelOption struct
+func (opt EditLabelOption) Validate() error {
+	if opt.Color != nil {
+		aw, err := regexp.MatchString("^#?[0-9,a-f,A-F]{6}$", *opt.Color)
+		if err != nil {
+			return err
+		}
+		if !aw {
+			return fmt.Errorf("invalid color format")
+		}
+	}
+	if opt.Name != nil {
+		if len(strings.TrimSpace(*opt.Name)) == 0 {
+			return fmt.Errorf("empty name not allowed")
+		}
+	}
+	return nil
+}
+
 // EditLabel modify one label with options
 func (c *Client) EditLabel(owner, repo string, id int64, opt EditLabelOption) (*Label, error) {
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
