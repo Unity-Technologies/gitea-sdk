@@ -68,6 +68,11 @@ func (c *Client) CreateLabel(owner, repo string, opt CreateLabelOption) (*Label,
 	if err := opt.Validate(); err != nil {
 		return nil, err
 	}
+	if len(opt.Color) == 6 {
+		if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+			opt.Color = "#" + opt.Color
+		}
+	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
