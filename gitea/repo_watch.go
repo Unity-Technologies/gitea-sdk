@@ -21,13 +21,13 @@ type WatchInfo struct {
 }
 
 // GetWatchedRepos list all the watched repos of user
-func (c *Client) GetWatchedRepos(user string) ([]*Repository, error) {
+func (c *Client) GetWatchedRepos(user string) ([]*Repository, *Response, error) {
 	repos := make([]*Repository, 0, 10)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/subscriptions", user), nil, nil, &repos)
 }
 
 // GetMyWatchedRepos list repositories watched by the authenticated user
-func (c *Client) GetMyWatchedRepos() ([]*Repository, error) {
+func (c *Client) GetMyWatchedRepos() ([]*Repository, *Response, error) {
 	repos := make([]*Repository, 0, 10)
 	return repos, c.getParsedResponse("GET", fmt.Sprintf("/user/subscriptions"), nil, nil, &repos)
 }

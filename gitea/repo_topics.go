@@ -21,7 +21,7 @@ type topicsList struct {
 }
 
 // ListRepoTopics list all repository's topics
-func (c *Client) ListRepoTopics(user, repo string, opt ListRepoTopicsOptions) ([]string, error) {
+func (c *Client) ListRepoTopics(user, repo string, opt ListRepoTopicsOptions) ([]string, *Response, error) {
 	opt.setDefaults()
 
 	list := new(topicsList)
@@ -33,7 +33,7 @@ func (c *Client) ListRepoTopics(user, repo string, opt ListRepoTopicsOptions) ([
 }
 
 // SetRepoTopics replaces the list of repo's topics
-func (c *Client) SetRepoTopics(user, repo string, list []string) error {
+func (c *Client) SetRepoTopics(user, repo string, list []string) (*Response, error) {
 
 	l := topicsList{Topics: list}
 
@@ -46,13 +46,13 @@ func (c *Client) SetRepoTopics(user, repo string, list []string) error {
 }
 
 // AddRepoTopic adds a topic to a repo's topics list
-func (c *Client) AddRepoTopic(user, repo, topic string) error {
+func (c *Client) AddRepoTopic(user, repo, topic string) (*Response, error) {
 	_, err := c.getResponse("PUT", fmt.Sprintf("/repos/%s/%s/topics/%s", user, repo, topic), nil, nil)
 	return err
 }
 
 // DeleteRepoTopic deletes a topic from repo's topics list
-func (c *Client) DeleteRepoTopic(user, repo, topic string) error {
+func (c *Client) DeleteRepoTopic(user, repo, topic string) (*Response, error) {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/topics/%s", user, repo, topic), nil, nil)
 	return err
 }

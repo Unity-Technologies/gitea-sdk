@@ -23,7 +23,7 @@ func (c *Client) ListMyFollowers(opt ListFollowersOptions) ([]*User, *Response, 
 }
 
 // ListFollowers list all the followers of one user
-func (c *Client) ListFollowers(user string, opt ListFollowersOptions) ([]*User, error) {
+func (c *Client) ListFollowers(user string, opt ListFollowersOptions) ([]*User, *Response, error) {
 	opt.setDefaults()
 	users := make([]*User, 0, opt.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/followers?%s", user, opt.getURLQuery().Encode()), nil, nil, &users)
@@ -35,19 +35,20 @@ type ListFollowingOptions struct {
 }
 
 // ListMyFollowing list all the users current user followed
-func (c *Client) ListMyFollowing(opt ListFollowingOptions) ([]*User, error) {
+func (c *Client) ListMyFollowing(opt ListFollowingOptions) ([]*User, *Response, error) {
 	opt.setDefaults()
 	users := make([]*User, 0, opt.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/user/following?%s", opt.getURLQuery().Encode()), nil, nil, &users)
 }
 
 // ListFollowing list all the users the user followed
-func (c *Client) ListFollowing(user string, opt ListFollowingOptions) ([]*User, error) {
+func (c *Client) ListFollowing(user string, opt ListFollowingOptions) ([]*User, *Response, error) {
 	opt.setDefaults()
 	users := make([]*User, 0, opt.PageSize)
 	return users, c.getParsedResponse("GET", fmt.Sprintf("/users/%s/following?%s", user, opt.getURLQuery().Encode()), nil, nil, &users)
 }
 
+// Todo: May be also return an error
 // IsFollowing if current user followed the target
 func (c *Client) IsFollowing(target string) bool {
 	_, err := c.getResponse("GET", fmt.Sprintf("/user/following/%s", target), nil, nil)
@@ -61,13 +62,13 @@ func (c *Client) IsUserFollowing(user, target string) bool {
 }
 
 // Follow set current user follow the target
-func (c *Client) Follow(target string) error {
+func (c *Client) Follow(target string) (*Response, error) {
 	_, err := c.getResponse("PUT", fmt.Sprintf("/user/following/%s", target), nil, nil)
 	return err
 }
 
 // Unfollow set current user unfollow the target
-func (c *Client) Unfollow(target string) error {
+func (c *Client) Unfollow(target string) (*Response, error) {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/user/following/%s", target), nil, nil)
 	return err
 }

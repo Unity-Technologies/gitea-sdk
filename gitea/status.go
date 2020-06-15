@@ -50,7 +50,7 @@ type CreateStatusOption struct {
 }
 
 // CreateStatus creates a new Status for a given Commit
-func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) (*Status, error) {
+func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) (*Status, *Response, error) {
 	body, err := json.Marshal(&opts)
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ type ListStatusesOption struct {
 }
 
 // ListStatuses returns all statuses for a given Commit
-func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOption) ([]*Status, error) {
+func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOption) ([]*Status, *Response, error) {
 	opt.setDefaults()
 	statuses := make([]*Status, 0, opt.PageSize)
 	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, opt.getURLQuery().Encode()), nil, nil, &statuses)
@@ -83,7 +83,7 @@ type CombinedStatus struct {
 }
 
 // GetCombinedStatus returns the CombinedStatus for a given Commit
-func (c *Client) GetCombinedStatus(owner, repo, sha string) (*CombinedStatus, error) {
+func (c *Client) GetCombinedStatus(owner, repo, sha string) (*CombinedStatus, *Response, error) {
 	status := new(CombinedStatus)
 	return status, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, sha), nil, nil, status)
 }

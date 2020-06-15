@@ -23,7 +23,7 @@ type ListEmailsOptions struct {
 }
 
 // ListEmails all the email addresses of user
-func (c *Client) ListEmails(opt ListEmailsOptions) ([]*Email, error) {
+func (c *Client) ListEmails(opt ListEmailsOptions) ([]*Email, *Response, error) {
 	opt.setDefaults()
 	emails := make([]*Email, 0, opt.PageSize)
 	return emails, c.getParsedResponse("GET", fmt.Sprintf("/user/emails?%s", opt.getURLQuery().Encode()), nil, nil, &emails)
@@ -36,7 +36,7 @@ type CreateEmailOption struct {
 }
 
 // AddEmail add one email to current user with options
-func (c *Client) AddEmail(opt CreateEmailOption) ([]*Email, error) {
+func (c *Client) AddEmail(opt CreateEmailOption) ([]*Email, *Response, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ type DeleteEmailOption struct {
 }
 
 // DeleteEmail delete one email of current users'
-func (c *Client) DeleteEmail(opt DeleteEmailOption) error {
+func (c *Client) DeleteEmail(opt DeleteEmailOption) (*Response, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return err

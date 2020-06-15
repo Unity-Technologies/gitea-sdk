@@ -10,7 +10,7 @@ import (
 )
 
 // GetIssueSubscribers get list of users who subscribed on an issue
-func (c *Client) GetIssueSubscribers(owner, repo string, index int64) ([]*User, error) {
+func (c *Client) GetIssueSubscribers(owner, repo string, index int64) ([]*User, *Response, error) {
 	if err := c.CheckServerVersionConstraint(">=1.11.0"); err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Client) CheckIssueSubscription(owner, repo string, index int64) (*Watch
 }
 
 // IssueSubscribe subscribe current user to an issue
-func (c *Client) IssueSubscribe(owner, repo string, index int64) error {
+func (c *Client) IssueSubscribe(owner, repo string, index int64) (*Response, error) {
 	u, err := c.GetMyUserInfo()
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func (c *Client) IssueSubscribe(owner, repo string, index int64) error {
 }
 
 // IssueUnSubscribe unsubscribe current user from an issue
-func (c *Client) IssueUnSubscribe(owner, repo string, index int64) error {
+func (c *Client) IssueUnSubscribe(owner, repo string, index int64) (*Response, error) {
 	u, err := c.GetMyUserInfo()
 	if err != nil {
 		return err

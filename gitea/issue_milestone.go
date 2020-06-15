@@ -41,19 +41,27 @@ func (opt *ListMilestoneOption) QueryEncode() string {
 }
 
 // ListRepoMilestones list all the milestones of one repository
-func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption) ([]*Milestone, error) {
+func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption) ([]*Milestone, *Response, error) {
 	opt.setDefaults()
 	milestones := make([]*Milestone, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/milestones", owner, repo))
 	link.RawQuery = opt.QueryEncode()
-	return milestones, c.getParsedResponse("GET", link.String(), nil, nil, &milestones)
+	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &milestones)
+	if err != nil {
+		return nil, nil, err
+	}
+	return milestones, resp, nil
 }
 
 // GetMilestone get one milestone by repo name and milestone id
-func (c *Client) GetMilestone(owner, repo string, id int64) (*Milestone, error) {
+func (c *Client) GetMilestone(owner, repo string, id int64) (*Milestone, *Response, error) {
 	milestone := new(Milestone)
-	return milestone, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil, milestone)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil, milestone)
+	if err != nil {
+		return nil, nil, err
+	}
+	return milestone, resp, nil
 }
 
 // CreateMilestoneOption options for creating a milestone
@@ -64,13 +72,17 @@ type CreateMilestoneOption struct {
 }
 
 // CreateMilestone create one milestone with options
-func (c *Client) CreateMilestone(owner, repo string, opt CreateMilestoneOption) (*Milestone, error) {
+func (c *Client) CreateMilestone(owner, repo string, opt CreateMilestoneOption) (*Milestone, *Response, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	milestone := new(Milestone)
-	return milestone, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/milestones", owner, repo), jsonHeader, bytes.NewReader(body), milestone)
+	resp, err := c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/milestones", owner, repo), jsonHeader, bytes.NewReader(body), milestone)
+	if err != nil {
+		return nil, nil, err
+	}
+	return milestone, resp, nil
 }
 
 // EditMilestoneOption options for editing a milestone
@@ -82,17 +94,24 @@ type EditMilestoneOption struct {
 }
 
 // EditMilestone modify milestone with options
-func (c *Client) EditMilestone(owner, repo string, id int64, opt EditMilestoneOption) (*Milestone, error) {
+func (c *Client) EditMilestone(owner, repo string, id int64, opt EditMilestoneOption) (*Milestone, *Response, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	milestone := new(Milestone)
-	return milestone, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
+	resp, err := c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
+	if err != nil {
+		return nil, nil, err
+	}
+	return milestone, resp, nil
 }
 
 // DeleteMilestone delete one milestone by milestone id
-func (c *Client) DeleteMilestone(owner, repo string, id int64) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil)
-	return err
+func (c *Client) DeleteMilestone(owner, repo string, id int64) (*Response, error) {
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
