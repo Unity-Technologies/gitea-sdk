@@ -76,7 +76,7 @@ func (c *Client) CreateMilestone(owner, repo string, opt CreateMilestoneOption) 
 	// make creating closed milestones need gitea >= v1.13.0
 	// this make it backwards compatible
 	if err == nil && opt.State == StateClosed && milestone.State != StateClosed {
-		closed := StateClosed
+		closed := "closed"
 		return c.EditMilestone(owner, repo, milestone.ID, EditMilestoneOption{
 			State: &closed,
 		})
