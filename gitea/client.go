@@ -110,8 +110,6 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 		return nil, err
 	}
 
-	errMap := make(map[string]interface{})
-
 	switch resp.StatusCode {
 	case 403:
 		return nil, errors.New("403 Forbidden")
@@ -121,19 +119,14 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 		return nil, errors.New("409 Conflict")
 	case 422:
 		return nil, fmt.Errorf("422 Unprocessable Entity: %s", string(data))
-	case 500:
-		if err = json.Unmarshal(data, &errMap); err != nil {
-			return nil, fmt.Errorf("500 Internal Server Error, request: '%s' with '%s' method '%s' header and '%s' body", path, method, header, string(data))
-		}
-		return nil, errors.New(errMap["message"].(string))
 	}
 
 	if resp.StatusCode/100 != 2 {
-
+		errMap := make(map[string]interface{})
 		if err = json.Unmarshal(data, &errMap); err != nil {
 			// when the JSON can't be parsed, data was probably empty or a plain string,
 			// so we try to return a helpful error anyway
-			return nil, fmt.Errorf("Unknown API Error: %d %s", resp.StatusCode, string(data))
+			return nil, fmt.Errorf("Unknown API Error: %d\nRequest: '%s' with '%s' method '%s' header and '%s' body", resp.StatusCode, path, method, header, string(data))
 		}
 		return nil, errors.New(errMap["message"].(string))
 	}
