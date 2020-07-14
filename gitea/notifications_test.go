@@ -113,7 +113,7 @@ func TestNotifications(t *testing.T) {
 	assert.NoError(t, err)
 	nList, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusRead}})
 	assert.NoError(t, err)
-	assert.Len(t, nList, 5)
+	assert.Len(t, nList, 4)
 
 	pinned := NotifyStatusPinned
 	unread := NotifyStatusUnread
