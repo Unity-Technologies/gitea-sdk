@@ -88,7 +88,6 @@ func (opt *MarkNotificationOptions) QueryEncode() string {
 	for _, s := range opt.Status {
 		query.Add("status-types", string(s))
 	}
-
 	if len(opt.ToStatus) != 0 {
 		query.Add("to-status", string(opt.ToStatus))
 	}
