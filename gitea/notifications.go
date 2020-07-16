@@ -124,6 +124,7 @@ func (c *Client) GetNotification(id int64) (*NotificationThread, error) {
 }
 
 // ReadNotification mark notification thread as read by ID
+// It optionally takes a second argument if status has to be set other than 'read'
 func (c *Client) ReadNotification(id int64, status ...NotifyStatus) error {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return err
