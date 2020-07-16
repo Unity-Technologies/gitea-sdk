@@ -38,7 +38,7 @@ vet:
 	# Default vet
 	cd gitea && $(GO) vet $(PACKAGE)
 	# Custom vet
-	$(GO) get gitea.com/jolheiser/gitea-vet
+	$(GO) get gitea.com/gitea/gitea-vet
 	$(GO) build gitea.com/jolheiser/gitea-vet
 	cd gitea && $(GO) vet -vettool=../gitea-vet $(PACKAGE)
 
