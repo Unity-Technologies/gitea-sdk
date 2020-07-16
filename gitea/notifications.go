@@ -124,13 +124,13 @@ func (c *Client) GetNotification(id int64) (*NotificationThread, error) {
 }
 
 // ReadNotification mark notification thread as read by ID
-func (c *Client) ReadNotification(id int64, status *NotifyStatus) error {
+func (c *Client) ReadNotification(id int64, status ...NotifyStatus) error {
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return err
 	}
 	link := fmt.Sprintf("/notifications/threads/%d", id)
-	if status != nil {
-		link += fmt.Sprintf("?to-status=%s", *status)
+	if len(status) != 0 {
+		link += fmt.Sprintf("?to-status=%s", status[0])
 	}
 	_, err := c.getResponse("PATCH", link, nil, nil)
 	return err
