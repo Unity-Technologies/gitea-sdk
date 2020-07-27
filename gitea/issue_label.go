@@ -133,15 +133,14 @@ func (c *Client) GetIssueLabels(owner, repo string, index int64, opts ListLabels
 	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/labels?%s", owner, repo, index, opts.getURLQuery().Encode()), nil, nil, &labels)
 }
 
-// IssueLabelsOption a collection of labels
-type IssueLabelsOption struct {
+type issueLabelsOption struct {
 	// list of label IDs
 	Labels []int64 `json:"labels"`
 }
 
 // AddIssueLabels add one or more labels to one issue
-func (c *Client) AddIssueLabels(owner, repo string, index int64, opt IssueLabelsOption) ([]*Label, error) {
-	body, err := json.Marshal(&opt)
+func (c *Client) AddIssueLabels(owner, repo string, index int64, ids []int64) ([]*Label, error) {
+	body, err := json.Marshal(&issueLabelsOption{Labels: ids})
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +149,8 @@ func (c *Client) AddIssueLabels(owner, repo string, index int64, opt IssueLabels
 }
 
 // ReplaceIssueLabels replace old labels of issue with new labels
-func (c *Client) ReplaceIssueLabels(owner, repo string, index int64, opt IssueLabelsOption) ([]*Label, error) {
-	body, err := json.Marshal(&opt)
+func (c *Client) ReplaceIssueLabels(owner, repo string, index int64, ids []int64) ([]*Label, error) {
+	body, err := json.Marshal(&issueLabelsOption{Labels: ids})
 	if err != nil {
 		return nil, err
 	}
