@@ -9,6 +9,7 @@ feel free to create an issue.
 
 -   [EditMilestoneOption use StateType (#350)](#EditMilestoneOption-use-StateType)
 -   [RepoSearch Options Struct was rewritten (#346)](#RepoSearch-Options-Struct-was-rewritten)
+-   [Remove structs witch only have one arguemt (#387)](#Remove-structs-witch-only-have-one-arguemt)
 
 <!-- tocstop -->
 
@@ -36,3 +37,15 @@ If there is a special edgecase you have you can pass a `RawQuery` to the API end
 Pulls:
 
 -   [#346 Refactor RepoSearch to be easy usable](https://gitea.com/gitea/go-sdk/pulls/346)
+
+
+## Remove structs witch only have one arguemt
+
+Some Functions have Option structs witch will not be extended in the future
+and the struct only contain one variable.
+So there is no need to warp them up in a extra struct, so they got be removed.
+Just pass the variable you set before to the option directly.
+
+Pulls:
+
+-   [#387 Replace IssueLabelsOption with []int64](https://gitea.com/gitea/go-sdk/pulls/387)
