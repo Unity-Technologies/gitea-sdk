@@ -154,13 +154,13 @@ func getMileIDbyStringOrInt64(c *Client, owner, repo string, value interface{}) 
 	case reflect.Int64:
 		return value.(int64), nil
 	case reflect.String:
-		return c.ResolveMileIDbyName(owner, repo, value.(string))
+		return c.ResolveMilestoneIDByName(owner, repo, value.(string))
 	}
 	return 0, fmt.Errorf("only string and int64 supported")
 }
 
-// ResolveMileIDbyName take a milestone name and return the id if it exist
-func (c *Client) ResolveMileIDbyName(owner, repo, name string) (int64, error) {
+// ResolveMilestoneIDByName take a milestone name and return the id if it exist
+func (c *Client) ResolveMilestoneIDByName(owner, repo, name string) (int64, error) {
 	i := 0
 	for {
 		i++
