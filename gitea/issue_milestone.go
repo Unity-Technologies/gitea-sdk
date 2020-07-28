@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -55,8 +56,12 @@ func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption)
 	return milestones, c.getParsedResponse("GET", link.String(), nil, nil, &milestones)
 }
 
-// GetMilestone get one milestone by repo name and milestone id
-func (c *Client) GetMilestone(owner, repo string, id int64) (*Milestone, error) {
+// GetMilestone get one milestone by repo name and milestone id / name
+func (c *Client) GetMilestone(owner, repo string, value interface{}) (*Milestone, error) {
+	id, err := getMileIDbyName(c, owner, repo, value)
+	if err != nil {
+		return nil, err
+	}
 	milestone := new(Milestone)
 	return milestone, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil, milestone)
 }
@@ -117,8 +122,12 @@ func (opt EditMilestoneOption) Validate() error {
 	return nil
 }
 
-// EditMilestone modify milestone with options
-func (c *Client) EditMilestone(owner, repo string, id int64, opt EditMilestoneOption) (*Milestone, error) {
+// EditMilestone modify milestone with options by milestone id / name
+func (c *Client) EditMilestone(owner, repo string, value interface{}, opt EditMilestoneOption) (*Milestone, error) {
+	id, err := getMileIDbyName(c, owner, repo, value)
+	if err != nil {
+		return nil, err
+	}
 	if err := opt.Validate(); err != nil {
 		return nil, err
 	}
@@ -130,8 +139,51 @@ func (c *Client) EditMilestone(owner, repo string, id int64, opt EditMilestoneOp
 	return milestone, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
 }
 
-// DeleteMilestone delete one milestone by milestone id
-func (c *Client) DeleteMilestone(owner, repo string, id int64) error {
-	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil)
+// DeleteMilestone delete one milestone by milestone id / name
+func (c *Client) DeleteMilestone(owner, repo string, value interface{}) error {
+	id, err := getMileIDbyName(c, owner, repo, value)
+	if err != nil {
+		return err
+	}
+	_, err = c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil)
 	return err
+}
+
+func getMileIDbyName(c *Client, owner, repo string, value interface{}) (int64, error) {
+	vv := reflect.ValueOf(value)
+	if vv.Kind() != reflect.String || vv.Kind() != reflect.Int64 {
+		return 0, fmt.Errorf("only string and int64 supported")
+	}
+	if vv.Kind() == reflect.String {
+		id, err := c.ResolveMileIDbyName(owner, repo, value.(string))
+		if err != nil {
+			return 0, err
+		}
+		return id, nil
+	} else {
+		return value.(int64), nil
+	}
+}
+
+// ResolveMileIDbyName take a milestone name and return the id if it exist
+func (c *Client) ResolveMileIDbyName(owner, repo, name string) (int64, error) {
+	i := 0
+	for {
+		i++
+		miles, err := c.ListRepoMilestones(owner, repo, ListMilestoneOption{
+			ListOptions: ListOptions{
+				Page: i,
+			},
+			State: "all",
+			Name:  name,
+		})
+		if err != nil || len(miles) == 0 {
+			return 0, err
+		}
+		for _, m := range miles {
+			if strings.ToLower(strings.TrimSpace(m.Title)) == strings.ToLower(strings.TrimSpace(name)) {
+				return m.ID, nil
+			}
+		}
+	}
 }
