@@ -171,8 +171,11 @@ func (c *Client) ResolveMileIDbyName(owner, repo, name string) (int64, error) {
 			State: "all",
 			Name:  name,
 		})
-		if err != nil || len(miles) == 0 {
+		if err != nil {
 			return 0, err
+		}
+		if len(miles) == 0 {
+			return 0, fmt.Errorf("milestone '%s' do not exist", name)
 		}
 		for _, m := range miles {
 			if strings.ToLower(strings.TrimSpace(m.Title)) == strings.ToLower(strings.TrimSpace(name)) {
