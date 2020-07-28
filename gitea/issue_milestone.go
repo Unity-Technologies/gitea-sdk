@@ -58,7 +58,7 @@ func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption)
 
 // GetMilestone get one milestone by repo name and milestone id / name
 func (c *Client) GetMilestone(owner, repo string, value interface{}) (*Milestone, error) {
-	id, err := getMileIDbyName(c, owner, repo, value)
+	id, err := getMileIDbyStringOrInt64(c, owner, repo, value)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (opt EditMilestoneOption) Validate() error {
 
 // EditMilestone modify milestone with options by milestone id / name
 func (c *Client) EditMilestone(owner, repo string, value interface{}, opt EditMilestoneOption) (*Milestone, error) {
-	id, err := getMileIDbyName(c, owner, repo, value)
+	id, err := getMileIDbyStringOrInt64(c, owner, repo, value)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (c *Client) EditMilestone(owner, repo string, value interface{}, opt EditMi
 
 // DeleteMilestone delete one milestone by milestone id / name
 func (c *Client) DeleteMilestone(owner, repo string, value interface{}) error {
-	id, err := getMileIDbyName(c, owner, repo, value)
+	id, err := getMileIDbyStringOrInt64(c, owner, repo, value)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (c *Client) DeleteMilestone(owner, repo string, value interface{}) error {
 	return err
 }
 
-func getMileIDbyName(c *Client, owner, repo string, value interface{}) (int64, error) {
+func getMileIDbyStringOrInt64(c *Client, owner, repo string, value interface{}) (int64, error) {
 	vv := reflect.ValueOf(value)
 	if vv.Kind() != reflect.String || vv.Kind() != reflect.Int64 {
 		return 0, fmt.Errorf("only string and int64 supported")
