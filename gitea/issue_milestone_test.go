@@ -49,6 +49,14 @@ func TestMilestones(t *testing.T) {
 	ml, err = c.ListRepoMilestones(repo.Owner.UserName, repo.Name, ListMilestoneOption{State: StateAll})
 	assert.NoError(t, err)
 	assert.Len(t, ml, 3)
+	ml, err = c.ListRepoMilestones(repo.Owner.UserName, repo.Name, ListMilestoneOption{State: StateAll, Name: "V3.0"})
+	assert.NoError(t, err)
+	assert.Len(t, ml, 1)
+	assert.EqualValues(t, "v3.0", ml[0].Title)
+
+	mID, err := c.ResolveMileIDbyName(repo.Owner.UserName, repo.Name, "V3.0")
+	assert.NoError(t, err)
+	assert.EqualValues(t, ml[0].ID, mID)
 
 	// GetMilestone
 	_, err = c.GetMilestone(repo.Owner.UserName, repo.Name, m4.ID)
@@ -56,4 +64,8 @@ func TestMilestones(t *testing.T) {
 	m, err := c.GetMilestone(repo.Owner.UserName, repo.Name, m1.ID)
 	assert.NoError(t, err)
 	assert.EqualValues(t, m1, m)
+
+	m2, err := c.GetMilestone(repo.Owner.UserName, repo.Name, m1.Title)
+	assert.NoError(t, err)
+	assert.EqualValues(t, m1, m2)
 }

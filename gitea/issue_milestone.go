@@ -151,17 +151,13 @@ func (c *Client) DeleteMilestone(owner, repo string, value interface{}) error {
 
 func getMileIDbyStringOrInt64(c *Client, owner, repo string, value interface{}) (int64, error) {
 	vv := reflect.ValueOf(value)
-	if vv.Kind() != reflect.String || vv.Kind() != reflect.Int64 {
-		return 0, fmt.Errorf("only string and int64 supported")
+	switch vv.Kind() {
+	case reflect.Int64:
+		return value.(int64), nil
+	case reflect.String:
+		return c.ResolveMileIDbyName(owner, repo, value.(string))
 	}
-	if vv.Kind() == reflect.String {
-		id, err := c.ResolveMileIDbyName(owner, repo, value.(string))
-		if err != nil {
-			return 0, err
-		}
-		return id, nil
-	}
-	return value.(int64), nil
+	return 0, fmt.Errorf("only string and int64 supported")
 }
 
 // ResolveMileIDbyName take a milestone name and return the id if it exist
