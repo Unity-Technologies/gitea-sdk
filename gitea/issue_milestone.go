@@ -160,9 +160,8 @@ func getMileIDbyStringOrInt64(c *Client, owner, repo string, value interface{}) 
 			return 0, err
 		}
 		return id, nil
-	} else {
-		return value.(int64), nil
 	}
+	return value.(int64), nil
 }
 
 // ResolveMileIDbyName take a milestone name and return the id if it exist
