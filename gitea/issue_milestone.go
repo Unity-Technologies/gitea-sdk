@@ -150,8 +150,7 @@ func (c *Client) DeleteMilestone(owner, repo string, value interface{}) error {
 }
 
 func getMileIDbyStringOrInt64(c *Client, owner, repo string, value interface{}) (int64, error) {
-	vv := reflect.ValueOf(value)
-	switch vv.Kind() {
+	switch reflect.ValueOf(value).Kind() {
 	case reflect.Int64:
 		return value.(int64), nil
 	case reflect.String:
