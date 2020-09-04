@@ -221,8 +221,8 @@ func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, err
 	return statusCode == 204, nil
 }
 
-// getPullRequestDifOrPatch gets the patch or diff file as bytes for a PR
-func (c *Client) getPullRequestDifOrPatch(owner, repo, kind string, index int64) ([]byte, error) {
+// getPullRequestDiffOrPatch gets the patch or diff file as bytes for a PR
+func (c *Client) getPullRequestDiffOrPatch(owner, repo, kind string, index int64) ([]byte, error) {
 	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
 		r, err2 := c.GetRepo(owner, repo)
 		if err2 != nil {
@@ -238,10 +238,10 @@ func (c *Client) getPullRequestDifOrPatch(owner, repo, kind string, index int64)
 
 // GetPullRequestPatch gets the .patch file as bytes for a PR
 func (c *Client) GetPullRequestPatch(owner, repo string, index int64) ([]byte, error) {
-	return c.getPullRequestDifOrPatch(owner, repo, "patch", index)
+	return c.getPullRequestDiffOrPatch(owner, repo, "patch", index)
 }
 
 // GetPullRequestDiff gets the .diff file as bytes for a PR
 func (c *Client) GetPullRequestDiff(owner, repo string, index int64) ([]byte, error) {
-	return c.getPullRequestDifOrPatch(owner, repo, "diff", index)
+	return c.getPullRequestDiffOrPatch(owner, repo, "diff", index)
 }
