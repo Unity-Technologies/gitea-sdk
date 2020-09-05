@@ -58,12 +58,12 @@ func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption)
 
 // GetMilestone get one milestone by repo name and milestone id / name
 func (c *Client) GetMilestone(owner, repo string, value interface{}) (*Milestone, error) {
-	id, err := getMileIDbyStringOrInt64(c, owner, repo, value)
+	id, err := getMilestoneIdentifier(c, owner, repo, value)
 	if err != nil {
 		return nil, err
 	}
 	milestone := new(Milestone)
-	return milestone, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil, milestone)
+	return milestone, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), nil, nil, milestone)
 }
 
 // CreateMilestoneOption options for creating a milestone
@@ -124,7 +124,7 @@ func (opt EditMilestoneOption) Validate() error {
 
 // EditMilestone modify milestone with options by milestone id / name
 func (c *Client) EditMilestone(owner, repo string, value interface{}, opt EditMilestoneOption) (*Milestone, error) {
-	id, err := getMileIDbyStringOrInt64(c, owner, repo, value)
+	id, err := getMilestoneIdentifier(c, owner, repo, value)
 	if err != nil {
 		return nil, err
 	}
@@ -136,31 +136,39 @@ func (c *Client) EditMilestone(owner, repo string, value interface{}, opt EditMi
 		return nil, err
 	}
 	milestone := new(Milestone)
-	return milestone, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
+	return milestone, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
 }
 
 // DeleteMilestone delete one milestone by milestone id / name
 func (c *Client) DeleteMilestone(owner, repo string, value interface{}) error {
-	id, err := getMileIDbyStringOrInt64(c, owner, repo, value)
+	id, err := getMilestoneIdentifier(c, owner, repo, value)
 	if err != nil {
 		return err
 	}
-	_, err = c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil)
+	_, err = c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), nil, nil)
 	return err
 }
 
-func getMileIDbyStringOrInt64(c *Client, owner, repo string, value interface{}) (int64, error) {
+func getMilestoneIdentifier(c *Client, owner, repo string, value interface{}) (string, error) {
 	switch reflect.ValueOf(value).Kind() {
 	case reflect.Int64:
-		return value.(int64), nil
+		return fmt.Sprint(value.(int64)), nil
 	case reflect.String:
-		return c.ResolveMilestoneIDByName(owner, repo, value.(string))
+		// use fallback for old gitea instances
+		if c.CheckServerVersionConstraint(">=1.13.0") != nil {
+			id, err := c.resolveMilestoneIDByName(owner, repo, value.(string))
+			if err != nil {
+				return "", err
+			}
+			return fmt.Sprint(id), nil
+		}
+		return value.(string), nil
 	}
-	return 0, fmt.Errorf("only string and int64 supported")
+	return "", fmt.Errorf("only string and int64 supported")
 }
 
-// ResolveMilestoneIDByName take a milestone name and return the id if it exist
-func (c *Client) ResolveMilestoneIDByName(owner, repo, name string) (int64, error) {
+// resolveMilestoneIDByName is a fallback method to find milestone id by name
+func (c *Client) resolveMilestoneIDByName(owner, repo, name string) (int64, error) {
 	i := 0
 	for {
 		i++
@@ -169,7 +177,6 @@ func (c *Client) ResolveMilestoneIDByName(owner, repo, name string) (int64, erro
 				Page: i,
 			},
 			State: "all",
-			Name:  name,
 		})
 		if err != nil {
 			return 0, err
