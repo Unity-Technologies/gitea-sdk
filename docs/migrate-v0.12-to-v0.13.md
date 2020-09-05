@@ -53,8 +53,8 @@ Pulls:
 
 The following functions are affected:  ListOrgTeams, ListMyTeams, GetTeam, CreateTeam, EditTeam and AddCollaborator
 
-Fhe field `Permission` type string has been replaced with **AccessMode**, which represent the raw strings you must use before.
-Just replace the string with the AccessMode equivalence.
+The `Permission` field has changed type from `string` to `AccessMode`, which represent the raw strings you must use before.
+Just replace the string with the AccessMode equivalent.
 
 Pulls:
 
