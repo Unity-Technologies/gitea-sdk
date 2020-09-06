@@ -65,7 +65,7 @@ func TestRepoMigrateAndLanguages(t *testing.T) {
 	lang, err := c.GetRepoLanguages(repoM.Owner.UserName, repoM.Name)
 	assert.NoError(t, err)
 	assert.Len(t, lang, 2)
-	assert.EqualValues(t, 217441, lang["Go"])
+	assert.True(t, 217441 < lang["Go"])
 	assert.EqualValues(t, 3578, lang["Makefile"])
 }
 
