@@ -1,8 +1,7 @@
 # Migration Guide: v0.12 to v0.13
 
-v0.13.0 introduces a number of breaking changes, throu it should not be hard to
-migrate.
-Just follow this guid and if issues still ocure ask for help on discord or
+v0.13.0 introduces a number of breaking changes, throu it should not be hard to migrate.  
+Just follow this guid and if issues still ocure ask for help on discord or  
 feel free to create an issue.
 
 <!-- toc -->
@@ -17,7 +16,7 @@ feel free to create an issue.
 
 ## EditMilestoneOption use StateType
 
-Instead of a raw string StateType is now used for State too.
+Instead of a raw string StateType is now used for State too.  
 just replace old strings with new enum.
 
 
@@ -27,10 +26,10 @@ Pulls:
 
 ## RepoSearch Options Struct was rewritten
 
-Since the API itself is ugly and there was no nameconvention whats o ever.
-You easely can pass the wrong options and dont get the result you want.
+Since the API itself is ugly and there was no nameconvention whats o ever.  
+You easely can pass the wrong options and dont get the result you want.  
 
-Now it is rewritten and translated for the API.
+Now it is rewritten and translated for the API.  
 The easyest way to migrate is to look at who this function is used and rewritten that code block.
 
 If there is a special edgecase you have you can pass a `RawQuery` to the API endpoint.
@@ -41,7 +40,7 @@ Pulls:
 
 ## Variable Renames
 
-Some names of strcut options have been renamed to describe there function/usecase more precisely.
+Some names of strcut options have been renamed to describe there function/usecase more precisely.  
 if you use `CreateOrgOption` somewhere just rename `UserName` to `Name`.
 
 Pulls:
@@ -51,7 +50,8 @@ Pulls:
 
 The following functions are affected:  ListOrgTeams, ListMyTeams, GetTeam, CreateTeam, EditTeam and AddCollaborator
 
-The `Permission` field has changed type from `string` to `AccessMode`, which represent the raw strings you must use before.
+The `Permission` field has changed type from `string` to `AccessMode`,  
+which represent the raw strings you must use before.  
 Just replace the string with the AccessMode equivalent.
 
 Pulls:
