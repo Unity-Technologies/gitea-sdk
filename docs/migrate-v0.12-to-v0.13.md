@@ -11,6 +11,7 @@ feel free to create an issue.
 -   [RepoSearch Options Struct was rewritten (#346)](#RepoSearch-Options-Struct-was-rewritten)
 -   [Variable Renames (#386)](#Variable-Renames)
 -   [Change Type of Permission Field (#408)](#Change-Type-of-Permission-Field)
+-   [All Function return http responce (#416)](#All-Function-return-http-responce)
 
 <!-- tocstop -->
 
@@ -21,7 +22,6 @@ just replace old strings with new enum.
 
 
 Pulls:
-
 -   [#350 EditMilestoneOption also use StateType](https://gitea.com/gitea/go-sdk/pulls/350)
 
 
@@ -36,7 +36,6 @@ The easyest way to migrate is to look at who this function is used and rewritten
 If there is a special edgecase you have you can pass a `RawQuery` to the API endpoint.
 
 Pulls:
-
 -   [#346 Refactor RepoSearch to be easy usable](https://gitea.com/gitea/go-sdk/pulls/346)
 
 
@@ -46,7 +45,6 @@ Some names of strcut options have been renamed to describe there function/usecas
 if you use `CreateOrgOption` somewhere just rename `UserName` to `Name`.
 
 Pulls:
-
 -   [#386 CreateOrgOption rename UserName to Name](https://gitea.com/gitea/go-sdk/pulls/386)
 
 ## Change Type of Permission Field
@@ -57,5 +55,22 @@ The `Permission` field has changed type from `string` to `AccessMode`, which rep
 Just replace the string with the AccessMode equivalent.
 
 Pulls:
-
 -   [#408 Use enum AccessMode for OrgTeam and Collaborator functions](https://gitea.com/gitea/go-sdk/pulls/408)
+
+
+## All Function return http responce
+
+All functions got one new return (`Responce`)!
+If you just like to migrate, add `_,` before the error return.
+
+example:
+```diff
+- user, err := c.GetMyUserInfo()
++ user, _, err := c.GetMyUserInfo()
+```
+
+If you like to check responce if an error ocure, make sure responce is not nil!
+If an error ocure before an http request (e.g. gitea is to old), it will be nil.
+
+Pulls:
+-   [#416 All Function return http responce](https://gitea.com/gitea/go-sdk/pulls/416)
