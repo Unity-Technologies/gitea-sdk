@@ -84,18 +84,19 @@ func (c *Client) MigrateRepo(opt MigrateRepoOption) (*Repository, error) {
 
 	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
 		if len(opt.AuthToken) != 0 {
-			// old gitea instances dont understand AuthToken
+			// gitea <= 1.12 dont understand AuthToken
 			opt.AuthUsername = opt.AuthToken
 			opt.AuthPassword, opt.AuthToken = "", ""
 		}
 		if len(opt.RepoOwner) != 0 {
+			// gitea <= 1.12 dont understand RepoOwner
 			u, err := c.GetUserInfo(opt.RepoOwner)
 			if err != nil {
 				return nil, err
 			}
 			opt.RepoOwnerID = u.ID
 		} else if opt.RepoOwnerID == 0 {
-			// fallback to current user as migration initiator
+			// gitea <= 1.12 require RepoOwnerID
 			u, err := c.GetMyUserInfo()
 			if err != nil {
 				return nil, err
