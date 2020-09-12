@@ -6,6 +6,7 @@
 package gitea
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -34,6 +35,7 @@ type Client struct {
 	otp           string
 	sudo          string
 	client        *http.Client
+	ctx           context.Context
 	serverVersion *version.Version
 	versionLock   sync.RWMutex
 }
@@ -59,6 +61,11 @@ func (c *Client) SetBasicAuth(username, password string) {
 	c.username, c.password = username, password
 }
 
+// SetContext set context witch is used for http requests
+func (c *Client) SetContext(ctx context.Context) {
+	c.ctx = ctx
+}
+
 // SetOTP sets OTP for 2FA
 func (c *Client) SetOTP(otp string) {
 	c.otp = otp
@@ -75,7 +82,15 @@ func (c *Client) SetSudo(sudo string) {
 }
 
 func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, error) {
-	req, err := http.NewRequest(method, c.url+path, body)
+	var (
+		req *http.Request
+		err error
+	)
+	if c.ctx == nil {
+		req, err = http.NewRequest(method, c.url+path, body)
+	} else {
+		req, err = http.NewRequestWithContext(c.ctx, method, c.url+path, body)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +104,15 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, er
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, c.url+"/api/v1"+path, body)
+	var (
+		req *http.Request
+		err error
+	)
+	if c.ctx == nil {
+		req, err = http.NewRequest(method, c.url+"/api/v1"+path, body)
+	} else {
+		req, err = http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
+	}
 	if err != nil {
 		return nil, err
 	}
