@@ -150,7 +150,7 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 		if err = json.Unmarshal(data, &errMap); err != nil {
 			// when the JSON can't be parsed, data was probably empty or a plain string,
 			// so we try to return a helpful error anyway
-			return nil, nil, fmt.Errorf("Unknown API Error: %d\nRequest: '%s' with '%s' method '%s' header and '%s' body", resp.StatusCode, path, method, header, string(data))
+			return data, resp, fmt.Errorf("Unknown API Error: %d\nRequest: '%s' with '%s' method '%s' header and '%s' body", resp.StatusCode, path, method, header, string(data))
 		}
 		return data, resp, errors.New(errMap["message"].(string))
 	}
