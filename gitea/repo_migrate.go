@@ -18,12 +18,14 @@ const (
 	GitServicePlain GitServiceType = "git"
 	//GitServiceGithub represents github.com
 	GitServiceGithub GitServiceType = "github"
-	// GitServiceGitea represents a gitea service
-	GitServiceGitea GitServiceType = "gitea"
 	// GitServiceGitlab represents a gitlab service
 	GitServiceGitlab GitServiceType = "gitlab"
-	// GitServiceGogs represents a gogs service
-	GitServiceGogs GitServiceType = "gogs"
+
+	// Not supported jet
+	// // GitServiceGitea represents a gitea service
+	// GitServiceGitea GitServiceType = "gitea"
+	// // GitServiceGogs represents a gogs service
+	// GitServiceGogs GitServiceType = "gogs"
 )
 
 // MigrateRepoOption options for migrating a repository from an external service
