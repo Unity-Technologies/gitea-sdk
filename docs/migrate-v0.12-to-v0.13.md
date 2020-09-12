@@ -60,7 +60,7 @@ Pulls:
 
 ## All Function return http responce
 
-All functions got one new return (`Responce`)!
+All functions got one new return (`Responce`)!  
 If you just like to migrate, add `_,` before the error return.
 
 example:
@@ -69,7 +69,7 @@ example:
 + user, _, err := c.GetMyUserInfo()
 ```
 
-If you like to check responce if an error ocure, make sure responce is not nil!
+If you like to check responce if an error ocure, make sure responce is not nil!  
 If an error ocure before an http request (e.g. gitea is to old), it will be nil.
 
 Pulls:
