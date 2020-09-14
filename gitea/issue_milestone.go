@@ -58,10 +58,20 @@ func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption)
 	return milestones, resp, err
 }
 
-// GetMilestone get one milestone by repo name and milestone id
-func (c *Client) GetMilestone(owner, repo string, id int64) (*Milestone, *Response, error) {
+// GetMilestone get one milestone by repo name and milestone id / name
+func (c *Client) GetMilestone(owner, repo string, value interface{}) (*Milestone, *Response, error) {
+	id, converted, err := milestoneValueToString(value)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !converted && c.CheckServerVersionConstraint(">=1.13") != nil {
+		// backwards compatibility mode
+		m, resp, err := c.resolveMilestoneByName(owner, repo, id)
+		return m, resp, err
+	}
+
 	milestone := new(Milestone)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil, milestone)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), nil, nil, milestone)
 	return milestone, resp, err
 }
 
@@ -121,8 +131,21 @@ func (opt EditMilestoneOption) Validate() error {
 	return nil
 }
 
-// EditMilestone modify milestone with options
-func (c *Client) EditMilestone(owner, repo string, id int64, opt EditMilestoneOption) (*Milestone, *Response, error) {
+// EditMilestone modify milestone with options by id / name
+func (c *Client) EditMilestone(owner, repo string, value interface{}, opt EditMilestoneOption) (*Milestone, *Response, error) {
+	id, converted, err := milestoneValueToString(value)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !converted && c.CheckServerVersionConstraint(">=1.13") != nil {
+		// backwards compatibility mode
+		m, _, err := c.resolveMilestoneByName(owner, repo, id)
+		if err != nil {
+			return nil, nil, err
+		}
+		id = fmt.Sprint(m.ID)
+	}
+
 	if err := opt.Validate(); err != nil {
 		return nil, nil, err
 	}
@@ -131,12 +154,64 @@ func (c *Client) EditMilestone(owner, repo string, id int64, opt EditMilestoneOp
 		return nil, nil, err
 	}
 	milestone := new(Milestone)
-	resp, err := c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
+	resp, err := c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
 	return milestone, resp, err
 }
 
-// DeleteMilestone delete one milestone by milestone id
-func (c *Client) DeleteMilestone(owner, repo string, id int64) (*Response, error) {
-	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%d", owner, repo, id), nil, nil)
+// DeleteMilestone delete one milestone by id / name
+func (c *Client) DeleteMilestone(owner, repo string, value interface{}) (*Response, error) {
+	id, converted, err := milestoneValueToString(value)
+	if err != nil {
+		return nil, err
+	}
+	if !converted && c.CheckServerVersionConstraint(">=1.13") != nil {
+		// backwards compatibility mode
+		m, _, err := c.resolveMilestoneByName(owner, repo, id)
+		if err != nil {
+			return nil, err
+		}
+		id = fmt.Sprint(m.ID)
+	}
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), nil, nil)
 	return resp, err
+}
+
+// milestoneValueToString return string of int/int6/string and if it was converted
+func milestoneValueToString(value interface{}) (string, bool, error) {
+	ii, ok := value.(int64)
+	if ok {
+		return fmt.Sprint(ii), true, nil
+	}
+	o, ok := value.(int)
+	if ok {
+		return fmt.Sprint(o), true, nil
+	}
+	s, ok := value.(string)
+	if ok {
+		return s, false, nil
+	}
+	return "", false, fmt.Errorf("unsuported type: %T", value)
+}
+
+// resolveMilestoneByName is a fallback method to find milestone id by name
+func (c *Client) resolveMilestoneByName(owner, repo, name string) (*Milestone, *Response, error) {
+	for i := 1; ; i++ {
+		miles, resp, err := c.ListRepoMilestones(owner, repo, ListMilestoneOption{
+			ListOptions: ListOptions{
+				Page: i,
+			},
+			State: "all",
+		})
+		if err != nil {
+			return nil, nil, err
+		}
+		if len(miles) == 0 {
+			return nil, nil, fmt.Errorf("milestone '%s' do not exist", name)
+		}
+		for _, m := range miles {
+			if strings.ToLower(strings.TrimSpace(m.Title)) == strings.ToLower(strings.TrimSpace(name)) {
+				return m, resp, nil
+			}
+		}
+	}
 }
