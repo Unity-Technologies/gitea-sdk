@@ -61,7 +61,7 @@ func NewClient(url string, options ...func(*Client) error) (*Client, error) {
 }
 
 // NewClientWithHTTP creates an API client with a custom http client
-// Deprecated use CustomHTTPClient option
+// Deprecated use SetHTTPClient option
 func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
 	client, _ := NewClient(url, SetHTTPClient(httpClient))
 	return client
