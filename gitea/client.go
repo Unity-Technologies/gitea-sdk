@@ -127,6 +127,14 @@ func (c *Client) SetHTTPClient(client *http.Client) {
 	c.client = client
 }
 
+// SetSudo is an option for NewClient to set sudo header
+func SetSudo(sudo string) func(client *Client) error {
+	return func(client *Client) error {
+		client.SetSudo(sudo)
+		return nil
+	}
+}
+
 // SetSudo sets username to impersonate.
 func (c *Client) SetSudo(sudo string) {
 	c.sudo = sudo

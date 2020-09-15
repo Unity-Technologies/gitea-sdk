@@ -82,7 +82,7 @@ Pulls:
 function `NewClient` use functional options now.
 If you simply like to migrate replace `client := NewClient(giteaUrl, token)` with `client, _ := NewClient(giteaURL, SetToken(token))`.
 
-If you like tu utilize them, currently there are: SetContext, SetBasicAuth, SetOTP, SetToken, SetHTTPClient
+If you like tu utilize them, currently there are: SetContext, SetBasicAuth, SetOTP, SetToken, SetHTTPClient, SetSudo
 
 Pulls:
--   [#417 Make http requests with context (optional)](https://gitea.com/gitea/go-sdk/pulls/417)
+-   [#417 Make http requests with context](https://gitea.com/gitea/go-sdk/pulls/417)
