@@ -3,6 +3,7 @@
 ## [v0.13.0](https://gitea.com/gitea/go-sdk/releases/tag/v0.13.0) - 2020-09-15
 
 * BREAKING
+  * Check Gitea Version Requirement (#419)
   * All Function return http responce (#416)
   * Remove opts from ListPullReviewComments (#411)
   * Use enum AccessMode for OrgTeam and Collaborator functions (#408)
@@ -22,7 +23,6 @@
   * Add Validate func for Create/Edit Options (#370)
   * Add Function to get GetGlobalSettings and GetSettingAllowedReactions (#359)
 * ENHANCEMENTS
-  * Check Gitea Version Requirement (#419)
   * TrackedTime API >= 1.11.x needed (#415)
   * Update Milestone struct (#410)
   * Add Fallback for GetPullRequestDiff/Patch (#399)
