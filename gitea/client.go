@@ -46,34 +46,79 @@ type Response struct {
 }
 
 // NewClient initializes and returns a API client.
-func NewClient(url, token string) *Client {
-	return &Client{
-		url:         strings.TrimSuffix(url, "/"),
-		accessToken: token,
-		client:      &http.Client{},
+func NewClient(url string, options ...func(*Client) error) (*Client, error) {
+	client := &Client{
+		url:    strings.TrimSuffix(url, "/"),
+		client: &http.Client{},
 	}
+	for _, opt := range options {
+		if err := opt(client); err != nil {
+			return nil, err
+		}
+	}
+	return client, nil
 }
 
 // NewClientWithHTTP creates an API client with a custom http client
+// Deprecated use CustomHTTPClient option
 func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
-	client := NewClient(url, "")
-	client.client = httpClient
+	client, _ := NewClient(url, SetHTTPClient(httpClient))
 	return client
 }
 
-// SetBasicAuth sets basicauth
+// SetHTTPClient is an option for NewClient to set custom http client
+func SetHTTPClient(httpClient *http.Client) func(client *Client) error {
+	return func(client *Client) error {
+		client.client = httpClient
+		return nil
+	}
+}
+
+// SetToken is an option for NewClient to set token
+func SetToken(token string) func(client *Client) error {
+	return func(client *Client) error {
+		client.accessToken = token
+		return nil
+	}
+}
+
+// SetBasicAuth is an option for NewClient to set username and password
+func SetBasicAuth(username, password string) func(client *Client) error {
+	return func(client *Client) error {
+		client.SetBasicAuth(username, password)
+		return nil
+	}
+}
+
+// SetBasicAuth sets username and password
 func (c *Client) SetBasicAuth(username, password string) {
 	c.username, c.password = username, password
 }
 
-// SetContext set context witch is used for http requests
-func (c *Client) SetContext(ctx context.Context) {
-	c.ctx = ctx
+// SetOTP is an option for NewClient to set OTP for 2FA
+func SetOTP(otp string) func(client *Client) error {
+	return func(client *Client) error {
+		client.SetOTP(otp)
+		return nil
+	}
 }
 
 // SetOTP sets OTP for 2FA
 func (c *Client) SetOTP(otp string) {
 	c.otp = otp
+}
+
+// SetContext is an option for NewClient to set context
+func SetContext(ctx context.Context) func(client *Client) error {
+	return func(client *Client) error {
+		client.SetContext(ctx)
+		return nil
+	}
+}
+
+// SetContext set context witch is used for http requests
+func (c *Client) SetContext(ctx context.Context) {
+	c.ctx = ctx
 }
 
 // SetHTTPClient replaces default http.Client with user given one.
