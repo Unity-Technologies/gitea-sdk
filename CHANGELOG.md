@@ -37,7 +37,7 @@
   * Issue/Pull add IsLocked Property (#357)
   * Update EditPullRequestOption Add Base (#353)
   * File Create/Update/Delete detect DefaultBranch if Branch not set for old Versions (#352)
-  * Impruve Error Handling (#351)
+  * Improve Error Handling (#351)
 
 ## [v0.12.2](https://gitea.com/gitea/go-sdk/releases/tag/v0.12.2) - 2020-09-05
 
