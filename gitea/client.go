@@ -46,16 +46,14 @@ type Response struct {
 }
 
 // NewClient initializes and returns a API client.
-func NewClient(url string, options ...func(*Client) error) (*Client, error) {
+func NewClient(url string, options ...func(*Client)) (*Client, error) {
 	client := &Client{
 		url:    strings.TrimSuffix(url, "/"),
 		client: &http.Client{},
 		ctx:    context.Background(),
 	}
 	for _, opt := range options {
-		if err := opt(client); err != nil {
-			return nil, err
-		}
+		opt(client)
 	}
 	return client, nil
 }
@@ -68,26 +66,23 @@ func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
 }
 
 // SetHTTPClient is an option for NewClient to set custom http client
-func SetHTTPClient(httpClient *http.Client) func(client *Client) error {
-	return func(client *Client) error {
+func SetHTTPClient(httpClient *http.Client) func(client *Client) {
+	return func(client *Client) {
 		client.client = httpClient
-		return nil
 	}
 }
 
 // SetToken is an option for NewClient to set token
-func SetToken(token string) func(client *Client) error {
-	return func(client *Client) error {
+func SetToken(token string) func(client *Client) {
+	return func(client *Client) {
 		client.accessToken = token
-		return nil
 	}
 }
 
 // SetBasicAuth is an option for NewClient to set username and password
-func SetBasicAuth(username, password string) func(client *Client) error {
-	return func(client *Client) error {
+func SetBasicAuth(username, password string) func(client *Client) {
+	return func(client *Client) {
 		client.SetBasicAuth(username, password)
-		return nil
 	}
 }
 
@@ -97,10 +92,9 @@ func (c *Client) SetBasicAuth(username, password string) {
 }
 
 // SetOTP is an option for NewClient to set OTP for 2FA
-func SetOTP(otp string) func(client *Client) error {
-	return func(client *Client) error {
+func SetOTP(otp string) func(client *Client) {
+	return func(client *Client) {
 		client.SetOTP(otp)
-		return nil
 	}
 }
 
@@ -110,10 +104,9 @@ func (c *Client) SetOTP(otp string) {
 }
 
 // SetContext is an option for NewClient to set context
-func SetContext(ctx context.Context) func(client *Client) error {
-	return func(client *Client) error {
+func SetContext(ctx context.Context) func(client *Client) {
+	return func(client *Client) {
 		client.SetContext(ctx)
-		return nil
 	}
 }
 
@@ -128,10 +121,9 @@ func (c *Client) SetHTTPClient(client *http.Client) {
 }
 
 // SetSudo is an option for NewClient to set sudo header
-func SetSudo(sudo string) func(client *Client) error {
-	return func(client *Client) error {
+func SetSudo(sudo string) func(client *Client) {
+	return func(client *Client) {
 		client.SetSudo(sudo)
-		return nil
 	}
 }
 
