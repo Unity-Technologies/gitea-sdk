@@ -79,7 +79,7 @@ Pulls:
 
 ## NewClient has new Option Interface
 
-function `NewClient` use functional options now.
+function `NewClient` use functional options now.  
 If you simply like to migrate replace `client := NewClient(giteaUrl, token)` with `client, _ := NewClient(giteaURL, SetToken(token))`.
 
 If you like tu utilize them, currently there are: SetContext, SetBasicAuth, SetOTP, SetToken, SetHTTPClient, SetSudo
