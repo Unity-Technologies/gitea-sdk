@@ -71,7 +71,7 @@ func (c *Client) GetMilestone(owner, repo string, value interface{}) (*Milestone
 	}
 
 	milestone := new(Milestone)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), nil, nil, milestone)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, url.PathEscape(id)), nil, nil, milestone)
 	return milestone, resp, err
 }
 
@@ -154,7 +154,7 @@ func (c *Client) EditMilestone(owner, repo string, value interface{}, opt EditMi
 		return nil, nil, err
 	}
 	milestone := new(Milestone)
-	resp, err := c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), jsonHeader, bytes.NewReader(body), milestone)
+	resp, err := c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, url.PathEscape(id)), jsonHeader, bytes.NewReader(body), milestone)
 	return milestone, resp, err
 }
 
@@ -172,7 +172,7 @@ func (c *Client) DeleteMilestone(owner, repo string, value interface{}) (*Respon
 		}
 		id = fmt.Sprint(m.ID)
 	}
-	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, id), nil, nil)
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/milestones/%s", owner, repo, url.PathEscape(id)), nil, nil)
 	return resp, err
 }
 
