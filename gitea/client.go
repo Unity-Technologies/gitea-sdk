@@ -50,6 +50,7 @@ func NewClient(url string, options ...func(*Client) error) (*Client, error) {
 	client := &Client{
 		url:    strings.TrimSuffix(url, "/"),
 		client: &http.Client{},
+		ctx:    context.Background(),
 	}
 	for _, opt := range options {
 		if err := opt(client); err != nil {
@@ -132,15 +133,7 @@ func (c *Client) SetSudo(sudo string) {
 }
 
 func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *Response, error) {
-	var (
-		req *http.Request
-		err error
-	)
-	if c.ctx == nil {
-		req, err = http.NewRequest(method, c.url+path, body)
-	} else {
-		req, err = http.NewRequestWithContext(c.ctx, method, c.url+path, body)
-	}
+	req, err := http.NewRequestWithContext(c.ctx, method, c.url+path, body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -155,15 +148,7 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
-	var (
-		req *http.Request
-		err error
-	)
-	if c.ctx == nil {
-		req, err = http.NewRequest(method, c.url+"/api/v1"+path, body)
-	} else {
-		req, err = http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
-	}
+	req, err := http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
 	if err != nil {
 		return nil, err
 	}
