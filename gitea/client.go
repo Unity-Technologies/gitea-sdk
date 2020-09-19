@@ -145,7 +145,7 @@ func SetDebugMode() func(client *Client) {
 
 func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *Response, error) {
 	if c.debug {
-		fmt.Printf("%s: %s\nBody: %v", method, path, body)
+		fmt.Printf("%s: %s\nBody: %v\n", method, c.url+path, body)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+path, body)
 	if err != nil {
@@ -159,14 +159,14 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	defer resp.Body.Close()
 	data, err := ioutil.ReadAll(resp.Body)
 	if c.debug {
-		fmt.Printf("Response: %v", resp)
+		fmt.Printf("Response: %v\n\n", resp)
 	}
 	return data, &Response{resp}, nil
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
 	if c.debug {
-		fmt.Printf("%s: %s\nHeader: %v\nBody: %v", method, path, header, body)
+		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+"/api/v1"+path, header, body)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
 	if err != nil {
@@ -193,7 +193,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 		return nil, err
 	}
 	if c.debug {
-		fmt.Printf("Response: %v", resp)
+		fmt.Printf("Response: %v\n\n", resp)
 	}
 	return &Response{resp}, nil
 }
