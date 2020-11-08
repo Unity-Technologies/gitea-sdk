@@ -105,7 +105,7 @@ func (opt MarkNotificationOptions) Validate(c *Client) error {
 
 // CheckNotifications list users's notification threads
 func (c *Client) CheckNotifications() (int64, *Response, error) {
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1120); err != nil {
 		return 0, nil, err
 	}
 	new := struct {
@@ -118,7 +118,7 @@ func (c *Client) CheckNotifications() (int64, *Response, error) {
 
 // GetNotification get notification thread by ID
 func (c *Client) GetNotification(id int64) (*NotificationThread, *Response, error) {
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1120); err != nil {
 		return nil, nil, err
 	}
 	thread := new(NotificationThread)
@@ -129,7 +129,7 @@ func (c *Client) GetNotification(id int64) (*NotificationThread, *Response, erro
 // ReadNotification mark notification thread as read by ID
 // It optionally takes a second argument if status has to be set other than 'read'
 func (c *Client) ReadNotification(id int64, status ...NotifyStatus) (*Response, error) {
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1120); err != nil {
 		return nil, err
 	}
 	link := fmt.Sprintf("/notifications/threads/%d", id)
@@ -142,7 +142,7 @@ func (c *Client) ReadNotification(id int64, status ...NotifyStatus) (*Response, 
 
 // ListNotifications list users's notification threads
 func (c *Client) ListNotifications(opt ListNotificationOptions) ([]*NotificationThread, *Response, error) {
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1120); err != nil {
 		return nil, nil, err
 	}
 	if err := opt.Validate(c); err != nil {
@@ -157,7 +157,7 @@ func (c *Client) ListNotifications(opt ListNotificationOptions) ([]*Notification
 
 // ReadNotifications mark notification threads as read
 func (c *Client) ReadNotifications(opt MarkNotificationOptions) (*Response, error) {
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1120); err != nil {
 		return nil, err
 	}
 	if err := opt.Validate(c); err != nil {
@@ -171,7 +171,7 @@ func (c *Client) ReadNotifications(opt MarkNotificationOptions) (*Response, erro
 
 // ListRepoNotifications list users's notification threads on a specific repo
 func (c *Client) ListRepoNotifications(owner, reponame string, opt ListNotificationOptions) ([]*NotificationThread, *Response, error) {
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1120); err != nil {
 		return nil, nil, err
 	}
 	if err := opt.Validate(c); err != nil {
@@ -186,7 +186,7 @@ func (c *Client) ListRepoNotifications(owner, reponame string, opt ListNotificat
 
 // ReadRepoNotifications mark notification threads as read on a specific repo
 func (c *Client) ReadRepoNotifications(owner, reponame string, opt MarkNotificationOptions) (*Response, error) {
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1120); err != nil {
 		return nil, err
 	}
 	if err := opt.Validate(c); err != nil {
