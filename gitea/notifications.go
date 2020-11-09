@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	version1123, _ = version.NewVersion("1.12.3")
+	version1_12_3, _ = version.NewVersion("1.12.3")
 )
 
 // NotificationThread expose Notification on API
@@ -81,7 +81,7 @@ func (opt *ListNotificationOptions) QueryEncode() string {
 // Validate the CreateUserOption struct
 func (opt ListNotificationOptions) Validate(c *Client) error {
 	if len(opt.Status) != 0 {
-		return c.checkServerVersionGreaterThanOrEqual(version1123)
+		return c.checkServerVersionGreaterThanOrEqual(version1_12_3)
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func (opt *MarkNotificationOptions) QueryEncode() string {
 // Validate the CreateUserOption struct
 func (opt MarkNotificationOptions) Validate(c *Client) error {
 	if len(opt.Status) != 0 || len(opt.ToStatus) != 0 {
-		return c.checkServerVersionGreaterThanOrEqual(version1123)
+		return c.checkServerVersionGreaterThanOrEqual(version1_12_3)
 	}
 	return nil
 }
