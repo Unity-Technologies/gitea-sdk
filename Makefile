@@ -11,22 +11,23 @@ GITEA_DL := https://dl.gitea.io/gitea/master/gitea-master-
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
   GITEA_DL := $(GITEA_DL)linux-
+
+  UNAME_P := $(shell uname -p)
+  ifeq ($(UNAME_P),unknown)
+   GITEA_DL := $(GITEA_DL)amd64
+  endif
+  ifeq ($(UNAME_P),x86_64)
+   GITEA_DL := $(GITEA_DL)amd64
+  endif
+  ifneq ($(filter %86,$(UNAME_P)),)
+   GITEA_DL := $(GITEA_DL)386
+  endif
+  ifneq ($(filter arm%,$(UNAME_P)),)
+    GITEA_DL := $(GITEA_DL)arm-5
+  endif
 endif
 ifeq ($(UNAME_S),Darwin)
-  GITEA_DL := $(GITEA_DL)darwin-10.6-
-endif
-UNAME_P := $(shell uname -p)
-ifeq ($(UNAME_P),unknown)
- GITEA_DL := $(GITEA_DL)amd64
-endif
-ifeq ($(UNAME_P),x86_64)
- GITEA_DL := $(GITEA_DL)amd64
-endif
-ifneq ($(filter %86,$(UNAME_P)),)
- GITEA_DL := $(GITEA_DL)386
-endif
-ifneq ($(filter arm%,$(UNAME_P)),)
-  GITEA_DL := $(GITEA_DL)arm-5
+  GITEA_DL := $(GITEA_DL)darwin-10.6-amd64
 endif
 
 .PHONY: all
