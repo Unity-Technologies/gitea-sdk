@@ -56,7 +56,7 @@ func NewClient(url string, options ...func(*Client)) (*Client, error) {
 	for _, opt := range options {
 		opt(client)
 	}
-	if err := client.CheckServerVersionConstraint(">=1.10"); err != nil {
+	if err := client.checkServerVersionGreaterThanOrEqual(version1100); err != nil {
 		return nil, err
 	}
 	return client, nil
