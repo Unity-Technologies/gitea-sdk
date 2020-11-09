@@ -13,7 +13,7 @@ ifeq ($(UNAME_S),Linux)
   GITEA_DL := $(GITEA_DL)linux-
 endif
 ifeq ($(UNAME_S),Darwin)
-  GITEA_DL := $(GITEA_DL)darwin-10.6-amd64
+  GITEA_DL := $(GITEA_DL)darwin-10.6-
 endif
 UNAME_P := $(shell uname -p)
 ifeq ($(UNAME_P),unknown)
