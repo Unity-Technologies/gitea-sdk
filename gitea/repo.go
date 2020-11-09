@@ -73,6 +73,20 @@ const (
 	RepoTypeMirror RepoType = "mirror"
 )
 
+// TrustModel represent how git signatures are handled in a repository
+type TrustModel string
+
+const (
+	// TrustModelDefault use TM set by global config
+	TrustModelDefault TrustModel = "default"
+	// TrustModelCollaborator gpg signature has to be owned by a repo collaborator
+	TrustModelCollaborator TrustModel = "collaborator"
+	// TrustModelCommitter gpg signature has to match committer
+	TrustModelCommitter TrustModel = "committer"
+	// TrustModelCollaboratorCommitter gpg signature has to match committer and owned by a repo collaborator
+	TrustModelCollaboratorCommitter TrustModel = "collaboratorcommitter"
+)
+
 // ListReposOptions options for listing repositories
 type ListReposOptions struct {
 	ListOptions
