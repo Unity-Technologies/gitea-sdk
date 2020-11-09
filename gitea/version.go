@@ -44,9 +44,9 @@ func (c *Client) CheckServerVersionConstraint(constraint string) error {
 
 // predefined versions only have to be parsed by library once
 var (
-	version1110, _ = version.NewVersion("1.11.0")
-	version1120, _ = version.NewVersion("1.12.0")
-	version1130, _ = version.NewVersion("1.13.0")
+	version1_11_0, _ = version.NewVersion("1.11.0")
+	version1_12_0, _ = version.NewVersion("1.12.0")
+	version1_13_0, _ = version.NewVersion("1.13.0")
 )
 
 // checkServerVersionGreaterThanOrEqual is internally used to speed up things and ignore issues with prerelease
