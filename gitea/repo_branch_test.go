@@ -107,14 +107,12 @@ func TestRepoBranchProtection(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, bpl[0], bp)
 
-	one := int64(1)
-
 	// EditBranchProtection
 	bp, _, err = c.EditBranchProtection(repo.Owner.UserName, repo.Name, bpl[0].BranchName, EditBranchProtectionOption{
 		EnablePush:                  OptionalFalse(),
 		EnablePushWhitelist:         OptionalFalse(),
 		PushWhitelistUsernames:      nil,
-		RequiredApprovals:           &one,
+		RequiredApprovals:           OptionalInt64(1),
 		EnableApprovalsWhitelist:    OptionalTrue(),
 		ApprovalsWhitelistUsernames: []string{"test01"},
 	})

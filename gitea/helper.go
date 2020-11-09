@@ -15,3 +15,13 @@ func OptionalFalse() *bool {
 	v := false
 	return &v
 }
+
+// OptionalString convert a string to a string reference
+func OptionalString(v string) *string {
+	return &v
+}
+
+// OptionalInt64 convert a int64 to a int64 reference
+func OptionalInt64(v int64) *int64 {
+	return &v
+}
