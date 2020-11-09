@@ -278,16 +278,30 @@ type CreateRepoOption struct {
 }
 
 // Validate the CreateRepoOption struct
-func (opt CreateRepoOption) Validate() error {
+func (opt CreateRepoOption) Validate(c *Client) error {
 	if len(strings.TrimSpace(opt.Name)) == 0 {
 		return fmt.Errorf("name is empty")
+	}
+	if len(opt.Name) > 100 {
+		return fmt.Errorf("name has more than 100 chars")
+	}
+	if len(opt.Description) > 255 {
+		return fmt.Errorf("name has more than 255 chars")
+	}
+	if len(opt.DefaultBranch) > 100 {
+		return fmt.Errorf("name has more than 100 chars")
+	}
+	if len(opt.TrustModel) != 0 {
+		if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 // CreateRepo creates a repository for authenticated user.
 func (c *Client) CreateRepo(opt CreateRepoOption) (*Repository, *Response, error) {
-	if err := opt.Validate(); err != nil {
+	if err := opt.Validate(c); err != nil {
 		return nil, nil, err
 	}
 	body, err := json.Marshal(&opt)
@@ -301,7 +315,7 @@ func (c *Client) CreateRepo(opt CreateRepoOption) (*Repository, *Response, error
 
 // CreateOrgRepo creates an organization repository for authenticated user.
 func (c *Client) CreateOrgRepo(org string, opt CreateRepoOption) (*Repository, *Response, error) {
-	if err := opt.Validate(); err != nil {
+	if err := opt.Validate(c); err != nil {
 		return nil, nil, err
 	}
 	body, err := json.Marshal(&opt)
