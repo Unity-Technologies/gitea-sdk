@@ -66,6 +66,9 @@ type ListRepoBranchesOptions struct {
 
 // ListRepoBranches list all the branches of one repository
 func (c *Client) ListRepoBranches(user, repo string, opt ListRepoBranchesOptions) ([]*Branch, *Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
+		return nil, nil, err
+	}
 	opt.setDefaults()
 	branches := make([]*Branch, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &branches)
@@ -74,6 +77,9 @@ func (c *Client) ListRepoBranches(user, repo string, opt ListRepoBranchesOptions
 
 // GetRepoBranch get one branch's information of one repository
 func (c *Client) GetRepoBranch(user, repo, branch string) (*Branch, *Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo, &branch); err != nil {
+		return nil, nil, err
+	}
 	b := new(Branch)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches/%s", user, repo, branch), nil, nil, &b)
 	if err != nil {
@@ -84,6 +90,9 @@ func (c *Client) GetRepoBranch(user, repo, branch string) (*Branch, *Response, e
 
 // DeleteRepoBranch delete a branch in a repository
 func (c *Client) DeleteRepoBranch(user, repo, branch string) (bool, *Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo, &branch); err != nil {
+		return false, nil, err
+	}
 	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
 		return false, nil, err
 	}
@@ -118,6 +127,9 @@ func (opt CreateBranchOption) Validate() error {
 
 // CreateBranch creates a branch for a user's repository
 func (c *Client) CreateBranch(owner, repo string, opt CreateBranchOption) (*Branch, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
 		return nil, nil, err
 	}

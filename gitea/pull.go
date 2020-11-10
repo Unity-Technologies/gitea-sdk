@@ -99,6 +99,9 @@ func (opt *ListPullRequestsOptions) QueryEncode() string {
 
 // ListRepoPullRequests list PRs of one repository
 func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	opt.setDefaults()
 	prs := make([]*PullRequest, 0, opt.PageSize)
 
@@ -110,6 +113,9 @@ func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOp
 
 // GetPullRequest get information of one PR
 func (c *Client) GetPullRequest(owner, repo string, index int64) (*PullRequest, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	pr := new(PullRequest)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls/%d", owner, repo, index), nil, nil, pr)
 	return pr, resp, err
@@ -130,6 +136,9 @@ type CreatePullRequestOption struct {
 
 // CreatePullRequest create pull request with options
 func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOption) (*PullRequest, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, nil, err
@@ -169,6 +178,9 @@ func (opt EditPullRequestOption) Validate(c *Client) error {
 
 // EditPullRequest modify pull request with PR id and options
 func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRequestOption) (*PullRequest, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := opt.Validate(c); err != nil {
 		return nil, nil, err
 	}
@@ -202,6 +214,9 @@ func (opt MergePullRequestOption) Validate(c *Client) error {
 
 // MergePullRequest merge a PR to repository by PR id
 func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (bool, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return false, nil, err
+	}
 	if err := opt.Validate(c); err != nil {
 		return false, nil, err
 	}
@@ -218,6 +233,9 @@ func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePull
 
 // IsPullRequestMerged test if one PR is merged to one repository
 func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return false, nil, err
+	}
 	status, resp, err := c.getStatusCode("GET", fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index), nil, nil)
 
 	if err != nil {
@@ -229,6 +247,9 @@ func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, *Re
 
 // getPullRequestDiffOrPatch gets the patch or diff file as bytes for a PR
 func (c *Client) getPullRequestDiffOrPatch(owner, repo, kind string, index int64) ([]byte, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
 		r, _, err2 := c.GetRepo(owner, repo)
 		if err2 != nil {

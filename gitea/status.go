@@ -51,6 +51,9 @@ type CreateStatusOption struct {
 
 // CreateStatus creates a new Status for a given Commit
 func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) (*Status, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo, &sha); err != nil {
+		return nil, nil, err
+	}
 	body, err := json.Marshal(&opts)
 	if err != nil {
 		return nil, nil, err
@@ -67,6 +70,9 @@ type ListStatusesOption struct {
 
 // ListStatuses returns all statuses for a given Commit
 func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOption) ([]*Status, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo, &sha); err != nil {
+		return nil, nil, err
+	}
 	opt.setDefaults()
 	statuses := make([]*Status, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, opt.getURLQuery().Encode()), nil, nil, &statuses)
@@ -86,6 +92,9 @@ type CombinedStatus struct {
 
 // GetCombinedStatus returns the CombinedStatus for a given Commit
 func (c *Client) GetCombinedStatus(owner, repo, sha string) (*CombinedStatus, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo, &sha); err != nil {
+		return nil, nil, err
+	}
 	status := new(CombinedStatus)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, sha), nil, nil, status)
 	return status, resp, err
