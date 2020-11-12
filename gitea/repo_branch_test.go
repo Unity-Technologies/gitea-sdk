@@ -109,11 +109,11 @@ func TestRepoBranchProtection(t *testing.T) {
 
 	// EditBranchProtection
 	bp, _, err = c.EditBranchProtection(repo.Owner.UserName, repo.Name, bpl[0].BranchName, EditBranchProtectionOption{
-		EnablePush:                  OptionalFalse(),
-		EnablePushWhitelist:         OptionalFalse(),
+		EnablePush:                  OptionalBool(false),
+		EnablePushWhitelist:         OptionalBool(false),
 		PushWhitelistUsernames:      nil,
 		RequiredApprovals:           OptionalInt64(1),
-		EnableApprovalsWhitelist:    OptionalTrue(),
+		EnableApprovalsWhitelist:    OptionalBool(true),
 		ApprovalsWhitelistUsernames: []string{"test01"},
 	})
 	assert.NoError(t, err)

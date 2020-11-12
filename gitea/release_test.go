@@ -60,8 +60,8 @@ func TestRelease(t *testing.T) {
 	r2, _, err = c.EditRelease(repo.Owner.UserName, repo.Name, r.ID, EditReleaseOption{
 		Title:        "Release Awesome",
 		Note:         "",
-		IsDraft:      OptionalFalse(),
-		IsPrerelease: OptionalFalse(),
+		IsDraft:      OptionalBool(false),
+		IsPrerelease: OptionalBool(false),
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, r.Target, r2.Target)

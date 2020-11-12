@@ -4,15 +4,8 @@
 
 package gitea
 
-// OptionalTrue return reference of true for a optional bool
-func OptionalTrue() *bool {
-	v := true
-	return &v
-}
-
-// OptionalFalse return reference of false for a optional bool
-func OptionalFalse() *bool {
-	v := false
+// OptionalBool convert a bool to a bool reference
+func OptionalBool(v bool) *bool {
 	return &v
 }
 
