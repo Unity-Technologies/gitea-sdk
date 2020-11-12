@@ -22,9 +22,7 @@ func (c *Client) ServerVersion() (string, *Response, error) {
 // CheckServerVersionConstraint validates that the login's server satisfies a
 // given version constraint such as ">= 1.11.0+dev"
 func (c *Client) CheckServerVersionConstraint(constraint string) error {
-	var err error
-	c.getVersionOnce.Do(func() { err = c.loadClientServerVersion() })
-	if err != nil {
+	if err := c.loadClientServerVersion(); err != nil {
 		return err
 	}
 
@@ -47,9 +45,7 @@ var (
 
 // checkServerVersionGreaterThanOrEqual is internally used to speed up things and ignore issues with prerelease
 func (c *Client) checkServerVersionGreaterThanOrEqual(v *version.Version) error {
-	var err error
-	c.getVersionOnce.Do(func() { err = c.loadClientServerVersion() })
-	if err != nil {
+	if err := c.loadClientServerVersion(); err != nil {
 		return err
 	}
 
@@ -60,13 +56,16 @@ func (c *Client) checkServerVersionGreaterThanOrEqual(v *version.Version) error 
 }
 
 // loadClientServerVersion init the serverVersion variable
-func (c *Client) loadClientServerVersion() error {
-	raw, _, err := c.ServerVersion()
-	if err != nil {
-		return err
-	}
-	if c.serverVersion, err = version.NewVersion(raw); err != nil {
-		return err
-	}
-	return nil
+func (c *Client) loadClientServerVersion() (err error) {
+	c.getVersionOnce.Do(func() {
+		raw, _, err2 := c.ServerVersion()
+		if err2 != nil {
+			err = err2
+			return
+		}
+		if c.serverVersion, err = version.NewVersion(raw); err != nil {
+			return
+		}
+	})
+	return
 }
