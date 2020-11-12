@@ -75,7 +75,7 @@ func (opt *MigrateRepoOption) Validate(c *Client) error {
 		}
 		// Gitlab is supported since 1.12.0 but api cant handle it until 1.13.0
 		// https://github.com/go-gitea/gitea/pull/12672
-		if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
+		if c.checkServerVersionGreaterThanOrEqual(version1_13_0) != nil {
 			return fmt.Errorf("migrate from service %s need gitea >= 1.13.0", opt.Service)
 		}
 	}
