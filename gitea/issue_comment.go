@@ -77,7 +77,7 @@ func (c *Client) GetIssueComment(owner, repo string, id int64) (*Comment, *Respo
 		return nil, nil, err
 	}
 	comment := new(Comment)
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return comment, nil, err
 	}
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, id), nil, nil, &comment)

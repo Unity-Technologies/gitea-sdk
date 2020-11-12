@@ -23,7 +23,7 @@ func (c *Client) TransferRepo(owner, reponame string, opt TransferRepoOption) (*
 	if err := escapeValidatePathSegments(&owner, &reponame); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	body, err := json.Marshal(&opt)

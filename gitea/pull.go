@@ -169,7 +169,7 @@ func (opt EditPullRequestOption) Validate(c *Client) error {
 		return fmt.Errorf("title is empty")
 	}
 	if len(opt.Base) != 0 {
-		if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 			return fmt.Errorf("can not change base gitea to old")
 		}
 	}
@@ -250,7 +250,7 @@ func (c *Client) getPullRequestDiffOrPatch(owner, repo, kind string, index int64
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
 		r, _, err2 := c.GetRepo(owner, repo)
 		if err2 != nil {
 			return nil, nil, err

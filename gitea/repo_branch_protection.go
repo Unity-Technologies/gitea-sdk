@@ -95,7 +95,7 @@ func (c *Client) ListBranchProtections(owner, repo string, opt ListBranchProtect
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	bps := make([]*BranchProtection, 0, opt.PageSize)
@@ -110,7 +110,7 @@ func (c *Client) GetBranchProtection(owner, repo, name string) (*BranchProtectio
 	if err := escapeValidatePathSegments(&owner, &repo, &name); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	bp := new(BranchProtection)
@@ -123,7 +123,7 @@ func (c *Client) CreateBranchProtection(owner, repo string, opt CreateBranchProt
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	bp := new(BranchProtection)
@@ -140,7 +140,7 @@ func (c *Client) EditBranchProtection(owner, repo, name string, opt EditBranchPr
 	if err := escapeValidatePathSegments(&owner, &repo, &name); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	bp := new(BranchProtection)
@@ -157,7 +157,7 @@ func (c *Client) DeleteBranchProtection(owner, repo, name string) (*Response, er
 	if err := escapeValidatePathSegments(&owner, &repo, &name); err != nil {
 		return nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, err
 	}
 	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/branch_protections/%s", owner, repo, name), jsonHeader, nil)

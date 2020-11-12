@@ -60,7 +60,7 @@ func (c *Client) CheckIssueSubscription(owner, repo string, index int64) (*Watch
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	wi := new(WatchInfo)

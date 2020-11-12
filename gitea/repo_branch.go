@@ -93,7 +93,7 @@ func (c *Client) DeleteRepoBranch(user, repo, branch string) (bool, *Response, e
 	if err := escapeValidatePathSegments(&user, &repo, &branch); err != nil {
 		return false, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return false, nil, err
 	}
 	status, resp, err := c.getStatusCode("DELETE", fmt.Sprintf("/repos/%s/%s/branches/%s", user, repo, branch), nil, nil)
@@ -130,7 +130,7 @@ func (c *Client) CreateBranch(owner, repo string, opt CreateBranchOption) (*Bran
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
 		return nil, nil, err
 	}
 	if err := opt.Validate(); err != nil {

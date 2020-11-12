@@ -135,7 +135,7 @@ func (c *Client) ListPullReviews(owner, repo string, index int64, opt ListPullRe
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	opt.setDefaults()
@@ -153,7 +153,7 @@ func (c *Client) GetPullReview(owner, repo string, index, id int64) (*PullReview
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 
@@ -167,7 +167,7 @@ func (c *Client) ListPullReviewComments(owner, repo string, index, id int64) ([]
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	rcl := make([]*PullReviewComment, 0, 4)
@@ -182,7 +182,7 @@ func (c *Client) DeletePullReview(owner, repo string, index, id int64) (*Respons
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, err
 	}
 
@@ -195,7 +195,7 @@ func (c *Client) CreatePullReview(owner, repo string, index int64, opt CreatePul
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	if err := opt.Validate(); err != nil {
@@ -218,7 +218,7 @@ func (c *Client) SubmitPullReview(owner, repo string, index, id int64, opt Submi
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
 	if err := opt.Validate(); err != nil {
