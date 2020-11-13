@@ -8,6 +8,29 @@ GITEA_SDK_TEST_PASSWORD ?= test01
 
 PACKAGE := code.gitea.io/sdk/gitea
 
+GITEA_DL := https://dl.gitea.io/gitea/master/gitea-master-
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+  GITEA_DL := $(GITEA_DL)linux-
+
+  UNAME_P := $(shell uname -p)
+  ifeq ($(UNAME_P),unknown)
+   GITEA_DL := $(GITEA_DL)amd64
+  endif
+  ifeq ($(UNAME_P),x86_64)
+   GITEA_DL := $(GITEA_DL)amd64
+  endif
+  ifneq ($(filter %86,$(UNAME_P)),)
+   GITEA_DL := $(GITEA_DL)386
+  endif
+  ifneq ($(filter arm%,$(UNAME_P)),)
+    GITEA_DL := $(GITEA_DL)arm-5
+  endif
+endif
+ifeq ($(UNAME_S),Darwin)
+  GITEA_DL := $(GITEA_DL)darwin-10.6-amd64
+endif
+
 .PHONY: all
 all: clean test build
 
@@ -27,7 +50,7 @@ help:
 .PHONY: clean
 clean:
 	rm -r -f test
-	$(GO) clean -i ./...
+	cd gitea && $(GO) clean -i ./...
 
 .PHONY: fmt
 fmt:
@@ -64,7 +87,7 @@ test:
 test-instance:
 	rm -f -r ${WORK_DIR}/test 2> /dev/null; \
 	mkdir -p ${WORK_DIR}/test/conf/ ${WORK_DIR}/test/data/
-	wget "https://dl.gitea.io/gitea/master/gitea-master-linux-amd64" -O ${WORK_DIR}/test/gitea-master; \
+	wget ${GITEA_DL} -O ${WORK_DIR}/test/gitea-master; \
 	chmod +x ${WORK_DIR}/test/gitea-master; \
 	echo "[security]" > ${WORK_DIR}/test/conf/app.ini; \
 	echo "INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1NTg4MzY4ODB9.LoKQyK5TN_0kMJFVHWUW0uDAyoGjDP6Mkup4ps2VJN4" >> ${WORK_DIR}/test/conf/app.ini; \
@@ -75,10 +98,10 @@ test-instance:
 	echo "DB_TYPE = sqlite3" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "[repository]" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "ROOT = ${WORK_DIR}/test/data/" >> ${WORK_DIR}/test/conf/app.ini; \
-	echo "[server]" >> /tmp/conf/app.ini; \
-	echo "ROOT_URL = ${GITEA_SDK_TEST_URL}" >> /tmp/conf/app.ini; \
+	echo "[server]" >> ${WORK_DIR}/test/conf/app.ini; \
+	echo "ROOT_URL = ${GITEA_SDK_TEST_URL}" >> ${WORK_DIR}/test/conf/app.ini; \
 	${WORK_DIR}/test/gitea-master migrate -c ${WORK_DIR}/test/conf/app.ini; \
-	${WORK_DIR}/test/gitea-master admin create-user --username=${GITEA_SDK_TEST_USERNAME} --password=${GITEA_SDK_TEST_PASSWORD} --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c ${WORK_DIR}/test/conf/app.ini; \
+	${WORK_DIR}/test/gitea-master admin user create --username=${GITEA_SDK_TEST_USERNAME} --password=${GITEA_SDK_TEST_PASSWORD} --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c ${WORK_DIR}/test/conf/app.ini; \
 	${WORK_DIR}/test/gitea-master web -c ${WORK_DIR}/test/conf/app.ini
 
 .PHONY: bench

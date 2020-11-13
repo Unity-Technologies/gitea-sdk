@@ -15,20 +15,58 @@ type GlobalRepoSettings struct {
 	HTTPGitDisabled bool `json:"http_git_disabled"`
 }
 
+// GlobalAPISettings contains global api settings exposed by it
+type GlobalAPISettings struct {
+	MaxResponseItems       int   `json:"max_response_items"`
+	DefaultPagingNum       int   `json:"default_paging_num"`
+	DefaultGitTreesPerPage int   `json:"default_git_trees_per_page"`
+	DefaultMaxBlobSize     int64 `json:"default_max_blob_size"`
+}
+
+// GlobalAttachmentSettings contains global Attachment settings exposed by API
+type GlobalAttachmentSettings struct {
+	Enabled      bool   `json:"enabled"`
+	AllowedTypes string `json:"allowed_types"`
+	MaxSize      int64  `json:"max_size"`
+	MaxFiles     int    `json:"max_files"`
+}
+
 // GetGlobalUISettings get global ui settings witch are exposed by API
-func (c *Client) GetGlobalUISettings() (settings *GlobalUISettings, err error) {
-	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
-		return nil, err
+func (c *Client) GetGlobalUISettings() (*GlobalUISettings, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
+		return nil, nil, err
 	}
 	conf := new(GlobalUISettings)
-	return conf, c.getParsedResponse("GET", "/settings/ui", jsonHeader, nil, &conf)
+	resp, err := c.getParsedResponse("GET", "/settings/ui", jsonHeader, nil, &conf)
+	return conf, resp, err
 }
 
 // GetGlobalRepoSettings get global repository settings witch are exposed by API
-func (c *Client) GetGlobalRepoSettings() (settings *GlobalRepoSettings, err error) {
-	if err := c.CheckServerVersionConstraint(">=1.13.0"); err != nil {
-		return nil, err
+func (c *Client) GetGlobalRepoSettings() (*GlobalRepoSettings, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
+		return nil, nil, err
 	}
 	conf := new(GlobalRepoSettings)
-	return conf, c.getParsedResponse("GET", "/settings/repository", jsonHeader, nil, &conf)
+	resp, err := c.getParsedResponse("GET", "/settings/repository", jsonHeader, nil, &conf)
+	return conf, resp, err
+}
+
+// GetGlobalAPISettings get global api settings witch are exposed by it
+func (c *Client) GetGlobalAPISettings() (*GlobalAPISettings, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
+		return nil, nil, err
+	}
+	conf := new(GlobalAPISettings)
+	resp, err := c.getParsedResponse("GET", "/settings/api", jsonHeader, nil, &conf)
+	return conf, resp, err
+}
+
+// GetGlobalAttachmentSettings get global repository settings witch are exposed by API
+func (c *Client) GetGlobalAttachmentSettings() (*GlobalAttachmentSettings, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
+		return nil, nil, err
+	}
+	conf := new(GlobalAttachmentSettings)
+	resp, err := c.getParsedResponse("GET", "/settings/attachment", jsonHeader, nil, &conf)
+	return conf, resp, err
 }

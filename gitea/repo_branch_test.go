@@ -21,32 +21,39 @@ func TestRepoBranches(t *testing.T) {
 		return
 	}
 
-	bl, err := c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
+	bl, _, err := c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bl, 3)
 	assert.EqualValues(t, "feature", bl[0].Name)
 	assert.EqualValues(t, "master", bl[1].Name)
 	assert.EqualValues(t, "update", bl[2].Name)
 
-	b, err := c.GetRepoBranch(repo.Owner.UserName, repo.Name, "update")
+	b, _, err := c.GetRepoBranch(repo.Owner.UserName, repo.Name, "update")
 	assert.NoError(t, err)
 	assert.EqualValues(t, bl[2].Commit.ID, b.Commit.ID)
 	assert.EqualValues(t, bl[2].Commit.Added, b.Commit.Added)
 
-	s, err := c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "master")
+	s, _, err := c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "master")
 	assert.NoError(t, err)
 	assert.False(t, s)
-	s, err = c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "feature")
+	s, _, err = c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "feature")
 	assert.NoError(t, err)
 	assert.True(t, s)
 
-	bl, err = c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
+	bl, _, err = c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bl, 2)
 
-	b, err = c.GetRepoBranch(repo.Owner.UserName, repo.Name, "feature")
+	b, _, err = c.GetRepoBranch(repo.Owner.UserName, repo.Name, "feature")
 	assert.Error(t, err)
 	assert.Nil(t, b)
+
+	bNew, _, err := c.CreateBranch(repo.Owner.UserName, repo.Name, CreateBranchOption{BranchName: "NewBranch"})
+	assert.NoError(t, err)
+
+	b, _, err = c.GetRepoBranch(repo.Owner.UserName, repo.Name, bNew.Name)
+	assert.NoError(t, err)
+	assert.EqualValues(t, bNew, b)
 }
 
 func TestRepoBranchProtection(t *testing.T) {
@@ -61,12 +68,12 @@ func TestRepoBranchProtection(t *testing.T) {
 	assert.NotNil(t, repo)
 
 	// ListBranchProtections
-	bpl, err := c.ListBranchProtections(repo.Owner.UserName, repo.Name, ListBranchProtectionsOptions{})
+	bpl, _, err := c.ListBranchProtections(repo.Owner.UserName, repo.Name, ListBranchProtectionsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bpl, 0)
 
 	// CreateBranchProtection
-	bp, err := c.CreateBranchProtection(repo.Owner.UserName, repo.Name, CreateBranchProtectionOption{
+	bp, _, err := c.CreateBranchProtection(repo.Owner.UserName, repo.Name, CreateBranchProtectionOption{
 		BranchName:              "master",
 		EnablePush:              true,
 		EnablePushWhitelist:     true,
@@ -82,7 +89,7 @@ func TestRepoBranchProtection(t *testing.T) {
 	assert.EqualValues(t, true, bp.EnablePushWhitelist)
 	assert.EqualValues(t, []string{"test01"}, bp.PushWhitelistUsernames)
 
-	bp, err = c.CreateBranchProtection(repo.Owner.UserName, repo.Name, CreateBranchProtectionOption{
+	bp, _, err = c.CreateBranchProtection(repo.Owner.UserName, repo.Name, CreateBranchProtectionOption{
 		BranchName:              "update",
 		EnablePush:              false,
 		EnableMergeWhitelist:    true,
@@ -91,26 +98,22 @@ func TestRepoBranchProtection(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, bp)
 
-	bpl, err = c.ListBranchProtections(repo.Owner.UserName, repo.Name, ListBranchProtectionsOptions{})
+	bpl, _, err = c.ListBranchProtections(repo.Owner.UserName, repo.Name, ListBranchProtectionsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bpl, 2)
 
 	// GetBranchProtection
-	bp, err = c.GetBranchProtection(repo.Owner.UserName, repo.Name, bpl[0].BranchName)
+	bp, _, err = c.GetBranchProtection(repo.Owner.UserName, repo.Name, bpl[0].BranchName)
 	assert.NoError(t, err)
 	assert.EqualValues(t, bpl[0], bp)
 
-	optTrue := true
-	optFalse := false
-	one := int64(1)
-
 	// EditBranchProtection
-	bp, err = c.EditBranchProtection(repo.Owner.UserName, repo.Name, bpl[0].BranchName, EditBranchProtectionOption{
-		EnablePush:                  &optFalse,
-		EnablePushWhitelist:         &optFalse,
+	bp, _, err = c.EditBranchProtection(repo.Owner.UserName, repo.Name, bpl[0].BranchName, EditBranchProtectionOption{
+		EnablePush:                  OptionalBool(false),
+		EnablePushWhitelist:         OptionalBool(false),
 		PushWhitelistUsernames:      nil,
-		RequiredApprovals:           &one,
-		EnableApprovalsWhitelist:    &optTrue,
+		RequiredApprovals:           OptionalInt64(1),
+		EnableApprovalsWhitelist:    OptionalBool(true),
 		ApprovalsWhitelistUsernames: []string{"test01"},
 	})
 	assert.NoError(t, err)
@@ -120,9 +123,9 @@ func TestRepoBranchProtection(t *testing.T) {
 	assert.EqualValues(t, bpl[0].Created, bp.Created)
 
 	// DeleteBranchProtection
-	err = c.DeleteBranchProtection(repo.Owner.UserName, repo.Name, bpl[1].BranchName)
+	_, err = c.DeleteBranchProtection(repo.Owner.UserName, repo.Name, bpl[1].BranchName)
 	assert.NoError(t, err)
-	bpl, err = c.ListBranchProtections(repo.Owner.UserName, repo.Name, ListBranchProtectionsOptions{})
+	bpl, _, err = c.ListBranchProtections(repo.Owner.UserName, repo.Name, ListBranchProtectionsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bpl, 1)
 }
@@ -133,12 +136,12 @@ func prepareBranchTest(t *testing.T, c *Client, repoName string) *Repository {
 		return nil
 	}
 
-	masterLicence, err := c.GetContents(origRepo.Owner.UserName, origRepo.Name, "master", "README.md")
+	masterLicence, _, err := c.GetContents(origRepo.Owner.UserName, origRepo.Name, "master", "README.md")
 	if !assert.NoError(t, err) || !assert.NotNil(t, masterLicence) {
 		return nil
 	}
 
-	updatedFile, err := c.UpdateFile(origRepo.Owner.UserName, origRepo.Name, "README.md", UpdateFileOptions{
+	updatedFile, _, err := c.UpdateFile(origRepo.Owner.UserName, origRepo.Name, "README.md", UpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "update it",
 			BranchName:    "master",
@@ -151,7 +154,7 @@ func prepareBranchTest(t *testing.T, c *Client, repoName string) *Repository {
 		return nil
 	}
 
-	newFile, err := c.CreateFile(origRepo.Owner.UserName, origRepo.Name, "WOW-file", CreateFileOptions{
+	newFile, _, err := c.CreateFile(origRepo.Owner.UserName, origRepo.Name, "WOW-file", CreateFileOptions{
 		Content: "QSBuZXcgRmlsZQo=",
 		FileOptions: FileOptions{
 			Message:       "creat a new file",

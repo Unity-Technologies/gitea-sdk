@@ -15,13 +15,33 @@ func TestGetGlobalSettings(t *testing.T) {
 	log.Println("== TestGetGlobalSettings ==")
 	c := newTestClient()
 
-	uiSettings, err := c.GetGlobalUISettings()
+	uiSettings, _, err := c.GetGlobalUISettings()
 	assert.NoError(t, err)
 	expectedAllowedReactions := []string{"+1", "-1", "laugh", "hooray", "confused", "heart", "rocket", "eyes"}
 	assert.ElementsMatch(t, expectedAllowedReactions, uiSettings.AllowedReactions)
 
-	repoSettings, err := c.GetGlobalRepoSettings()
+	repoSettings, _, err := c.GetGlobalRepoSettings()
 	assert.NoError(t, err)
-	assert.False(t, repoSettings.HTTPGitDisabled)
-	assert.False(t, repoSettings.MirrorsDisabled)
+	assert.EqualValues(t, &GlobalRepoSettings{
+		HTTPGitDisabled: false,
+		MirrorsDisabled: false,
+	}, repoSettings)
+
+	apiSettings, _, err := c.GetGlobalAPISettings()
+	assert.NoError(t, err)
+	assert.EqualValues(t, &GlobalAPISettings{
+		MaxResponseItems:       50,
+		DefaultPagingNum:       30,
+		DefaultGitTreesPerPage: 1000,
+		DefaultMaxBlobSize:     10485760,
+	}, apiSettings)
+
+	attachSettings, _, err := c.GetGlobalAttachmentSettings()
+	assert.NoError(t, err)
+	assert.EqualValues(t, &GlobalAttachmentSettings{
+		Enabled:      true,
+		AllowedTypes: ".docx,.gif,.gz,.jpeg,.jpg,.log,.pdf,.png,.pptx,.txt,.xlsx,.zip",
+		MaxSize:      4,
+		MaxFiles:     5,
+	}, attachSettings)
 }
