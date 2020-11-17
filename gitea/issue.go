@@ -41,8 +41,10 @@ type Issue struct {
 	Body             string     `json:"body"`
 	Labels           []*Label   `json:"labels"`
 	Milestone        *Milestone `json:"milestone"`
-	Assignee         *User      `json:"assignee"`
-	Assignees        []*User    `json:"assignees"`
+	// deprecated
+	// TODO: rm on sdk 0.15.0
+	Assignee  *User   `json:"assignee"`
+	Assignees []*User `json:"assignees"`
 	// Whether the issue is open or closed
 	State       StateType        `json:"state"`
 	IsLocked    bool             `json:"is_locked"`
