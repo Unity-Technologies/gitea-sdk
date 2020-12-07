@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.13.2](https://gitea.com/gitea/go-sdk/releases/tag/v0.13.2) - 2020-12-07
+
+* BUGFIXES
+  * Use Predefind Versions & Compare Function (#442) (#446)
+* ENHANCEMENTS
+  * Add Gitea2Gitea Migration Support (#454) (#455)
+  * Update CreateRepoOption struct (#445) (#447)
+  * Update CommitMeta Struct (#434) (#437)
+
+
 ## [v0.13.1](https://gitea.com/gitea/go-sdk/releases/tag/v0.13.1) - 2020-09-29
 
 * FEATURES
