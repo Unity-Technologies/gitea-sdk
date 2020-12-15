@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -25,10 +26,28 @@ type TrackedTime struct {
 	Issue   *Issue `json:"issue"`
 }
 
+// GetRepoTrackedTimesOptions set optional filters
+type GetRepoTrackedTimesOptions struct {
+	User string
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *GetRepoTrackedTimesOptions) QueryEncode() string {
+	query := make(url.Values)
+
+	if len(opt.User) != 0 {
+		query.Add("user", opt.User)
+	}
+
+	return query.Encode()
+}
+
 // GetRepoTrackedTimes list tracked times of a repository
-func (c *Client) GetRepoTrackedTimes(owner, repo string) ([]*TrackedTime, *Response, error) {
+func (c *Client) GetRepoTrackedTimes(owner, repo string, opt GetRepoTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/times", owner, repo))
+	link.RawQuery = opt.QueryEncode()
 	times := make([]*TrackedTime, 0, 10)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/times", owner, repo), nil, nil, &times)
+	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &times)
 	return times, resp, err
 }
 
