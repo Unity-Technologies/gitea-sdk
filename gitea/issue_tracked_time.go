@@ -25,13 +25,6 @@ type TrackedTime struct {
 	Issue   *Issue `json:"issue"`
 }
 
-// GetUserTrackedTimes list tracked times of a user
-func (c *Client) GetUserTrackedTimes(owner, repo, user string) ([]*TrackedTime, *Response, error) {
-	times := make([]*TrackedTime, 0, 10)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/times/%s", owner, repo, user), nil, nil, &times)
-	return times, resp, err
-}
-
 // GetRepoTrackedTimes list tracked times of a repository
 func (c *Client) GetRepoTrackedTimes(owner, repo string) ([]*TrackedTime, *Response, error) {
 	times := make([]*TrackedTime, 0, 10)
