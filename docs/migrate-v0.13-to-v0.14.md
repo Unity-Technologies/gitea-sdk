@@ -24,4 +24,4 @@ Pulls:
 - **ListTrackedTimes** is now **ListIssueTrackedTimes**
 
 Pulls:
--   [#467 Remove GetUserTrackedTimes](https://gitea.com/gitea/go-sdk/pulls/467)
+-   [#467 Remove & Rename TrackedTimes list functions](https://gitea.com/gitea/go-sdk/pulls/467)
