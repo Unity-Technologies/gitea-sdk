@@ -69,7 +69,7 @@ type ListStatusesOption struct {
 func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOption) ([]*Status, *Response, error) {
 	opt.setDefaults()
 	statuses := make([]*Status, 0, opt.PageSize)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, opt.getURLQuery().Encode()), nil, nil, &statuses)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/statuses/%s?%s", owner, repo, sha, opt.getURLQuery().Encode()), jsonHeader, nil, &statuses)
 	return statuses, resp, err
 }
 
