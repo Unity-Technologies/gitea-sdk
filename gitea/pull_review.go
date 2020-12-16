@@ -38,9 +38,9 @@ type PullReview struct {
 	State    ReviewStateType `json:"state"`
 	Body     string          `json:"body"`
 	CommitID string          `json:"commit_id"`
-	// Stale indicates if the review was made on an earlier commit
+	// Stale indicates if the pull has changed since the review
 	Stale bool `json:"stale"`
-	// Official indicates if the review counts towards the required approval limit
+	// Official indicates if the review counts towards the required approval limit, if PR base is a protected branch
 	Official          bool      `json:"official"`
 	CodeCommentsCount int       `json:"comments_count"`
 	Submitted         time.Time `json:"submitted_at"`
