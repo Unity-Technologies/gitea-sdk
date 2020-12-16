@@ -33,15 +33,17 @@ const (
 
 // PullReview represents a pull request review
 type PullReview struct {
-	ID                int64           `json:"id"`
-	Reviewer          *User           `json:"user"`
-	State             ReviewStateType `json:"state"`
-	Body              string          `json:"body"`
-	CommitID          string          `json:"commit_id"`
-	Stale             bool            `json:"stale"`
-	Official          bool            `json:"official"`
-	CodeCommentsCount int             `json:"comments_count"`
-	Submitted         time.Time       `json:"submitted_at"`
+	ID       int64           `json:"id"`
+	Reviewer *User           `json:"user"`
+	State    ReviewStateType `json:"state"`
+	Body     string          `json:"body"`
+	CommitID string          `json:"commit_id"`
+	// Stale indicates if the review was made on an earlier commit
+	Stale bool `json:"stale"`
+	// Official indicates if the review counts towards the required approval limit
+	Official          bool      `json:"official"`
+	CodeCommentsCount int       `json:"comments_count"`
+	Submitted         time.Time `json:"submitted_at"`
 
 	HTMLURL     string `json:"html_url"`
 	HTMLPullURL string `json:"pull_request_url"`
