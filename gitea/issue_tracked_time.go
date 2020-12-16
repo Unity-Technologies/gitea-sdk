@@ -26,14 +26,25 @@ type TrackedTime struct {
 	Issue   *Issue `json:"issue"`
 }
 
-// GetRepoTrackedTimesOptions set optional filters
-type GetRepoTrackedTimesOptions struct {
+// ListTrackedTimesOptions options for listing repository's tracked times
+type ListTrackedTimesOptions struct {
+	ListOptions
+	Since  time.Time
+	Before time.Time
+	// User filter is only used by ListRepoTrackedTimes !!!
 	User string
 }
 
 // QueryEncode turns options into querystring argument
-func (opt *GetRepoTrackedTimesOptions) QueryEncode() string {
-	query := make(url.Values)
+func (opt *ListTrackedTimesOptions) QueryEncode() string {
+	query := opt.getURLQuery()
+
+	if !opt.Since.IsZero() {
+		query.Add("since", opt.Since.Format(time.RFC3339))
+	}
+	if !opt.Before.IsZero() {
+		query.Add("before", opt.Before.Format(time.RFC3339))
+	}
 
 	if len(opt.User) != 0 {
 		query.Add("user", opt.User)
@@ -42,11 +53,12 @@ func (opt *GetRepoTrackedTimesOptions) QueryEncode() string {
 	return query.Encode()
 }
 
-// GetRepoTrackedTimes list tracked times of a repository
-func (c *Client) GetRepoTrackedTimes(owner, repo string, opt GetRepoTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
+// ListRepoTrackedTimes list tracked times of a repository
+func (c *Client) ListRepoTrackedTimes(owner, repo string, opt ListTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/times", owner, repo))
+	opt.setDefaults()
 	link.RawQuery = opt.QueryEncode()
-	times := make([]*TrackedTime, 0, 10)
+	times := make([]*TrackedTime, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &times)
 	return times, resp, err
 }
@@ -92,16 +104,13 @@ func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*T
 	return t, resp, err
 }
 
-// ListTrackedTimesOptions options for listing repository's tracked times
-type ListTrackedTimesOptions struct {
-	ListOptions
-}
-
 // ListTrackedTimes list tracked times of a single issue for a given repository
 func (c *Client) ListTrackedTimes(owner, repo string, index int64, opt ListTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index))
 	opt.setDefaults()
+	link.RawQuery = opt.QueryEncode()
 	times := make([]*TrackedTime, 0, opt.PageSize)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/times?%s", owner, repo, index, opt.getURLQuery().Encode()), nil, nil, &times)
+	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &times)
 	return times, resp, err
 }
 
