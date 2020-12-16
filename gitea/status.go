@@ -85,8 +85,8 @@ type CombinedStatus struct {
 }
 
 // GetCombinedStatus returns the CombinedStatus for a given Commit
-func (c *Client) GetCombinedStatus(owner, repo, sha string) (*CombinedStatus, *Response, error) {
+func (c *Client) GetCombinedStatus(owner, repo, ref string) (*CombinedStatus, *Response, error) {
 	status := new(CombinedStatus)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses", owner, repo, sha), nil, nil, status)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses", owner, repo, ref), jsonHeader, nil, status)
 	return status, resp, err
 }
