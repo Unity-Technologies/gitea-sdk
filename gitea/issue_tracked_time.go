@@ -104,8 +104,8 @@ func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*T
 	return t, resp, err
 }
 
-// ListTrackedTimes list tracked times of a single issue for a given repository
-func (c *Client) ListTrackedTimes(owner, repo string, index int64, opt ListTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
+// ListIssueTrackedTimes list tracked times of a single issue for a given repository
+func (c *Client) ListIssueTrackedTimes(owner, repo string, index int64, opt ListTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index))
 	opt.setDefaults()
 	link.RawQuery = opt.QueryEncode()

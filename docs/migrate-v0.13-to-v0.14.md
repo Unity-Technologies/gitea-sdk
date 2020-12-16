@@ -6,13 +6,22 @@ feel free to create an issue.
 
 <!-- toc -->
 
--   [Remove Functions for deprecated endpoints (#467)](#Remove-Functions-for-deprecated-endpoints)
+-   [Removed Functions (#467)](#Removed-Functions)
+-   [Renamed Functions (#467)](#Renamed-Functions)
 
 <!-- tocstop -->
 
-## Remove Functions for deprecated endpoints
+## Removed Functions
 
- - for **GetUserTrackedTimes** use **GetRepoTrackedTimes** with user set in options
+ - for **GetUserTrackedTimes** and **GetRepoTrackedTimes** use **ListRepoTrackedTimes** with specific options set
+
+Pulls:
+-   [#467 Remove GetUserTrackedTimes](https://gitea.com/gitea/go-sdk/pulls/467)
+
+
+## Renamed Functions
+
+- **ListTrackedTimes** is now **ListIssueTrackedTimes**
 
 Pulls:
 -   [#467 Remove GetUserTrackedTimes](https://gitea.com/gitea/go-sdk/pulls/467)
