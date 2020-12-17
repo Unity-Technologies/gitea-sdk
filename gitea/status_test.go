@@ -32,6 +32,12 @@ func TestCommitStatus(t *testing.T) {
 	}
 	sha := commits[0].SHA
 
+	combiStats, resp, err := c.GetCombinedStatus(user.UserName, repoName, sha)
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.NotNil(t, combiStats)
+	assert.EqualValues(t, 0, combiStats.TotalCount)
+
 	statuses, resp, err := c.ListStatuses(user.UserName, repoName, sha, ListStatusesOption{})
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -50,12 +56,13 @@ func TestCommitStatus(t *testing.T) {
 	assert.NotNil(t, statuses)
 	assert.Len(t, statuses, 5)
 
-	combiStats, resp, err := c.GetCombinedStatus(user.UserName, repoName, sha)
+	combiStats, resp, err = c.GetCombinedStatus(user.UserName, repoName, sha)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.NotNil(t, combiStats)
-	assert.EqualValues(t, 5, combiStats.TotalCount)
-
+	assert.EqualValues(t, 2, combiStats.TotalCount)
+	assert.EqualValues(t, StatusState("warning"), combiStats.State)
+	assert.Len(t, combiStats.Statuses, 2)
 }
 
 func createStatus(t *testing.T, c *Client, userName, repoName, sha, url, desc, context string, state StatusState) {
