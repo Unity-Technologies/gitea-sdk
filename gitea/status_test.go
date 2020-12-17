@@ -50,11 +50,11 @@ func TestCommitStatus(t *testing.T) {
 	assert.NotNil(t, statuses)
 	assert.Len(t, statuses, 5)
 
-	// combiStats, resp, err := c.GetCombinedStatus(user.UserName, repoName, sha)
-	// assert.NoError(t, err)
-	// assert.NotNil(t, resp)
-	// assert.NotNil(t, combiStats)
-	// assert.EqualValues(t, 5, combiStats.TotalCount)
+	combiStats, resp, err := c.GetCombinedStatus(user.UserName, repoName, sha)
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.NotNil(t, combiStats)
+	assert.EqualValues(t, 5, combiStats.TotalCount)
 
 }
 
