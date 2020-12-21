@@ -38,7 +38,7 @@ func (o ListOptions) setDefaults() {
 }
 
 // saveSetDefaults respect custom MaxResponseItems settings
-func (o ListOptions) saveSetDefaults(c *Client) {
+func (o ListOptions) saveSetDefaults(c *Client) error {
 	if o.Page < 1 {
 		o.Page = 1
 	}
@@ -53,6 +53,8 @@ func (o ListOptions) saveSetDefaults(c *Client) {
 	if o.PageSize < 0 || o.PageSize > max {
 		o.PageSize = defaultPageSize
 	}
+
+	return nil
 }
 
 // preparePaginatedResponse prepare Response for pagination functions

@@ -119,8 +119,10 @@ func (opt *ListIssueOption) QueryEncode() string {
 
 // ListIssues returns all issues assigned the authenticated user
 func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
-	opt.setDefaults()
 	issues := make([]*Issue, 0, opt.PageSize)
+	if err := opt.saveSetDefaults(c); err != nil {
+		return issues, nil, err
+	}
 
 	link, _ := url.Parse("/repos/issues/search")
 	link.RawQuery = opt.QueryEncode()
@@ -135,13 +137,20 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 	for i := range issues {
 		c.issueBackwardsCompatibility(issues[i])
 	}
+
+	if err = c.preparePaginatedResponse(resp, opt.ListOptions, len(issues)); err != nil {
+		return issues, resp, err
+	}
+
 	return issues, resp, err
 }
 
 // ListRepoIssues returns all issues for a given repository
 func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Issue, *Response, error) {
-	opt.setDefaults()
 	issues := make([]*Issue, 0, opt.PageSize)
+	if err := opt.saveSetDefaults(c); err != nil {
+		return issues, nil, err
+	}
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
 	link.RawQuery = opt.QueryEncode()
@@ -156,6 +165,11 @@ func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Iss
 	for i := range issues {
 		c.issueBackwardsCompatibility(issues[i])
 	}
+
+	if err = c.preparePaginatedResponse(resp, opt.ListOptions, len(issues)); err != nil {
+		return issues, resp, err
+	}
+
 	return issues, resp, err
 }
 

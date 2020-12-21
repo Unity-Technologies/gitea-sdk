@@ -71,37 +71,55 @@ func editIssues(t *testing.T, c *Client) {
 func listIssues(t *testing.T, c *Client) {
 	log.Println("== TestListIssues ==")
 
-	issues, _, err := c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
+	issues, resp, err := c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
 		Labels:  []string{"Label1", "Label2"},
 		KeyWord: "",
 		State:   "all",
 	})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 1)
+	assert.False(t, resp.Next())
 
-	issues, _, err = c.ListIssues(ListIssueOption{
+	issues, resp, err = c.ListIssues(ListIssueOption{
 		Labels:  []string{"Label2"},
 		KeyWord: "Done",
 		State:   "all",
 	})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 1)
+	assert.False(t, resp.Next())
 
-	issues, _, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
+	issues, resp, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{
 		Milestones: []string{"mile1"},
 		State:      "all",
 	})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 3)
+	assert.False(t, resp.Next())
 	for i := range issues {
 		if assert.NotNil(t, issues[i].Milestone) {
 			assert.EqualValues(t, "mile1", issues[i].Milestone.Title)
 		}
 	}
 
-	issues, _, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{})
+	issues, resp, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{})
 	assert.NoError(t, err)
 	assert.Len(t, issues, 3)
+	assert.False(t, resp.Next())
+
+	// test resp.Next()
+	issues, resp, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{ListOptions: ListOptions{PageSize: 1, Page: 1}})
+	assert.NoError(t, err)
+	assert.Len(t, issues, 1)
+	assert.True(t, resp.Next())
+	issues, resp, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{ListOptions: ListOptions{PageSize: 1, Page: 3}})
+	assert.NoError(t, err)
+	assert.Len(t, issues, 1)
+	assert.False(t, resp.Next())
+	issues, resp, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{ListOptions: ListOptions{PageSize: 1, Page: 4}})
+	assert.NoError(t, err)
+	assert.Len(t, issues, 1)
+	assert.False(t, resp.Next())
 }
 
 func createTestIssue(t *testing.T, c *Client, repoName, title, body string, assignees []string, deadline *time.Time, milestone int64, labels []int64, closed, shouldFail bool) {

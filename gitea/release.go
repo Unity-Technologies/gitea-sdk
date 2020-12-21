@@ -152,7 +152,7 @@ func (c *Client) fallbackGetReleaseByTag(user, repo string, tag string) (*Releas
 		}
 		if len(rl) == 0 {
 			return nil,
-				&Response{&http.Response{StatusCode: 404}},
+				&Response{Response: &http.Response{StatusCode: 404}},
 				fmt.Errorf("release with tag '%s' not found", tag)
 		}
 		for _, r := range rl {
