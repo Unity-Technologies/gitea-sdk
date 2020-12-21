@@ -47,6 +47,11 @@ type Client struct {
 // Response represents the gitea response
 type Response struct {
 	*http.Response
+
+	// pagination values, need to be initialized by preparePaginatedResponse
+	currentItem int // number of current returned objects
+	maxItems    int // number of current returned objects
+	page        int
 }
 
 // NewClient initializes and returns a API client.
@@ -164,7 +169,7 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	if c.debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return data, &Response{resp}, nil
+	return data, &Response{Response: resp}, nil
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
@@ -198,7 +203,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	if c.debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return &Response{resp}, nil
+	return &Response{Response: resp}, nil
 }
 
 func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {
