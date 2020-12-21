@@ -50,8 +50,8 @@ func (o ListOptions) saveSetDefaults(c *Client) error {
 		max = conf.MaxResponseItems
 	}
 
-	if o.PageSize < 0 || o.PageSize > max {
-		o.PageSize = defaultPageSize
+	if o.PageSize <= 0 || o.PageSize > max {
+		o.PageSize = max
 	}
 
 	return nil
