@@ -118,6 +118,7 @@ func (opt *ListIssueOption) QueryEncode() string {
 }
 
 // ListIssues returns all issues assigned the authenticated user
+// response support Next()
 func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 	issues := make([]*Issue, 0, opt.PageSize)
 	if err := opt.saveSetDefaults(c); err != nil {
@@ -146,6 +147,7 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 }
 
 // ListRepoIssues returns all issues for a given repository
+// response support Next()
 func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Issue, *Response, error) {
 	issues := make([]*Issue, 0, opt.PageSize)
 	if err := opt.saveSetDefaults(c); err != nil {

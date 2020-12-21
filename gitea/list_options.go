@@ -27,7 +27,7 @@ func (o ListOptions) getURLQuery() url.Values {
 	return query
 }
 
-func (o ListOptions) setDefaults() {
+func (o *ListOptions) setDefaults() {
 	if o.Page < 1 {
 		o.Page = 1
 	}
@@ -38,7 +38,11 @@ func (o ListOptions) setDefaults() {
 }
 
 // saveSetDefaults respect custom MaxResponseItems settings
-func (o ListOptions) saveSetDefaults(c *Client) error {
+func (o *ListOptions) saveSetDefaults(c *Client) error {
+	if o == nil {
+		return fmt.Errorf("option is nil")
+	}
+
 	if o.Page < 1 {
 		o.Page = 1
 	}

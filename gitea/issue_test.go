@@ -118,7 +118,7 @@ func listIssues(t *testing.T, c *Client) {
 	assert.False(t, resp.Next())
 	issues, resp, err = c.ListRepoIssues("test01", "IssueTestsRepo", ListIssueOption{ListOptions: ListOptions{PageSize: 1, Page: 4}})
 	assert.NoError(t, err)
-	assert.Len(t, issues, 1)
+	assert.Len(t, issues, 0)
 	assert.False(t, resp.Next())
 }
 
