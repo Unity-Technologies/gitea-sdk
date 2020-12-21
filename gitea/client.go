@@ -39,6 +39,9 @@ type Client struct {
 	ctx            context.Context
 	serverVersion  *version.Version
 	getVersionOnce sync.Once
+
+	apiSettings        *GlobalAPISettings
+	getAPISettingsOnce sync.Once
 }
 
 // Response represents the gitea response

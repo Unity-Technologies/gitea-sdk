@@ -4,6 +4,8 @@
 
 package gitea
 
+import "net/http"
+
 // GlobalUISettings represent the global ui settings of a gitea instance witch is exposed by API
 type GlobalUISettings struct {
 	AllowedReactions []string `json:"allowed_reactions"`
@@ -57,8 +59,14 @@ func (c *Client) GetGlobalAPISettings() (*GlobalAPISettings, *Response, error) {
 		return nil, nil, err
 	}
 	conf := new(GlobalAPISettings)
-	resp, err := c.getParsedResponse("GET", "/settings/api", jsonHeader, nil, &conf)
-	return conf, resp, err
+	resp := &Response{Response: &http.Response{StatusCode: 200}}
+	var err error
+	c.getAPISettingsOnce.Do(func() {
+		resp, err = c.getParsedResponse("GET", "/settings/api", jsonHeader, nil, &conf)
+		c.apiSettings = conf
+	})
+
+	return c.apiSettings, resp, err
 }
 
 // GetGlobalAttachmentSettings get global repository settings witch are exposed by API
