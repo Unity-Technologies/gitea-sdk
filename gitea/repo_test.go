@@ -146,7 +146,7 @@ func TestGetArchiveReader(t *testing.T) {
 	c := newTestClient()
 	repo, _ := createTestRepo(t, "ToDownload", c)
 	time.Sleep(time.Second / 2)
-	r, err := c.GetArchiveReader(repo.Owner.UserName, repo.Name, "master", ZipArchive)
+	r, _, err := c.GetArchiveReader(repo.Owner.UserName, repo.Name, "master", ZipArchive)
 	assert.NoError(t, err)
 	defer r.Close()
 

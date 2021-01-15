@@ -426,15 +426,15 @@ func (c *Client) GetArchive(owner, repo, ref string, ext ArchiveType) ([]byte, *
 // such as a branch name (`master`), a commit hash (`70b7c74b33`), a tag
 // (`v1.2.1`). The archive is returned as a byte stream in a ReadCloser. It is
 // the responsibility of the client to close the reader.
-func (c *Client) GetArchiveReader(owner, repo, ref string, ext ArchiveType) (io.ReadCloser, error) {
+func (c *Client) GetArchiveReader(owner, repo, ref string, ext ArchiveType) (io.ReadCloser, *Response, error) {
 	resp, err := c.doRequest("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, url.PathEscape(ref), ext), nil, nil)
 	if err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
 	if _, err := statusCodeToErr(resp); err != nil {
-		return nil, err
+		return nil, resp, err
 	}
 
-	return resp.Body, nil
+	return resp.Body, resp, nil
 }
