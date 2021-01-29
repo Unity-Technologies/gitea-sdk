@@ -17,10 +17,16 @@ type AdminListUsersOptions struct {
 }
 
 // AdminListUsers lists all users
+// response support Next()
 func (c *Client) AdminListUsers(opt AdminListUsersOptions) ([]*User, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	users := make([]*User, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/admin/users?%s", opt.getURLQuery().Encode()), nil, nil, &users)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(users)); err != nil {
+		return users, resp, err
+	}
 	return users, resp, err
 }
 

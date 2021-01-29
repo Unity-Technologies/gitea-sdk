@@ -27,6 +27,7 @@ func (o ListOptions) getURLQuery() url.Values {
 	return query
 }
 
+// deprecated
 func (o *ListOptions) setDefaults() {
 	if o.Page < 1 {
 		o.Page = 1

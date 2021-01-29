@@ -162,10 +162,16 @@ type ListTeamMembersOptions struct {
 }
 
 // ListTeamMembers lists all members of a team
+// response support Next()
 func (c *Client) ListTeamMembers(id int64, opt ListTeamMembersOptions) ([]*User, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	members := make([]*User, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/members?%s", id, opt.getURLQuery().Encode()), nil, nil, &members)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(members)); err != nil {
+		return members, resp, err
+	}
 	return members, resp, err
 }
 
@@ -194,10 +200,16 @@ type ListTeamRepositoriesOptions struct {
 }
 
 // ListTeamRepositories lists all repositories of a team
+// response support Next()
 func (c *Client) ListTeamRepositories(id int64, opt ListTeamRepositoriesOptions) ([]*Repository, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	repos := make([]*Repository, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/repos?%s", id, opt.getURLQuery().Encode()), nil, nil, &repos)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(repos)); err != nil {
+		return repos, resp, err
+	}
 	return repos, resp, err
 }
 
