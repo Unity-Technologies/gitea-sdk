@@ -28,10 +28,16 @@ type ListLabelsOptions struct {
 }
 
 // ListRepoLabels list labels of one repository
+// response support Next()
 func (c *Client) ListRepoLabels(owner, repo string, opt ListLabelsOptions) ([]*Label, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	labels := make([]*Label, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/labels?%s", owner, repo, opt.getURLQuery().Encode()), nil, nil, &labels)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(labels)); err != nil {
+		return labels, resp, err
+	}
 	return labels, resp, err
 }
 
