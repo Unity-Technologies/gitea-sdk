@@ -120,10 +120,10 @@ func (opt *ListIssueOption) QueryEncode() string {
 // ListIssues returns all issues assigned the authenticated user
 // response support Next()
 func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
-	issues := make([]*Issue, 0, opt.PageSize)
 	if err := opt.saveSetDefaults(c); err != nil {
-		return issues, nil, err
+		return nil, nil, err
 	}
+	issues := make([]*Issue, 0, opt.PageSize)
 
 	link, _ := url.Parse("/repos/issues/search")
 	link.RawQuery = opt.QueryEncode()
@@ -149,10 +149,10 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 // ListRepoIssues returns all issues for a given repository
 // response support Next()
 func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Issue, *Response, error) {
-	issues := make([]*Issue, 0, opt.PageSize)
 	if err := opt.saveSetDefaults(c); err != nil {
-		return issues, nil, err
+		return nil, nil, err
 	}
+	issues := make([]*Issue, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues", owner, repo))
 	link.RawQuery = opt.QueryEncode()

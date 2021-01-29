@@ -18,7 +18,9 @@ type ListForksOptions struct {
 // ListForks list a repository's forks
 // response support Next()
 func (c *Client) ListForks(user string, repo string, opt ListForksOptions) ([]*Repository, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	forks := make([]*Repository, opt.PageSize)
 	resp, err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/forks?%s", user, repo, opt.getURLQuery().Encode()),

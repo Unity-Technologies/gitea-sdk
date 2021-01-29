@@ -25,7 +25,9 @@ type ListRepoGitHooksOptions struct {
 // ListRepoGitHooks list all the Git hooks of one repository
 // response support Next()
 func (c *Client) ListRepoGitHooks(user, repo string, opt ListRepoGitHooksOptions) ([]*GitHook, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	hooks := make([]*GitHook, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks/git?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &hooks)
 	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(hooks)); err != nil {
