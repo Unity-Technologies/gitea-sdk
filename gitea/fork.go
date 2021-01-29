@@ -16,12 +16,16 @@ type ListForksOptions struct {
 }
 
 // ListForks list a repository's forks
+// response support Next()
 func (c *Client) ListForks(user string, repo string, opt ListForksOptions) ([]*Repository, *Response, error) {
 	opt.setDefaults()
 	forks := make([]*Repository, opt.PageSize)
 	resp, err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/forks?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &forks)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(forks)); err != nil {
+		return forks, resp, err
+	}
 	return forks, resp, err
 }
 

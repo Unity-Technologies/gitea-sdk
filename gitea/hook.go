@@ -30,18 +30,26 @@ type ListHooksOptions struct {
 }
 
 // ListOrgHooks list all the hooks of one organization
+// response support Next()
 func (c *Client) ListOrgHooks(org string, opt ListHooksOptions) ([]*Hook, *Response, error) {
 	opt.setDefaults()
 	hooks := make([]*Hook, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/hooks?%s", org, opt.getURLQuery().Encode()), nil, nil, &hooks)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(hooks)); err != nil {
+		return hooks, resp, err
+	}
 	return hooks, resp, err
 }
 
 // ListRepoHooks list all the hooks of one repository
+// response support Next()
 func (c *Client) ListRepoHooks(user, repo string, opt ListHooksOptions) ([]*Hook, *Response, error) {
 	opt.setDefaults()
 	hooks := make([]*Hook, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &hooks)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(hooks)); err != nil {
+		return hooks, resp, err
+	}
 	return hooks, resp, err
 }
 

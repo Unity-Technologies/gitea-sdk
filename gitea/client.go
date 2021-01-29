@@ -50,7 +50,7 @@ type Response struct {
 
 	// pagination values, need to be initialized by preparePaginatedResponse
 	currentItem int // number of current returned objects
-	maxItems    int // number of current returned objects
+	maxItems    int // number of max items returned per page
 	page        int
 }
 

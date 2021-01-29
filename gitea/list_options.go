@@ -63,7 +63,7 @@ func (o *ListOptions) saveSetDefaults(c *Client) error {
 
 // preparePaginatedResponse prepare Response for pagination functions
 // if you use this function make sure the endpoint do accept at least the page option!
-func (c *Client) preparePaginatedResponse(resp *Response, lo ListOptions, listLength int) error {
+func (c *Client) preparePaginatedResponse(resp *Response, lo *ListOptions, listLength int) error {
 	if resp == nil {
 		return nil
 	}

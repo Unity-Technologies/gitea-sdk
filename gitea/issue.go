@@ -139,7 +139,7 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 		c.issueBackwardsCompatibility(issues[i])
 	}
 
-	if err = c.preparePaginatedResponse(resp, opt.ListOptions, len(issues)); err != nil {
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(issues)); err != nil {
 		return issues, resp, err
 	}
 
@@ -168,7 +168,7 @@ func (c *Client) ListRepoIssues(owner, repo string, opt ListIssueOption) ([]*Iss
 		c.issueBackwardsCompatibility(issues[i])
 	}
 
-	if err = c.preparePaginatedResponse(resp, opt.ListOptions, len(issues)); err != nil {
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(issues)); err != nil {
 		return issues, resp, err
 	}
 

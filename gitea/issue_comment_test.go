@@ -53,14 +53,17 @@ func TestIssueComment(t *testing.T) {
 	assert.NoError(t, err)
 
 	// ListRepoIssueComments
-	comments, _, err := c.ListRepoIssueComments(user.UserName, repo.Name, ListIssueCommentOptions{})
+	comments, resp, err := c.ListRepoIssueComments(user.UserName, repo.Name, ListIssueCommentOptions{ListOptions: ListOptions{PageSize: 7}})
 	assert.NoError(t, err)
+	assert.True(t, resp.Next())
+	comments, _, _ = c.ListRepoIssueComments(user.UserName, repo.Name, ListIssueCommentOptions{})
 	assert.Len(t, comments, 7)
 
 	// ListIssueComments
-	comments, _, err = c.ListIssueComments(user.UserName, repo.Name, 2, ListIssueCommentOptions{})
+	comments, resp, err = c.ListIssueComments(user.UserName, repo.Name, 2, ListIssueCommentOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, comments, 3)
+	assert.False(t, resp.Next())
 
 	// GetIssueComment
 	comment, _, err := c.GetIssueComment(user.UserName, repo.Name, comments[1].ID)
