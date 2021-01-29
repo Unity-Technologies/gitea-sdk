@@ -48,13 +48,19 @@ func (opt *ListMilestoneOption) QueryEncode() string {
 }
 
 // ListRepoMilestones list all the milestones of one repository
+// response support Next()
 func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption) ([]*Milestone, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	milestones := make([]*Milestone, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/milestones", owner, repo))
 	link.RawQuery = opt.QueryEncode()
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &milestones)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(milestones)); err != nil {
+		return milestones, resp, err
+	}
 	return milestones, resp, err
 }
 

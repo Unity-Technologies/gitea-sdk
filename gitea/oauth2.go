@@ -71,13 +71,19 @@ func (c *Client) GetOauth2(oauth2id int64) (*Oauth2, *Response, error) {
 }
 
 // ListOauth2 all of your Oauth2 Applications.
+// response support Next()
 func (c *Client) ListOauth2(opt ListOauth2Option) ([]*Oauth2, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	oauth2s := make([]*Oauth2, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/applications/oauth2?%s", opt.getURLQuery().Encode()), nil, nil, &oauth2s)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(oauth2s)); err != nil {
+		return oauth2s, resp, err
+	}
 	return oauth2s, resp, err
 }
 

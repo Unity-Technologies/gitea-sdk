@@ -19,9 +19,10 @@ func TestRelease(t *testing.T) {
 	repo, _ := createTestRepo(t, "ReleaseTests", c)
 
 	// ListReleases
-	rl, _, err := c.ListReleases(repo.Owner.UserName, repo.Name, ListReleasesOptions{})
+	rl, resp, err := c.ListReleases(repo.Owner.UserName, repo.Name, ListReleasesOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, rl, 0)
+	assert.False(t, resp.Next())
 
 	// CreateRelease
 	r, _, err := c.CreateRelease(repo.Owner.UserName, repo.Name, CreateReleaseOption{
@@ -86,7 +87,7 @@ func TestRelease(t *testing.T) {
 	assert.Len(t, tags, 0)
 
 	// Test Response if try to get not existing release
-	_, resp, err := c.GetRelease(repo.Owner.UserName, repo.Name, 1234)
+	_, resp, err = c.GetRelease(repo.Owner.UserName, repo.Name, 1234)
 	assert.Error(t, err)
 	if assert.NotNil(t, resp) {
 		assert.EqualValues(t, 404, resp.StatusCode)

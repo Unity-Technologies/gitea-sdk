@@ -54,12 +54,18 @@ func (opt *ListTrackedTimesOptions) QueryEncode() string {
 }
 
 // ListRepoTrackedTimes list tracked times of a repository
+// response support Next()
 func (c *Client) ListRepoTrackedTimes(owner, repo string, opt ListTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/times", owner, repo))
-	opt.setDefaults()
 	link.RawQuery = opt.QueryEncode()
 	times := make([]*TrackedTime, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &times)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(times)); err != nil {
+		return times, resp, err
+	}
 	return times, resp, err
 }
 
@@ -105,12 +111,18 @@ func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*T
 }
 
 // ListIssueTrackedTimes list tracked times of a single issue for a given repository
+// response support Next()
 func (c *Client) ListIssueTrackedTimes(owner, repo string, index int64, opt ListTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index))
-	opt.setDefaults()
 	link.RawQuery = opt.QueryEncode()
 	times := make([]*TrackedTime, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &times)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(times)); err != nil {
+		return times, resp, err
+	}
 	return times, resp, err
 }
 

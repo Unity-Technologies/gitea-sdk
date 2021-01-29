@@ -23,10 +23,11 @@ func TestOauth2(t *testing.T) {
 	assert.NotNil(t, newApp)
 	assert.EqualValues(t, "test", newApp.Name)
 
-	a, _, err := c.ListOauth2(ListOauth2Option{})
+	a, resp, err := c.ListOauth2(ListOauth2Option{})
 	assert.NoError(t, err)
 	assert.Len(t, a, 1)
 	assert.EqualValues(t, newApp.Name, a[0].Name)
+	assert.False(t, resp.Next())
 
 	b, _, err := c.GetOauth2(newApp.ID)
 	assert.NoError(t, err)

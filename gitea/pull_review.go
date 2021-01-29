@@ -133,17 +133,23 @@ func (opt CreatePullReviewComment) Validate() error {
 }
 
 // ListPullReviews lists all reviews of a pull request
+// response support Next()
 func (c *Client) ListPullReviews(owner, repo string, index int64, opt ListPullReviewsOptions) ([]*PullReview, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	rs := make([]*PullReview, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls/%d/reviews", owner, repo, index))
 	link.RawQuery = opt.ListOptions.getURLQuery().Encode()
 
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &rs)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(rs)); err != nil {
+		return rs, resp, err
+	}
 	return rs, resp, err
 }
 

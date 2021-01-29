@@ -41,14 +41,16 @@ func TestOrgMembership(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, check)
 
-	u, _, err := c.ListOrgMembership(newOrg.UserName, ListOrgMembershipOption{})
+	u, resp, err := c.ListOrgMembership(newOrg.UserName, ListOrgMembershipOption{})
 	assert.NoError(t, err)
 	assert.Len(t, u, 1)
 	assert.EqualValues(t, user.UserName, u[0].UserName)
-	u, _, err = c.ListPublicOrgMembership(newOrg.UserName, ListOrgMembershipOption{})
+	assert.False(t, resp.Next())
+	u, resp, err = c.ListPublicOrgMembership(newOrg.UserName, ListOrgMembershipOption{})
 	assert.NoError(t, err)
 	assert.Len(t, u, 1)
 	assert.EqualValues(t, user.UserName, u[0].UserName)
+	assert.False(t, resp.Next())
 
 	_, err = c.DeleteOrgMembership(newOrg.UserName, user.UserName)
 	assert.Error(t, err)

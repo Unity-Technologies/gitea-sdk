@@ -43,18 +43,30 @@ type ListOrgsOptions struct {
 }
 
 // ListMyOrgs list all of current user's organizations
+// response support Next()
 func (c *Client) ListMyOrgs(opt ListOrgsOptions) ([]*Organization, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	orgs := make([]*Organization, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/orgs?%s", opt.getURLQuery().Encode()), nil, nil, &orgs)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(orgs)); err != nil {
+		return orgs, resp, err
+	}
 	return orgs, resp, err
 }
 
 // ListUserOrgs list all of some user's organizations
+// response support Next()
 func (c *Client) ListUserOrgs(user string, opt ListOrgsOptions) ([]*Organization, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	orgs := make([]*Organization, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s/orgs?%s", user, opt.getURLQuery().Encode()), nil, nil, &orgs)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(orgs)); err != nil {
+		return orgs, resp, err
+	}
 	return orgs, resp, err
 }
 

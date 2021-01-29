@@ -29,18 +29,30 @@ type ListTeamsOptions struct {
 }
 
 // ListOrgTeams lists all teams of an organization
+// response support Next()
 func (c *Client) ListOrgTeams(org string, opt ListTeamsOptions) ([]*Team, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	teams := make([]*Team, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams?%s", org, opt.getURLQuery().Encode()), nil, nil, &teams)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(teams)); err != nil {
+		return teams, resp, err
+	}
 	return teams, resp, err
 }
 
 // ListMyTeams lists all the teams of the current user
+// response support Next()
 func (c *Client) ListMyTeams(opt *ListTeamsOptions) ([]*Team, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	teams := make([]*Team, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/teams?%s", opt.getURLQuery().Encode()), nil, nil, &teams)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(teams)); err != nil {
+		return teams, resp, err
+	}
 	return teams, resp, err
 }
 

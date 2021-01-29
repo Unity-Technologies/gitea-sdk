@@ -147,6 +147,7 @@ func (c *Client) ReadNotification(id int64, status ...NotifyStatus) (*Response, 
 }
 
 // ListNotifications list users's notification threads
+// response support Next()
 func (c *Client) ListNotifications(opt ListNotificationOptions) ([]*NotificationThread, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
@@ -154,10 +155,16 @@ func (c *Client) ListNotifications(opt ListNotificationOptions) ([]*Notification
 	if err := opt.Validate(c); err != nil {
 		return nil, nil, err
 	}
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	link, _ := url.Parse("/notifications")
 	link.RawQuery = opt.QueryEncode()
 	threads := make([]*NotificationThread, 0, 10)
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &threads)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(threads)); err != nil {
+		return threads, resp, err
+	}
 	return threads, resp, err
 }
 
@@ -176,6 +183,7 @@ func (c *Client) ReadNotifications(opt MarkNotificationOptions) (*Response, erro
 }
 
 // ListRepoNotifications list users's notification threads on a specific repo
+// response support Next()
 func (c *Client) ListRepoNotifications(owner, reponame string, opt ListNotificationOptions) ([]*NotificationThread, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
@@ -183,10 +191,16 @@ func (c *Client) ListRepoNotifications(owner, reponame string, opt ListNotificat
 	if err := opt.Validate(c); err != nil {
 		return nil, nil, err
 	}
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/notifications", owner, reponame))
 	link.RawQuery = opt.QueryEncode()
 	threads := make([]*NotificationThread, 0, 10)
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &threads)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(threads)); err != nil {
+		return threads, resp, err
+	}
 	return threads, resp, err
 }
 

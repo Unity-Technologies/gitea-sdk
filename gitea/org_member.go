@@ -22,24 +22,36 @@ type ListOrgMembershipOption struct {
 }
 
 // ListOrgMembership list an organization's members
+// response support Next()
 func (c *Client) ListOrgMembership(org string, opt ListOrgMembershipOption) ([]*User, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	users := make([]*User, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/orgs/%s/members", url.PathEscape(org)))
 	link.RawQuery = opt.getURLQuery().Encode()
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &users)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(users)); err != nil {
+		return users, resp, err
+	}
 	return users, resp, err
 }
 
 // ListPublicOrgMembership list an organization's members
+// response support Next()
 func (c *Client) ListPublicOrgMembership(org string, opt ListOrgMembershipOption) ([]*User, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	users := make([]*User, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/orgs/%s/public_members", url.PathEscape(org)))
 	link.RawQuery = opt.getURLQuery().Encode()
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &users)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(users)); err != nil {
+		return users, resp, err
+	}
 	return users, resp, err
 }
 

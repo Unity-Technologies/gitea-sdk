@@ -54,9 +54,10 @@ func TestNotifications(t *testing.T) {
 	assert.EqualValues(t, 2, count)
 
 	// ListNotifications
-	nList, _, err := c.ListNotifications(ListNotificationOptions{})
+	nList, resp, err := c.ListNotifications(ListNotificationOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 2)
+	assert.False(t, resp.Next())
 	for _, n := range nList {
 		assert.EqualValues(t, true, n.Unread)
 		assert.EqualValues(t, "Issue", n.Subject.Type)
@@ -68,12 +69,16 @@ func TestNotifications(t *testing.T) {
 			assert.Error(t, fmt.Errorf("ListNotifications returned a Issue witch should not"))
 		}
 	}
+	nList, resp, err = c.ListNotifications(ListNotificationOptions{ListOptions: ListOptions{PageSize: 1}})
+	assert.NoError(t, err)
+	assert.True(t, resp.Next())
 
 	// ListRepoNotifications
-	nList, _, err = c.ListRepoNotifications(repoA.Owner.UserName, repoA.Name, ListNotificationOptions{})
+	nList, resp, err = c.ListRepoNotifications(repoA.Owner.UserName, repoA.Name, ListNotificationOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 1)
 	assert.EqualValues(t, "A Issue", nList[0].Subject.Title)
+	assert.False(t, resp.Next())
 	// ReadRepoNotifications
 	_, err = c.ReadRepoNotifications(repoA.Owner.UserName, repoA.Name, MarkNotificationOptions{})
 	assert.NoError(t, err)
@@ -87,9 +92,10 @@ func TestNotifications(t *testing.T) {
 	// ReadNotifications
 	_, err = c.ReadNotifications(MarkNotificationOptions{})
 	assert.NoError(t, err)
-	nList, _, err = c.ListNotifications(ListNotificationOptions{})
+	nList, resp, err = c.ListNotifications(ListNotificationOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 0)
+	assert.False(t, resp.Next())
 
 	// ReadThread
 	iState := StateClosed

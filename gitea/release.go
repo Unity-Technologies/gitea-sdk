@@ -38,12 +38,16 @@ type ListReleasesOptions struct {
 }
 
 // ListReleases list releases of a repository
+// response support Next()
 func (c *Client) ListReleases(user, repo string, opt ListReleasesOptions) ([]*Release, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	releases := make([]*Release, 0, opt.PageSize)
-	resp, err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases?%s", user, repo, opt.getURLQuery().Encode()),
-		nil, nil, &releases)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/releases?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &releases)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(releases)); err != nil {
+		return releases, resp, err
+	}
 	return releases, resp, err
 }
 

@@ -63,10 +63,12 @@ func TestPullReview(t *testing.T) {
 
 	// ListPullReviews
 	c.SetSudo("")
-	rl, _, err := c.ListPullReviews(repo.Owner.UserName, repo.Name, pull.Index, ListPullReviewsOptions{})
+	rl, resp, err := c.ListPullReviews(repo.Owner.UserName, repo.Name, pull.Index, ListPullReviewsOptions{ListOptions: ListOptions{PageSize: 2}})
 	if !assert.NoError(t, err) {
 		return
 	}
+	assert.True(t, resp.Next())
+	rl, _, _ = c.ListPullReviews(repo.Owner.UserName, repo.Name, pull.Index, ListPullReviewsOptions{})
 	assert.Len(t, rl, 3)
 	for i := range rl {
 		assert.EqualValues(t, pull.HTMLURL, rl[i].HTMLPullURL)
