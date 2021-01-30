@@ -94,7 +94,11 @@ const (
 
 // QueryEncode turns options into querystring argument
 func (opt *ListIssueOption) QueryEncode() string {
-	query := opt.getURLQuery()
+	return opt.getURLQuery().Encode()
+}
+
+func (opt *ListIssueOption) getURLQuery() url.Values {
+	query := opt.ListOptions.getURLQuery()
 
 	if len(opt.State) > 0 {
 		query.Add("state", string(opt.State))
@@ -114,20 +118,15 @@ func (opt *ListIssueOption) QueryEncode() string {
 		query.Add("milestones", strings.Join(opt.Milestones, ","))
 	}
 
-	return query.Encode()
+	return query
 }
 
 // ListIssues returns all issues assigned the authenticated user
 // response support Next()
 func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
-	if err := opt.saveSetDefaults(c); err != nil {
-		return nil, nil, err
-	}
 	issues := make([]*Issue, 0, opt.PageSize)
-
 	link, _ := url.Parse("/repos/issues/search")
-	link.RawQuery = opt.QueryEncode()
-	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &issues)
+	resp, err := c.getParsedPaginatedResponse("GET", link, &opt, &issues)
 	if e := c.checkServerVersionGreaterThanOrEqual(version1_12_0); e != nil {
 		for i := 0; i < len(issues); i++ {
 			if issues[i].Repository != nil {
@@ -137,10 +136,6 @@ func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 	}
 	for i := range issues {
 		c.issueBackwardsCompatibility(issues[i])
-	}
-
-	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(issues)); err != nil {
-		return issues, resp, err
 	}
 
 	return issues, resp, err
