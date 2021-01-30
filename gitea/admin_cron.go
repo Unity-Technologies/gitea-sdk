@@ -6,6 +6,7 @@ package gitea
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -29,14 +30,9 @@ func (c *Client) ListCronTasks(opt ListCronTaskOptions) ([]*CronTask, *Response,
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
 		return nil, nil, err
 	}
-	if err := opt.saveSetDefaults(c); err != nil {
-		return nil, nil, err
-	}
 	ct := make([]*CronTask, 0, opt.PageSize)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/admin/cron?%s", opt.getURLQuery().Encode()), jsonHeader, nil, &ct)
-	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(ct)); err != nil {
-		return ct, resp, err
-	}
+	link, _ := url.Parse("/admin/cron")
+	resp, err := c.getParsedPaginatedResponse("GET", link, &opt, &ct)
 	return ct, resp, err
 }
 
