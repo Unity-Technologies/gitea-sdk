@@ -30,7 +30,7 @@ func (c *Client) ListCronTasks(opt ListCronTaskOptions) ([]*CronTask, *Response,
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
 		return nil, nil, err
 	}
-	ct := make([]*CronTask, 0, opt.PageSize)
+	ct := make([]*CronTask, 0, mustPositive(opt.PageSize))
 	link, _ := url.Parse("/admin/cron")
 	resp, err := c.getParsedPaginatedResponse("GET", link, &opt, &ct)
 	return ct, resp, err

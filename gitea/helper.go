@@ -18,3 +18,10 @@ func OptionalString(v string) *string {
 func OptionalInt64(v int64) *int64 {
 	return &v
 }
+
+func mustPositive(v int) int {
+	if v < 0 {
+		return 0
+	}
+	return v
+}
