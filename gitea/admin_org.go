@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 )
 
 // AdminListOrgsOptions options for listing admin's organizations
@@ -16,14 +17,13 @@ type AdminListOrgsOptions struct {
 	ListOptions
 }
 
+var adminListOrgsLink, _ = url.Parse("/admin/orgs")
+
 // AdminListOrgs lists all orgs
 // response support Next()
 func (c *Client) AdminListOrgs(opt AdminListOrgsOptions) ([]*Organization, *Response, error) {
-	if err := opt.saveSetDefaults(c); err != nil {
-		return nil, nil, err
-	}
-	orgs := make([]*Organization, 0, opt.PageSize)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/admin/orgs?%s", opt.getURLQuery().Encode()), nil, nil, &orgs)
+	orgs := make([]*Organization, 0, mustPositive(opt.PageSize))
+	resp, err := c.getParsedPaginatedResponse("GET", adminListOrgsLink, &opt, &orgs)
 	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(orgs)); err != nil {
 		return orgs, resp, err
 	}

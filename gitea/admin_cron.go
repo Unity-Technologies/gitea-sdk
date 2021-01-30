@@ -24,6 +24,8 @@ type ListCronTaskOptions struct {
 	ListOptions
 }
 
+var listCronTasksLink, _ = url.Parse("/admin/cron")
+
 // ListCronTasks list available cron tasks
 // response support Next()
 func (c *Client) ListCronTasks(opt ListCronTaskOptions) ([]*CronTask, *Response, error) {
@@ -31,8 +33,7 @@ func (c *Client) ListCronTasks(opt ListCronTaskOptions) ([]*CronTask, *Response,
 		return nil, nil, err
 	}
 	ct := make([]*CronTask, 0, mustPositive(opt.PageSize))
-	link, _ := url.Parse("/admin/cron")
-	resp, err := c.getParsedPaginatedResponse("GET", link, &opt, &ct)
+	resp, err := c.getParsedPaginatedResponse("GET", listCronTasksLink, &opt, &ct)
 	return ct, resp, err
 }
 

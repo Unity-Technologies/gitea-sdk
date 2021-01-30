@@ -121,12 +121,13 @@ func (opt *ListIssueOption) getURLQuery() url.Values {
 	return query
 }
 
+var listIssuesLink, _ = url.Parse("/repos/issues/search")
+
 // ListIssues returns all issues assigned the authenticated user
 // response support Next()
 func (c *Client) ListIssues(opt ListIssueOption) ([]*Issue, *Response, error) {
 	issues := make([]*Issue, 0, mustPositive(opt.PageSize))
-	link, _ := url.Parse("/repos/issues/search")
-	resp, err := c.getParsedPaginatedResponse("GET", link, &opt, &issues)
+	resp, err := c.getParsedPaginatedResponse("GET", listIssuesLink, &opt, &issues)
 	if e := c.checkServerVersionGreaterThanOrEqual(version1_12_0); e != nil {
 		for i := 0; i < len(issues); i++ {
 			if issues[i].Repository != nil {
