@@ -45,12 +45,18 @@ func (opt *ListDeployKeysOptions) QueryEncode() string {
 }
 
 // ListDeployKeys list all the deploy keys of one repository
+// response support Next()
 func (c *Client) ListDeployKeys(user, repo string, opt ListDeployKeysOptions) ([]*DeployKey, *Response, error) {
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/keys", user, repo))
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	link.RawQuery = opt.QueryEncode()
 	keys := make([]*DeployKey, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &keys)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(keys)); err != nil {
+		return keys, resp, err
+	}
 	return keys, resp, err
 }
 

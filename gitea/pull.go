@@ -98,13 +98,19 @@ func (opt *ListPullRequestsOptions) QueryEncode() string {
 }
 
 // ListRepoPullRequests list PRs of one repository
+// response support Next()
 func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	prs := make([]*PullRequest, 0, opt.PageSize)
 
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
 	link.RawQuery = opt.QueryEncode()
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &prs)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(prs)); err != nil {
+		return prs, resp, err
+	}
 	return prs, resp, err
 }
 

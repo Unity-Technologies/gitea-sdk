@@ -21,12 +21,18 @@ func TestRepoBranches(t *testing.T) {
 		return
 	}
 
-	bl, _, err := c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
+	bl, resp, err := c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{ListOptions: ListOptions{PageSize: 2}})
+	assert.NoError(t, err)
+	assert.Len(t, bl, 2)
+	assert.True(t, resp.Next())
+
+	bl, resp, err = c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bl, 3)
 	assert.EqualValues(t, "feature", bl[0].Name)
 	assert.EqualValues(t, "master", bl[1].Name)
 	assert.EqualValues(t, "update", bl[2].Name)
+	assert.False(t, resp.Next())
 
 	b, _, err := c.GetRepoBranch(repo.Owner.UserName, repo.Name, "update")
 	assert.NoError(t, err)

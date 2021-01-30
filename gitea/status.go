@@ -66,10 +66,16 @@ type ListStatusesOption struct {
 }
 
 // ListStatuses returns all statuses for a given Commit by ref
+// response support Next()
 func (c *Client) ListStatuses(owner, repo, ref string, opt ListStatusesOption) ([]*Status, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	statuses := make([]*Status, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, ref, opt.getURLQuery().Encode()), jsonHeader, nil, &statuses)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(statuses)); err != nil {
+		return statuses, resp, err
+	}
 	return statuses, resp, err
 }
 

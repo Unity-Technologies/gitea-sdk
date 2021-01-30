@@ -30,18 +30,30 @@ type ListPublicKeysOptions struct {
 }
 
 // ListPublicKeys list all the public keys of the user
+// response support Next()
 func (c *Client) ListPublicKeys(user string, opt ListPublicKeysOptions) ([]*PublicKey, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	keys := make([]*PublicKey, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s/keys?%s", user, opt.getURLQuery().Encode()), nil, nil, &keys)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(keys)); err != nil {
+		return keys, resp, err
+	}
 	return keys, resp, err
 }
 
 // ListMyPublicKeys list all the public keys of current user
+// response support Next()
 func (c *Client) ListMyPublicKeys(opt ListPublicKeysOptions) ([]*PublicKey, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	keys := make([]*PublicKey, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/keys?%s", opt.getURLQuery().Encode()), nil, nil, &keys)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(keys)); err != nil {
+		return keys, resp, err
+	}
 	return keys, resp, err
 }
 

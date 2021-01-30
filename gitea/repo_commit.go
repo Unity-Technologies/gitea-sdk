@@ -79,11 +79,17 @@ func (opt *ListCommitOptions) QueryEncode() string {
 }
 
 // ListRepoCommits return list of commits from a repo
+// response support Next()
 func (c *Client) ListRepoCommits(user, repo string, opt ListCommitOptions) ([]*Commit, *Response, error) {
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/commits", user, repo))
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	commits := make([]*Commit, 0, opt.PageSize)
 	link.RawQuery = opt.QueryEncode()
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &commits)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(commits)); err != nil {
+		return commits, resp, err
+	}
 	return commits, resp, err
 }

@@ -94,18 +94,30 @@ type ListReposOptions struct {
 }
 
 // ListMyRepos lists all repositories for the authenticated user that has access to.
+// response support Next()
 func (c *Client) ListMyRepos(opt ListReposOptions) ([]*Repository, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	repos := make([]*Repository, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/repos?%s", opt.getURLQuery().Encode()), nil, nil, &repos)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(repos)); err != nil {
+		return repos, resp, err
+	}
 	return repos, resp, err
 }
 
 // ListUserRepos list all repositories of one user by user's name
+// response support Next()
 func (c *Client) ListUserRepos(user string, opt ListReposOptions) ([]*Repository, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	repos := make([]*Repository, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", user, opt.getURLQuery().Encode()), nil, nil, &repos)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(repos)); err != nil {
+		return repos, resp, err
+	}
 	return repos, resp, err
 }
 
@@ -115,10 +127,16 @@ type ListOrgReposOptions struct {
 }
 
 // ListOrgRepos list all repositories of one organization by organization's name
+// response support Next()
 func (c *Client) ListOrgRepos(org string, opt ListOrgReposOptions) ([]*Repository, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	repos := make([]*Repository, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", org, opt.getURLQuery().Encode()), nil, nil, &repos)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(repos)); err != nil {
+		return repos, resp, err
+	}
 	return repos, resp, err
 }
 
@@ -228,8 +246,11 @@ type searchRepoResponse struct {
 }
 
 // SearchRepos searches for repositories matching the given filters
+// response support Next()
 func (c *Client) SearchRepos(opt SearchRepoOptions) ([]*Repository, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	repos := new(searchRepoResponse)
 
 	link, _ := url.Parse("/repos/search")
@@ -249,6 +270,9 @@ func (c *Client) SearchRepos(opt SearchRepoOptions) ([]*Repository, *Response, e
 	}
 
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &repos)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(repos.Repos)); err != nil {
+		return repos.Repos, resp, err
+	}
 	return repos.Repos, resp, err
 }
 

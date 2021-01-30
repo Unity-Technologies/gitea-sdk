@@ -65,10 +65,16 @@ type ListRepoBranchesOptions struct {
 }
 
 // ListRepoBranches list all the branches of one repository
+// response support Next()
 func (c *Client) ListRepoBranches(user, repo string, opt ListRepoBranchesOptions) ([]*Branch, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	branches := make([]*Branch, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/branches?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &branches)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(branches)); err != nil {
+		return branches, resp, err
+	}
 	return branches, resp, err
 }
 

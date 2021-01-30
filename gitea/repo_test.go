@@ -87,20 +87,24 @@ func TestSearchRepo(t *testing.T) {
 	_, err = c.AddRepoTopic(repo.Owner.UserName, repo.Name, "TestTopic1")
 	assert.NoError(t, err)
 
-	repos, _, err := c.SearchRepos(SearchRepoOptions{
+	repos, resp, err := c.SearchRepos(SearchRepoOptions{ListOptions: ListOptions{PageSize: 1}})
+	assert.NoError(t, err)
+	assert.Len(t, repos, 1)
+	assert.True(t, resp.Next())
+
+	repos, resp, err = c.SearchRepos(SearchRepoOptions{
 		Keyword:              "Search1",
 		KeywordInDescription: true,
 	})
 	assert.NoError(t, err)
-	assert.NotNil(t, repos)
 	assert.Len(t, repos, 1)
+	assert.False(t, resp.Next())
 
 	repos, _, err = c.SearchRepos(SearchRepoOptions{
 		Keyword:              "Search",
 		KeywordInDescription: true,
 	})
 	assert.NoError(t, err)
-	assert.NotNil(t, repos)
 	assert.Len(t, repos, 2)
 
 	repos, _, err = c.SearchRepos(SearchRepoOptions{

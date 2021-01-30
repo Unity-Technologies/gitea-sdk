@@ -39,18 +39,30 @@ type ListGPGKeysOptions struct {
 }
 
 // ListGPGKeys list all the GPG keys of the user
+// response support Next()
 func (c *Client) ListGPGKeys(user string, opt ListGPGKeysOptions) ([]*GPGKey, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	keys := make([]*GPGKey, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s/gpg_keys?%s", user, opt.getURLQuery().Encode()), nil, nil, &keys)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(keys)); err != nil {
+		return keys, resp, err
+	}
 	return keys, resp, err
 }
 
 // ListMyGPGKeys list all the GPG keys of current user
+// response support Next()
 func (c *Client) ListMyGPGKeys(opt *ListGPGKeysOptions) ([]*GPGKey, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	keys := make([]*GPGKey, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys?%s", opt.getURLQuery().Encode()), nil, nil, &keys)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(keys)); err != nil {
+		return keys, resp, err
+	}
 	return keys, resp, err
 }
 

@@ -27,17 +27,6 @@ func (o ListOptions) getURLQuery() url.Values {
 	return query
 }
 
-// deprecated
-func (o *ListOptions) setDefaults() {
-	if o.Page < 1 {
-		o.Page = 1
-	}
-
-	if o.PageSize < 0 || o.PageSize > maxPageSize {
-		o.PageSize = defaultPageSize
-	}
-}
-
 // saveSetDefaults respect custom MaxResponseItems settings
 func (o *ListOptions) saveSetDefaults(c *Client) error {
 	if o == nil {

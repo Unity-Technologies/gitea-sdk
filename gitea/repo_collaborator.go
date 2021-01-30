@@ -16,12 +16,18 @@ type ListCollaboratorsOptions struct {
 }
 
 // ListCollaborators list a repository's collaborators
+// response support Next()
 func (c *Client) ListCollaborators(user, repo string, opt ListCollaboratorsOptions) ([]*User, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	collaborators := make([]*User, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET",
 		fmt.Sprintf("/repos/%s/%s/collaborators?%s", user, repo, opt.getURLQuery().Encode()),
 		nil, nil, &collaborators)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(collaborators)); err != nil {
+		return collaborators, resp, err
+	}
 	return collaborators, resp, err
 }
 

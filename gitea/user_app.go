@@ -26,13 +26,19 @@ type ListAccessTokensOptions struct {
 }
 
 // ListAccessTokens lists all the access tokens of user
-func (c *Client) ListAccessTokens(opts ListAccessTokensOptions) ([]*AccessToken, *Response, error) {
+// response support Next()
+func (c *Client) ListAccessTokens(opt ListAccessTokensOptions) ([]*AccessToken, *Response, error) {
 	if len(c.username) == 0 {
 		return nil, nil, fmt.Errorf("\"username\" not set: only BasicAuth allowed")
 	}
-	opts.setDefaults()
-	tokens := make([]*AccessToken, 0, opts.PageSize)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", c.username, opts.getURLQuery().Encode()), jsonHeader, nil, &tokens)
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
+	tokens := make([]*AccessToken, 0, opt.PageSize)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s/tokens?%s", c.username, opt.getURLQuery().Encode()), jsonHeader, nil, &tokens)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(tokens)); err != nil {
+		return tokens, resp, err
+	}
 	return tokens, resp, err
 }
 

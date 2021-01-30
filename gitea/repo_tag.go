@@ -23,9 +23,15 @@ type ListRepoTagsOptions struct {
 }
 
 // ListRepoTags list all the branches of one repository
+// response support Next()
 func (c *Client) ListRepoTags(user, repo string, opt ListRepoTagsOptions) ([]*Tag, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	tags := make([]*Tag, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/tags?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, &tags)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(tags)); err != nil {
+		return tags, resp, err
+	}
 	return tags, resp, err
 }

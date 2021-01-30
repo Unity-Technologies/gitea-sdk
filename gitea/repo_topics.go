@@ -21,13 +21,18 @@ type topicsList struct {
 }
 
 // ListRepoTopics list all repository's topics
+// response support Next()
 func (c *Client) ListRepoTopics(user, repo string, opt ListRepoTopicsOptions) ([]string, *Response, error) {
-	opt.setDefaults()
-
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	list := new(topicsList)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/topics?%s", user, repo, opt.getURLQuery().Encode()), nil, nil, list)
 	if err != nil {
 		return nil, resp, err
+	}
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(list.Topics)); err != nil {
+		return list.Topics, resp, err
 	}
 	return list.Topics, resp, nil
 }

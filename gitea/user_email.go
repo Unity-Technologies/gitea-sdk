@@ -23,10 +23,16 @@ type ListEmailsOptions struct {
 }
 
 // ListEmails all the email addresses of user
+// response support Next()
 func (c *Client) ListEmails(opt ListEmailsOptions) ([]*Email, *Response, error) {
-	opt.setDefaults()
+	if err := opt.saveSetDefaults(c); err != nil {
+		return nil, nil, err
+	}
 	emails := make([]*Email, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/user/emails?%s", opt.getURLQuery().Encode()), nil, nil, &emails)
+	if err = c.preparePaginatedResponse(resp, &opt.ListOptions, len(emails)); err != nil {
+		return emails, resp, err
+	}
 	return emails, resp, err
 }
 
