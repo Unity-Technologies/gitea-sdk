@@ -382,14 +382,24 @@ type EditRepoOption struct {
 	// Note: you will get a 422 error if the organization restricts changing repository visibility to organization
 	// owners and a non-owner tries to change the value of private.
 	Private *bool `json:"private,omitempty"`
+	// either `true` to make this repository a template or `false` to make it a normal repository
+	Template *bool `json:"template,omitempty"`
 	// either `true` to enable issues for this repository or `false` to disable them.
 	HasIssues *bool `json:"has_issues,omitempty"`
+	// set this structure to configure internal issue tracker (requires has_issues)
+	InternalTracker *InternalTracker `json:"internal_tracker,omitempty"`
+	// set this structure to use external issue tracker (requires has_issues)
+	ExternalTracker *ExternalTracker `json:"external_tracker,omitempty"`
 	// either `true` to enable the wiki for this repository or `false` to disable it.
 	HasWiki *bool `json:"has_wiki,omitempty"`
+	// set this structure to use external wiki instead of internal (requires has_wiki)
+	ExternalWiki *ExternalWiki `json:"external_wiki,omitempty"`
 	// sets the default branch for this repository.
 	DefaultBranch *string `json:"default_branch,omitempty"`
 	// either `true` to allow pull requests, or `false` to prevent pull request.
 	HasPullRequests *bool `json:"has_pull_requests,omitempty"`
+	// either `true` to enable project unit, or `false` to disable them.
+	HasProjects *bool `json:"has_projects,omitempty"`
 	// either `true` to ignore whitespace for conflicts, or `false` to not ignore whitespace. `has_pull_requests` must be `true`.
 	IgnoreWhitespaceConflicts *bool `json:"ignore_whitespace_conflicts,omitempty"`
 	// either `true` to allow merging pull requests with a merge commit, or `false` to prevent merging pull requests with merge commits. `has_pull_requests` must be `true`.
@@ -402,6 +412,8 @@ type EditRepoOption struct {
 	AllowSquash *bool `json:"allow_squash_merge,omitempty"`
 	// set to `true` to archive this repository.
 	Archived *bool `json:"archived,omitempty"`
+	// set to a string like `8h30m0s` to set the mirror interval time
+	MirrorInterval *string `json:"mirror_interval,omitempty"`
 }
 
 // EditRepo edit the properties of a repository
