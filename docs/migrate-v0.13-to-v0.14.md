@@ -30,7 +30,7 @@ Pulls:
 
 ## New Optional Fields
 
-The `EditUserOption` struct has gained several new Optional fields..
+The `EditUserOption` struct has gained several new Optional fields.
 For example Email type changed from `string` to `*string`.
 
 The easiest migration path is, to wrap your options with:
