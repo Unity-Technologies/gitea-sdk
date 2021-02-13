@@ -8,6 +8,7 @@ feel free to create an issue.
 
 -   [Removed Functions (#467)](#Removed-Functions)
 -   [Renamed Functions (#467)](#Renamed-Functions)
+-   [Some EditUserOption got optional (#486)](#Some-EditUserOption-got-optional)
 
 <!-- tocstop -->
 
@@ -25,3 +26,14 @@ Pulls:
 
 Pulls:
 -   [#467 Remove & Rename TrackedTimes list functions](https://gitea.com/gitea/go-sdk/pulls/467)
+
+
+## Some EditUserOption got optional
+
+For example Email type changed from `string` to `*string`.
+
+The easyest migration path is, to war your options with:
+**OptionalString**, **OptionalBool** and **OptionalInt64**
+
+Pulls:
+-   [#486 Update Structs](https://gitea.com/gitea/go-sdk/pulls/486)
