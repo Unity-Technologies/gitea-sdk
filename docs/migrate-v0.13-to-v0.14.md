@@ -8,7 +8,7 @@ feel free to create an issue.
 
 -   [Removed Functions (#467)](#removed-functions)
 -   [Renamed Functions (#467)](#renamed-functions)
--   [Some Fields of Structs got optional (#486)](#some-fields-of-structs-got-optional)
+-   [New Optional Fields (#486)](#new-optional-fields)
 
 <!-- tocstop -->
 
@@ -28,9 +28,9 @@ Pulls:
 -   [#467 Remove & Rename TrackedTimes list functions](https://gitea.com/gitea/go-sdk/pulls/467)
 
 
-## Some Fields of Structs got optional
+## New Optional Fields
 
-The EditUserOption struct is only affected currently.
+`EditUserOption` struct is has gained several new Optional fields.
 For example Email type changed from `string` to `*string`.
 
 The easyest migration path is, to war your options with:
