@@ -30,11 +30,11 @@ Pulls:
 
 ## New Optional Fields
 
-`EditUserOption` struct is has gained several new Optional fields.
+The `EditUserOption` struct has gained several new Optional fields..
 For example Email type changed from `string` to `*string`.
 
-The easyest migration path is, to war your options with:
-**OptionalString**, **OptionalBool** and **OptionalInt64**
+The easiest migration path is, to wrap your options with:
+**OptionalString()**, **OptionalBool()** and **OptionalInt64()**
 
 Pulls:
 -   [#486 Update Structs](https://gitea.com/gitea/go-sdk/pulls/486)
