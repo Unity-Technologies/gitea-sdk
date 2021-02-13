@@ -66,11 +66,11 @@ func (opt *MigrateRepoOption) Validate(c *Client) error {
 	switch opt.Service {
 	case GitServiceGithub:
 		if len(opt.AuthToken) == 0 {
-			return fmt.Errorf("github require token authentication")
+			return fmt.Errorf("github requires token authentication")
 		}
 	case GitServiceGitlab, GitServiceGitea:
 		if len(opt.AuthToken) == 0 {
-			return fmt.Errorf("%s require token authentication", opt.Service)
+			return fmt.Errorf("%s requires token authentication", opt.Service)
 		}
 		// Gitlab is supported since 1.12.0 but api cant handle it until 1.13.0
 		// https://github.com/go-gitea/gitea/pull/12672
@@ -79,7 +79,7 @@ func (opt *MigrateRepoOption) Validate(c *Client) error {
 		}
 	case GitServiceGogs:
 		if len(opt.AuthToken) == 0 {
-			return fmt.Errorf("gogs require token authentication")
+			return fmt.Errorf("gogs requires token authentication")
 		}
 		if c.checkServerVersionGreaterThanOrEqual(version1_14_0) != nil {
 			return fmt.Errorf("migrate from service gogs need gitea >= 1.14.0")
