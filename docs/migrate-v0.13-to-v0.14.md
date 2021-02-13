@@ -6,9 +6,9 @@ feel free to create an issue.
 
 <!-- toc -->
 
--   [Removed Functions (#467)](#Removed-Functions)
--   [Renamed Functions (#467)](#Renamed-Functions)
--   [Some EditUserOption got optional (#486)](#Some-EditUserOption-got-optional)
+-   [Removed Functions (#467)](#removed-functions)
+-   [Renamed Functions (#467)](#renamed-functions)
+-   [Some Fields of Structs got optional (#486)](#some-fields-of-structs-got-optional)
 
 <!-- tocstop -->
 
@@ -28,8 +28,9 @@ Pulls:
 -   [#467 Remove & Rename TrackedTimes list functions](https://gitea.com/gitea/go-sdk/pulls/467)
 
 
-## Some EditUserOption got optional
+## Some Fields of Structs got optional
 
+The EditUserOption struct is only affected currently.
 For example Email type changed from `string` to `*string`.
 
 The easyest migration path is, to war your options with:
