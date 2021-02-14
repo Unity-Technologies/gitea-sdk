@@ -80,7 +80,9 @@ test:
 .PHONY: test-instance
 test-instance:
 	rm -f -r ${WORK_DIR}/test 2> /dev/null; \
-	mkdir -p ${WORK_DIR}/test/conf/ ${WORK_DIR}/test/data/
+	mkdir -p ${WORK_DIR}/test/conf/ ${WORK_DIR}/test/data/adoptuser; \
+	git init --bare ${WORK_DIR}/test/data/adoptuser/repo1.git; \
+	git init --bare ${WORK_DIR}/test/data/adoptuser/repo2.git; \
 	wget ${GITEA_DL} -O ${WORK_DIR}/test/gitea-master; \
 	chmod +x ${WORK_DIR}/test/gitea-master; \
 	echo "[security]" > ${WORK_DIR}/test/conf/app.ini; \

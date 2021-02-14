@@ -15,8 +15,9 @@ steps:
   image: gitea/gitea:latest
   detach: true
   commands:
-  - mkdir -p /tmp/conf/
-  - mkdir -p /tmp/data/
+  - mkdir -p /tmp/conf/ /tmp/data/adoptuser
+  - git init --bare /tmp/data/adoptuser/repo1.git
+  - git init --bare /tmp/data/adoptuser/repo2.git
   - echo "[security]" > /tmp/conf/app.ini
   - echo "INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1NTg4MzY4ODB9.LoKQyK5TN_0kMJFVHWUW0uDAyoGjDP6Mkup4ps2VJN4" >> /tmp/conf/app.ini
   - echo "INSTALL_LOCK   = true" >> /tmp/conf/app.ini
