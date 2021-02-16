@@ -127,7 +127,7 @@ func pathEscapeSegments(path string) string {
 }
 
 // GetFile downloads a file of repository, ref can be branch/tag/commit.
-// e.g.: ref -> master, tree -> README.md (no leading slash)
+// e.g.: ref -> master, filepath -> README.md (no leading slash)
 func (c *Client) GetFile(owner, repo, ref, filepath string) ([]byte, *Response, error) {
 	filepath = pathEscapeSegments(filepath)
 	if c.checkServerVersionGreaterThanOrEqual(version1_14_0) != nil {
@@ -142,7 +142,7 @@ func (c *Client) GetContents(owner, repo, ref, filepath string) (*ContentsRespon
 	filepath = pathEscapeSegments(filepath)
 	cr := new(ContentsResponse)
 	filepath = strings.TrimPrefix(filepath, "/")
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/contents/%s?ref=%s", owner, repo, filepath, ref), jsonHeader, nil, cr)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/contents/%s?ref=%s", owner, repo, filepath, url.QueryEscape(ref)), jsonHeader, nil, cr)
 	return cr, resp, err
 }
 
@@ -152,7 +152,7 @@ func (c *Client) ListContents(owner, repo, ref, filepath string) ([]*ContentsRes
 	filepath = pathEscapeSegments(filepath)
 	cr := make([]*ContentsResponse, 0)
 	filepath = strings.TrimPrefix(filepath, "/")
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/contents/%s?ref=%s", owner, repo, filepath, ref), jsonHeader, nil, &cr)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/contents/%s?ref=%s", owner, repo, filepath, url.QueryEscape(ref)), jsonHeader, nil, &cr)
 	return cr, resp, err
 }
 
