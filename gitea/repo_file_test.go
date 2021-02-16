@@ -64,6 +64,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	licence, _, err := c.GetContents(repo.Owner.UserName, repo.Name, "", "LICENSE")
 	assert.NoError(t, err)
 	licenceRaw, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "", "LICENSE")
+	testContent := "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo="
 	updatedFile, _, err = c.UpdateFile(repo.Owner.UserName, repo.Name, "LICENSE", UpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "Overwrite",
@@ -71,7 +72,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 			NewBranchName: "overwrite-a+/&licence",
 		},
 		SHA:     licence.SHA,
-		Content: "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo=",
+		Content: testContent,
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, updatedFile)
@@ -79,4 +80,5 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, licence)
 	assert.False(t, bytes.Equal(licenceRaw, licenceRawNew))
+	assert.EqualValues(t, testContent, base64.StdEncoding.EncodeToString(licenceRawNew))
 }
