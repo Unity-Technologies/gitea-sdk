@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -121,7 +122,7 @@ func (c *Client) GetFile(owner, repo, ref, tree string) ([]byte, *Response, erro
 	if c.checkServerVersionGreaterThanOrEqual(version1_14_0) != nil {
 		return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s/%s", owner, repo, ref, tree), nil, nil)
 	}
-	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s?ref=%s", owner, repo, tree, ref), nil, nil)
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s?ref=%s", owner, repo, tree, url.QueryEscape(ref)), nil, nil)
 }
 
 // GetContents get the metadata and contents of a file in a repository

@@ -59,7 +59,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	assert.NoError(t, err)
 	_, resp, err := c.GetFile(repo.Owner.UserName, repo.Name, "master", "A")
 	assert.EqualValues(t, "404 Not Found", err.Error())
-	assert.EqualValues(t, 404, resp.StatusCode )
+	assert.EqualValues(t, 404, resp.StatusCode)
 
 	licence, _, err := c.GetContents(repo.Owner.UserName, repo.Name, "", "LICENSE")
 	assert.NoError(t, err)
@@ -68,14 +68,14 @@ func TestFileCreateUpdateGet(t *testing.T) {
 		FileOptions: FileOptions{
 			Message:       "Overwrite",
 			BranchName:    "master",
-			NewBranchName: "overwrite_licence",
+			NewBranchName: "overwrite/licence",
 		},
 		SHA:     licence.SHA,
 		Content: "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo=",
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, updatedFile)
-	licenceRawNew, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "overwrite_licence", "LICENSE")
+	licenceRawNew, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "overwrite/licence", "LICENSE")
 	assert.NoError(t, err)
 	assert.NotNil(t, licence)
 	assert.False(t, bytes.Equal(licenceRaw, licenceRawNew))
