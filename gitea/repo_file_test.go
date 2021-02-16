@@ -68,14 +68,14 @@ func TestFileCreateUpdateGet(t *testing.T) {
 		FileOptions: FileOptions{
 			Message:       "Overwrite",
 			BranchName:    "master",
-			NewBranchName: "overwrite/licence",
+			NewBranchName: "overwrite-a+/&licence",
 		},
 		SHA:     licence.SHA,
 		Content: "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo=",
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, updatedFile)
-	licenceRawNew, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "overwrite/licence", "LICENSE")
+	licenceRawNew, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "overwrite-a+/&licence", "LICENSE")
 	assert.NoError(t, err)
 	assert.NotNil(t, licence)
 	assert.False(t, bytes.Equal(licenceRaw, licenceRawNew))
