@@ -116,9 +116,12 @@ type FileDeleteResponse struct {
 }
 
 // GetFile downloads a file of repository, ref can be branch/tag/commit.
-// e.g.: ref -> master, tree -> macaron.go(no leading slash)
-func (c *Client) GetFile(user, repo, ref, tree string) ([]byte, *Response, error) {
-	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s/%s", user, repo, ref, tree), nil, nil)
+// e.g.: ref -> master, tree -> README.md (no leading slash)
+func (c *Client) GetFile(owner, repo, ref, tree string) ([]byte, *Response, error) {
+	if c.checkServerVersionGreaterThanOrEqual(version1_14_0) != nil {
+		return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s/%s", owner, repo, ref, tree), nil, nil)
+	}
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/raw/%s?ref=%s", owner, repo, tree, ref), nil, nil)
 }
 
 // GetContents get the metadata and contents of a file in a repository
