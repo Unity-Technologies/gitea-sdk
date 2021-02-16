@@ -5,6 +5,7 @@
 package gitea
 
 import (
+	"bytes"
 	"encoding/base64"
 	"log"
 	"testing"
@@ -62,8 +63,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 
 	licence, _, err := c.GetContents(repo.Owner.UserName, repo.Name, "", "LICENSE")
 	assert.NoError(t, err)
-	assert.NotNil(t, licence)
-	sha := licence.SHA
+	licenceRaw, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "", "LICENSE")
 	updatedFile, _, err = c.UpdateFile(repo.Owner.UserName, repo.Name, "LICENSE", UpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "Overwrite",
@@ -75,8 +75,8 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, updatedFile)
-	licence, _, err = c.GetContents(repo.Owner.UserName, repo.Name, "overwrite_licence", "LICENSE")
+	licenceRawNew, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "overwrite_licence", "LICENSE")
 	assert.NoError(t, err)
 	assert.NotNil(t, licence)
-	assert.True(t, sha != licence.SHA)
+	assert.False(t, bytes.Equal(licenceRaw, licenceRawNew))
 }
