@@ -21,6 +21,7 @@ type Release struct {
 	Title        string        `json:"name"`
 	Note         string        `json:"body"`
 	URL          string        `json:"url"`
+	HTMLURL      string        `json:"html_url"`
 	TarURL       string        `json:"tarball_url"`
 	ZipURL       string        `json:"zipball_url"`
 	IsDraft      bool          `json:"draft"`
@@ -139,13 +140,24 @@ func (c *Client) EditRelease(owner, repo string, id int64, form EditReleaseOptio
 	return r, resp, err
 }
 
-// DeleteRelease delete a release from a repository
-func (c *Client) DeleteRelease(owner, repo string, id int64) (*Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+// DeleteRelease delete a release from a repository, keeping its tag
+func (c *Client) DeleteRelease(user, repo string, id int64) (*Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
 		return nil, err
 	}
 	_, resp, err := c.getResponse("DELETE",
 		fmt.Sprintf("/repos/%s/%s/releases/%d", owner, repo, id),
+		nil, nil)
+	return resp, err
+}
+
+// DeleteReleaseByTag deletes a release frm a repository by tag
+func (c *Client) DeleteReleaseByTag(user, repo string, tag string) (*Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_14_0); err != nil {
+		return nil, err
+	}
+	_, resp, err := c.getResponse("DELETE",
+		fmt.Sprintf("/repos/%s/%s/releases/tags/%s", user, repo, tag),
 		nil, nil)
 	return resp, err
 }

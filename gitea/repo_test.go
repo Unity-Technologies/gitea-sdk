@@ -5,6 +5,8 @@
 package gitea
 
 import (
+	"bytes"
+	"io"
 	"log"
 	"testing"
 	"time"
@@ -136,7 +138,23 @@ func TestGetArchive(t *testing.T) {
 	time.Sleep(time.Second / 2)
 	archive, _, err := c.GetArchive(repo.Owner.UserName, repo.Name, "master", ZipArchive)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 1620, len(archive))
+	assert.EqualValues(t, 1602, len(archive))
+}
+
+func TestGetArchiveReader(t *testing.T) {
+	log.Println("== TestGetArchiveReader ==")
+	c := newTestClient()
+	repo, _ := createTestRepo(t, "ToDownload", c)
+	time.Sleep(time.Second / 2)
+	r, _, err := c.GetArchiveReader(repo.Owner.UserName, repo.Name, "master", ZipArchive)
+	assert.NoError(t, err)
+	defer r.Close()
+
+	archive := bytes.NewBuffer(nil)
+	nBytes, err := io.Copy(archive, r)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 1602, nBytes)
+	assert.EqualValues(t, nBytes, len(archive.Bytes()))
 }
 
 // standard func to create a init repo for test routines
