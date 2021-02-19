@@ -39,6 +39,18 @@ func enableRunGitea() bool {
 	return r
 }
 
+func getRepoRoot() string {
+	repoRoot := os.Getenv("REPO_ROOT")
+	if len(repoRoot) != 0 {
+		return repoRoot
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Join(pwd, "../test/data")
+}
+
 func newTestClient() *Client {
 	token := getGiteaToken()
 	if token == "" {
