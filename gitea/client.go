@@ -37,6 +37,7 @@ type Client struct {
 	debug          bool
 	client         *http.Client
 	ctx            context.Context
+	mutex          sync.RWMutex
 	serverVersion  *version.Version
 	getVersionOnce sync.Once
 }
@@ -73,14 +74,23 @@ func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
 // SetHTTPClient is an option for NewClient to set custom http client
 func SetHTTPClient(httpClient *http.Client) func(client *Client) {
 	return func(client *Client) {
-		client.client = httpClient
+		client.SetHTTPClient(httpClient)
 	}
+}
+
+// SetHTTPClient replaces default http.Client with user given one.
+func (c *Client) SetHTTPClient(client *http.Client) {
+	c.mutex.Lock()
+	c.client = client
+	c.mutex.Unlock()
 }
 
 // SetToken is an option for NewClient to set token
 func SetToken(token string) func(client *Client) {
 	return func(client *Client) {
+		client.mutex.Lock()
 		client.accessToken = token
+		client.mutex.Unlock()
 	}
 }
 
@@ -93,7 +103,9 @@ func SetBasicAuth(username, password string) func(client *Client) {
 
 // SetBasicAuth sets username and password
 func (c *Client) SetBasicAuth(username, password string) {
+	c.mutex.Lock()
 	c.username, c.password = username, password
+	c.mutex.Unlock()
 }
 
 // SetOTP is an option for NewClient to set OTP for 2FA
@@ -105,7 +117,9 @@ func SetOTP(otp string) func(client *Client) {
 
 // SetOTP sets OTP for 2FA
 func (c *Client) SetOTP(otp string) {
+	c.mutex.Lock()
 	c.otp = otp
+	c.mutex.Unlock()
 }
 
 // SetContext is an option for NewClient to set context
@@ -117,12 +131,9 @@ func SetContext(ctx context.Context) func(client *Client) {
 
 // SetContext set context witch is used for http requests
 func (c *Client) SetContext(ctx context.Context) {
+	c.mutex.Lock()
 	c.ctx = ctx
-}
-
-// SetHTTPClient replaces default http.Client with user given one.
-func (c *Client) SetHTTPClient(client *http.Client) {
-	c.client = client
+	c.mutex.Unlock()
 }
 
 // SetSudo is an option for NewClient to set sudo header
@@ -134,7 +145,9 @@ func SetSudo(sudo string) func(client *Client) {
 
 // SetSudo sets username to impersonate.
 func (c *Client) SetSudo(sudo string) {
+	c.mutex.Lock()
 	c.sudo = sudo
+	c.mutex.Unlock()
 }
 
 // SetDebugMode is an option for NewClient to enable debug mode
@@ -145,13 +158,18 @@ func SetDebugMode() func(client *Client) {
 }
 
 func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *Response, error) {
+	c.mutex.RLock()
 	if c.debug {
 		fmt.Printf("%s: %s\nBody: %v\n", method, c.url+path, body)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+path, body)
 	if err != nil {
+		c.mutex.RUnlock()
 		return nil, nil, err
 	}
+
+	c.mutex.RUnlock()
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, nil, err
@@ -166,11 +184,13 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
+	c.mutex.RLock()
 	if c.debug {
 		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+"/api/v1"+path, header, body)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
 	if err != nil {
+		c.mutex.RUnlock()
 		return nil, err
 	}
 	if len(c.accessToken) != 0 {
@@ -185,6 +205,9 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	if len(c.sudo) != 0 {
 		req.Header.Set("Sudo", c.sudo)
 	}
+
+	c.mutex.RUnlock()
+
 	for k, v := range header {
 		req.Header[k] = v
 	}
