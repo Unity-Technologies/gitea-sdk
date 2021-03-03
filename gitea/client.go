@@ -26,7 +26,7 @@ func Version() string {
 	return "0.14.0"
 }
 
-// Client represents a Gitea API client.
+// Client represents a thread-safe Gitea API client.
 type Client struct {
 	url            string
 	accessToken    string
@@ -47,6 +47,7 @@ type Response struct {
 }
 
 // NewClient initializes and returns a API client.
+// Usage of all gitea.Client methods is concurrency-safe.
 func NewClient(url string, options ...func(*Client)) (*Client, error) {
 	client := &Client{
 		url:    strings.TrimSuffix(url, "/"),
