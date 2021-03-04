@@ -165,12 +165,15 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 		fmt.Printf("%s: %s\nBody: %v\n", method, c.url+path, body)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+path, body)
+
+	client := c.client // client ref can change from this point on so safe it
 	c.mutex.RUnlock()
+
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -206,13 +209,14 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 		req.Header.Set("Sudo", c.sudo)
 	}
 
+	client := c.client // client ref can change from this point on so safe it
 	c.mutex.RUnlock()
 
 	for k, v := range header {
 		req.Header[k] = v
 	}
 
-	resp, err := c.client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
