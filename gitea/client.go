@@ -153,7 +153,9 @@ func (c *Client) SetSudo(sudo string) {
 // SetDebugMode is an option for NewClient to enable debug mode
 func SetDebugMode() func(client *Client) {
 	return func(client *Client) {
+		client.mutex.Lock()
 		client.debug = true
+		client.mutex.Unlock()
 	}
 }
 
@@ -163,12 +165,10 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 		fmt.Printf("%s: %s\nBody: %v\n", method, c.url+path, body)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+path, body)
+	c.mutex.RUnlock()
 	if err != nil {
-		c.mutex.RUnlock()
 		return nil, nil, err
 	}
-
-	c.mutex.RUnlock()
 
 	resp, err := c.client.Do(req)
 	if err != nil {
