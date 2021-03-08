@@ -501,6 +501,9 @@ func (c *Client) GetArchive(owner, repo, ref string, ext ArchiveType) ([]byte, *
 // (`v1.2.1`). The archive is returned as a byte stream in a ReadCloser. It is
 // the responsibility of the client to close the reader.
 func (c *Client) GetArchiveReader(owner, repo, ref string, ext ArchiveType) (io.ReadCloser, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	resp, err := c.doRequest("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, url.PathEscape(ref), ext), nil, nil)
 	if err != nil {
 		return nil, resp, err

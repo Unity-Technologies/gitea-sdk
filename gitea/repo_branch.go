@@ -20,9 +20,6 @@ type PayloadUser struct {
 	UserName string `json:"username"`
 }
 
-// FIXME: consider using same format as API when commits API are added.
-//        applies to PayloadCommit and PayloadCommitVerification
-
 // PayloadCommit represents a commit
 type PayloadCommit struct {
 	// sha1 hash of the commit
