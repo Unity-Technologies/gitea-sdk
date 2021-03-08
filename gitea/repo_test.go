@@ -138,7 +138,7 @@ func TestGetArchive(t *testing.T) {
 	time.Sleep(time.Second / 2)
 	archive, _, err := c.GetArchive(repo.Owner.UserName, repo.Name, "master", ZipArchive)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 1602, len(archive))
+	assert.True(t, len(archive) > 1500 && len(archive) < 1700)
 }
 
 func TestGetArchiveReader(t *testing.T) {
@@ -153,7 +153,7 @@ func TestGetArchiveReader(t *testing.T) {
 	archive := bytes.NewBuffer(nil)
 	nBytes, err := io.Copy(archive, r)
 	assert.NoError(t, err)
-	assert.EqualValues(t, 1602, nBytes)
+	assert.True(t, nBytes > 1500)
 	assert.EqualValues(t, nBytes, len(archive.Bytes()))
 }
 
