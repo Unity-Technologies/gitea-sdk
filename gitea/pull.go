@@ -269,7 +269,8 @@ func (c *Client) GetPullRequestDiff(owner, repo string, index int64) ([]byte, *R
 // pr.Head.Ref points in this case not to the head repo branch name, but the base repo ref,
 // which stays available to resolve the commit sha.
 func fixPullHeadSha(client *Client, pr *PullRequest) error {
-	if pr.Base != nil && pr.Base.Repository != nil && pr.Base.Repository.Owner != nil && pr.Head != nil && pr.Head.Ref != "" && pr.Head.Sha == "" {
+	if pr.Base != nil && pr.Base.Repository != nil && pr.Base.Repository.Owner != nil &&
+		pr.Head != nil && pr.Head.Ref != "" && pr.Head.Sha == "" {
 		owner := pr.Base.Repository.Owner.UserName
 		repo := pr.Base.Repository.Name
 		refs, _, err := client.GetRepoRefs(owner, repo, pr.Head.Ref)
