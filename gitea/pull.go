@@ -105,6 +105,13 @@ func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOp
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
 	link.RawQuery = opt.QueryEncode()
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &prs)
+	if c.checkServerVersionGreaterThanOrEqual(version1_14_0) != nil {
+		for i := range prs {
+			if err := fixPullHeadSha(c, prs[i]); err != nil {
+				return prs, resp, err
+			}
+		}
+	}
 	return prs, resp, err
 }
 
@@ -112,6 +119,11 @@ func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOp
 func (c *Client) GetPullRequest(owner, repo string, index int64) (*PullRequest, *Response, error) {
 	pr := new(PullRequest)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls/%d", owner, repo, index), nil, nil, pr)
+	if c.checkServerVersionGreaterThanOrEqual(version1_14_0) != nil {
+		if err := fixPullHeadSha(c, pr); err != nil {
+			return pr, resp, err
+		}
+	}
 	return pr, resp, err
 }
 
@@ -250,4 +262,24 @@ func (c *Client) GetPullRequestPatch(owner, repo string, index int64) ([]byte, *
 // GetPullRequestDiff gets the .diff file as bytes for a PR
 func (c *Client) GetPullRequestDiff(owner, repo string, index int64) ([]byte, *Response, error) {
 	return c.getPullRequestDiffOrPatch(owner, repo, "diff", index)
+}
+
+// fixPullHeadSha is a workaround for https://github.com/go-gitea/gitea/issues/12675
+// When no head sha is available, this is because the branch got deleted in the base repo.
+// pr.Head.Ref points in this case not to the head repo branch name, but the base repo ref,
+// which stays available to resolve the commit sha. This is fixed for gitea >= 1.14.0
+func fixPullHeadSha(client *Client, pr *PullRequest) error {
+	if pr.Base != nil && pr.Base.Repository != nil && pr.Base.Repository.Owner != nil &&
+		pr.Head != nil && pr.Head.Ref != "" && pr.Head.Sha == "" {
+		owner := pr.Base.Repository.Owner.UserName
+		repo := pr.Base.Repository.Name
+		refs, _, err := client.GetRepoRefs(owner, repo, pr.Head.Ref)
+		if err != nil {
+			return err
+		} else if len(refs) == 0 {
+			return fmt.Errorf("unable to resolve PR ref '%s'", pr.Head.Ref)
+		}
+		pr.Head.Sha = refs[0].Object.SHA
+	}
+	return nil
 }
