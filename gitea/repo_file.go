@@ -173,7 +173,6 @@ func (c *Client) CreateFile(owner, repo, filepath string, opt CreateFileOptions)
 		return nil, nil, err
 	}
 	filepath = pathEscapeSegments(filepath)
-	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
 		return nil, nil, err
 	}
@@ -194,7 +193,6 @@ func (c *Client) UpdateFile(owner, repo, filepath string, opt UpdateFileOptions)
 		return nil, nil, err
 	}
 	filepath = pathEscapeSegments(filepath)
-	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
 		return nil, nil, err
 	}
@@ -212,10 +210,9 @@ func (c *Client) UpdateFile(owner, repo, filepath string, opt UpdateFileOptions)
 func (c *Client) DeleteFile(owner, repo, filepath string, opt DeleteFileOptions) (*Response, error) {
 	err := escapeValidatePathSegments(&owner, &repo)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	filepath = pathEscapeSegments(filepath)
-	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
 		return nil, err
 	}

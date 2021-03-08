@@ -97,7 +97,7 @@ func (c *Client) GetCombinedStatus(owner, repo, ref string) (*CombinedStatus, *R
 		return nil, nil, err
 	}
 	status := new(CombinedStatus)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, url.QueryEscape(ref), ref), jsonHeader, nil, status)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, url.QueryEscape(ref)), jsonHeader, nil, status)
 
 	// gitea api return empty body if nothing here jet
 	if resp != nil && resp.StatusCode == 200 && err != nil {

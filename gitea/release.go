@@ -146,7 +146,7 @@ func (c *Client) DeleteRelease(user, repo string, id int64) (*Response, error) {
 		return nil, err
 	}
 	_, resp, err := c.getResponse("DELETE",
-		fmt.Sprintf("/repos/%s/%s/releases/%d", owner, repo, id),
+		fmt.Sprintf("/repos/%s/%s/releases/%d", user, repo, id),
 		nil, nil)
 	return resp, err
 }

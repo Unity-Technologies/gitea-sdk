@@ -126,7 +126,7 @@ func (c *Client) ListIssueTrackedTimes(owner, repo string, index int64, opt List
 // ResetIssueTime reset tracked time of a single issue for a given repository
 func (c *Client) ResetIssueTime(owner, repo string, index int64) (*Response, error) {
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index), jsonHeader, nil)
 	return resp, err
@@ -135,7 +135,7 @@ func (c *Client) ResetIssueTime(owner, repo string, index int64) (*Response, err
 // DeleteTime delete a specific tracked time by id of a single issue for a given repository
 func (c *Client) DeleteTime(owner, repo string, index, timeID int64) (*Response, error) {
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/issues/%d/times/%d", owner, repo, index, timeID), jsonHeader, nil)
 	return resp, err
