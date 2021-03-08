@@ -267,7 +267,7 @@ func (c *Client) GetPullRequestDiff(owner, repo string, index int64) ([]byte, *R
 // fixPullHeadSha is a workaround for https://github.com/go-gitea/gitea/issues/12675
 // When no head sha is available, this is because the branch got deleted in the base repo.
 // pr.Head.Ref points in this case not to the head repo branch name, but the base repo ref,
-// which stays available to resolve the commit sha.
+// which stays available to resolve the commit sha. This is fixed for gitea >= 1.14.0
 func fixPullHeadSha(client *Client, pr *PullRequest) error {
 	if pr.Base != nil && pr.Base.Repository != nil && pr.Base.Repository.Owner != nil &&
 		pr.Head != nil && pr.Head.Ref != "" && pr.Head.Sha == "" {
