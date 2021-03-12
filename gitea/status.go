@@ -71,12 +71,12 @@ type ListStatusesOption struct {
 
 // ListStatuses returns all statuses for a given Commit by ref
 func (c *Client) ListStatuses(owner, repo, ref string, opt ListStatusesOption) ([]*Status, *Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+	if err := escapeValidatePathSegments(&owner, &repo, &ref); err != nil {
 		return nil, nil, err
 	}
 	opt.setDefaults()
 	statuses := make([]*Status, 0, opt.PageSize)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, url.QueryEscape(ref), opt.getURLQuery().Encode()), jsonHeader, nil, &statuses)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, ref, opt.getURLQuery().Encode()), jsonHeader, nil, &statuses)
 	return statuses, resp, err
 }
 
@@ -93,11 +93,11 @@ type CombinedStatus struct {
 
 // GetCombinedStatus returns the CombinedStatus for a given Commit
 func (c *Client) GetCombinedStatus(owner, repo, ref string) (*CombinedStatus, *Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+	if err := escapeValidatePathSegments(&owner, &repo, &ref); err != nil {
 		return nil, nil, err
 	}
 	status := new(CombinedStatus)
-	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, url.QueryEscape(ref)), jsonHeader, nil, status)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, ref), jsonHeader, nil, status)
 
 	// gitea api return empty body if nothing here jet
 	if resp != nil && resp.StatusCode == 200 && err != nil {

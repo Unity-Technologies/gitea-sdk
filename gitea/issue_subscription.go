@@ -70,9 +70,6 @@ func (c *Client) CheckIssueSubscription(owner, repo string, index int64) (*Watch
 
 // IssueSubscribe subscribe current user to an issue
 func (c *Client) IssueSubscribe(owner, repo string, index int64) (*Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
-		return nil, err
-	}
 	u, _, err := c.GetMyUserInfo()
 	if err != nil {
 		return nil, err
@@ -82,9 +79,6 @@ func (c *Client) IssueSubscribe(owner, repo string, index int64) (*Response, err
 
 // IssueUnSubscribe unsubscribe current user from an issue
 func (c *Client) IssueUnSubscribe(owner, repo string, index int64) (*Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
-		return nil, err
-	}
 	u, _, err := c.GetMyUserInfo()
 	if err != nil {
 		return nil, err

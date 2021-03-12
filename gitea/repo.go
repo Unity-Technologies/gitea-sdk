@@ -490,9 +490,10 @@ const (
 // GetArchive get an archive of a repository by git reference
 // e.g.: ref -> master, 70b7c74b33, v1.2.1, ...
 func (c *Client) GetArchive(owner, repo, ref string, ext ArchiveType) ([]byte, *Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo, &ref); err != nil {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
+	ref = pathEscapeSegments(ref)
 	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, ref, ext), nil, nil)
 }
 
@@ -504,7 +505,8 @@ func (c *Client) GetArchiveReader(owner, repo, ref string, ext ArchiveType) (io.
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
 		return nil, nil, err
 	}
-	resp, err := c.doRequest("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, url.PathEscape(ref), ext), nil, nil)
+	ref = pathEscapeSegments(ref)
+	resp, err := c.doRequest("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, ref, ext), nil, nil)
 	if err != nil {
 		return nil, resp, err
 	}

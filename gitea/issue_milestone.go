@@ -215,9 +215,6 @@ func (c *Client) DeleteMilestoneByName(owner, repo string, name string) (*Respon
 
 // resolveMilestoneByName is a fallback method to find milestone id by name
 func (c *Client) resolveMilestoneByName(owner, repo, name string) (*Milestone, *Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
-		return nil, nil, err
-	}
 	for i := 1; ; i++ {
 		miles, resp, err := c.ListRepoMilestones(owner, repo, ListMilestoneOption{
 			ListOptions: ListOptions{
