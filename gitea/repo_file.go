@@ -168,14 +168,14 @@ func (c *Client) getDirOrFileContents(owner, repo, ref, filepath string) ([]byte
 
 // CreateFile create a file in a repository
 func (c *Client) CreateFile(owner, repo, filepath string, opt CreateFileOptions) (*FileResponse, *Response, error) {
-	err := escapeValidatePathSegments(&owner, &repo)
-	if err != nil {
-		return nil, nil, err
-	}
-	filepath = pathEscapeSegments(filepath)
+	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
 		return nil, nil, err
 	}
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	filepath = pathEscapeSegments(filepath)
 
 	body, err := json.Marshal(&opt)
 	if err != nil {
@@ -188,14 +188,15 @@ func (c *Client) CreateFile(owner, repo, filepath string, opt CreateFileOptions)
 
 // UpdateFile update a file in a repository
 func (c *Client) UpdateFile(owner, repo, filepath string, opt UpdateFileOptions) (*FileResponse, *Response, error) {
-	err := escapeValidatePathSegments(&owner, &repo)
-	if err != nil {
-		return nil, nil, err
-	}
-	filepath = pathEscapeSegments(filepath)
+	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
 		return nil, nil, err
 	}
+
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	filepath = pathEscapeSegments(filepath)
 
 	body, err := json.Marshal(&opt)
 	if err != nil {
@@ -208,14 +209,14 @@ func (c *Client) UpdateFile(owner, repo, filepath string, opt UpdateFileOptions)
 
 // DeleteFile delete a file from repository
 func (c *Client) DeleteFile(owner, repo, filepath string, opt DeleteFileOptions) (*Response, error) {
-	err := escapeValidatePathSegments(&owner, &repo)
-	if err != nil {
-		return nil, err
-	}
-	filepath = pathEscapeSegments(filepath)
+	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
 		return nil, err
 	}
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
+	filepath = pathEscapeSegments(filepath)
 
 	body, err := json.Marshal(&opt)
 	if err != nil {

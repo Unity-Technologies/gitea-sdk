@@ -165,6 +165,9 @@ func (c *Client) ListTeamMembers(id int64, opt ListTeamMembersOptions) ([]*User,
 
 // GetTeamMember gets a member of a team
 func (c *Client) GetTeamMember(id int64, user string) (*User, *Response, error) {
+	if err := escapeValidatePathSegments(&user); err != nil {
+		return nil, nil, err
+	}
 	m := new(User)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/teams/%d/members/%s", id, user), nil, nil, m)
 	return m, resp, err
@@ -172,12 +175,18 @@ func (c *Client) GetTeamMember(id int64, user string) (*User, *Response, error) 
 
 // AddTeamMember adds a member to a team
 func (c *Client) AddTeamMember(id int64, user string) (*Response, error) {
+	if err := escapeValidatePathSegments(&user); err != nil {
+		return nil, err
+	}
 	_, resp, err := c.getResponse("PUT", fmt.Sprintf("/teams/%d/members/%s", id, user), nil, nil)
 	return resp, err
 }
 
 // RemoveTeamMember removes a member from a team
 func (c *Client) RemoveTeamMember(id int64, user string) (*Response, error) {
+	if err := escapeValidatePathSegments(&user); err != nil {
+		return nil, err
+	}
 	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/teams/%d/members/%s", id, user), nil, nil)
 	return resp, err
 }

@@ -259,7 +259,7 @@ func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, *Re
 
 // getPullRequestDiffOrPatch gets the patch or diff file as bytes for a PR
 func (c *Client) getPullRequestDiffOrPatch(owner, repo, kind string, index int64) ([]byte, *Response, error) {
-	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+	if err := escapeValidatePathSegments(&owner, &repo, &kind); err != nil {
 		return nil, nil, err
 	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_13_0); err != nil {
