@@ -4,6 +4,8 @@
 
 This project acts as a client SDK implementation written in Go to interact with the Gitea API implementation. For further informations take a look at the current [documentation](https://godoc.org/code.gitea.io/sdk/gitea).
 
+Note: function arguments are escaped by the SDK.
+
 ## Use it
 
 ```go
