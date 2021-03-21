@@ -1,5 +1,42 @@
 # Changelog
 
+## [v0.14.0](https://gitea.com/gitea/go-sdk/releases/tag/v0.14.0) - 2021-03-21
+
+* BREAKING
+  * Update Structs (#486)
+  * Added repo ListContents and changed GetContents doc to talk about a single file (#485)
+  * Remove & Rename  TrackedTimes list functions (#467)
+* FEATURES
+  * Add Create/Delete ReviewRequests (#493)
+  * Add Un-/DismissPullReview funcs (#489)
+  * Add Repo Un-Star Functions (#483)
+  * introduce Client.GetArchiveReader (#476)
+  * Add DeleteRepoTag function (#461)
+  * Add GetReleaseByTag (#427)
+* BUGFIXES
+  * Handle Contents Edge-Case (#492)
+  * Fix GetCombinedStatus() (#470)
+  * Use Predefind Versions & Compare Function (#442)
+  * Return resp on NotFound too (#428)
+* ENHANCEMENTS
+  * Add workaround to get head branch sha of pulls with deleted head branch (#498)
+  * GetFile: Use "ref" in-query if posible (#491)
+  * Add DeleteTag & Correct DeleteReleaseByTag (#488)
+  * Add html_url field to Release struct (#477)
+  * Add Ref to Issue structs (#466)
+  * Update Issue Struct (#458)
+  * Use sync.Once for loading ServerVersion (#456)
+  * Add Gitea2Gitea Migration Support (#454)
+  * Add Helper for Optional Values (#448)
+  * Update CreateRepoOption struct (#445)
+  * Update CommitMeta Struct (#434)
+  * Update Struct NotificationSubject (#424)
+  * Add Debug Mode (#422)
+* DOCS
+  * Make Client thread-safe & add docs (#495)
+  * Improve PullReview docs (#469)
+
+
 ## [v0.13.2](https://gitea.com/gitea/go-sdk/releases/tag/gitea/v0.13.2) - 2020-12-07
 
 * BUGFIXES
