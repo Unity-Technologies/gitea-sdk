@@ -13,6 +13,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 
@@ -308,4 +309,25 @@ func (c *Client) getStatusCode(method, path string, header http.Header, body io.
 	defer resp.Body.Close()
 
 	return resp.StatusCode, resp, nil
+}
+
+// pathEscapeSegments escapes segments of a path while not escaping forward slash
+func pathEscapeSegments(path string) string {
+	slice := strings.Split(path, "/")
+	for index := range slice {
+		slice[index] = url.PathEscape(slice[index])
+	}
+	escapedPath := strings.Join(slice, "/")
+	return escapedPath
+}
+
+// escapeValidatePathSegments is a help function to validate and encode url path segments
+func escapeValidatePathSegments(seg ...*string) error {
+	for i := range seg {
+		if seg[i] == nil || len(*seg[i]) == 0 {
+			return fmt.Errorf("path segment [%d] is empty", i)
+		}
+		*seg[i] = url.PathEscape(*seg[i])
+	}
+	return nil
 }
