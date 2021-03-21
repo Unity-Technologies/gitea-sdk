@@ -6,6 +6,7 @@
   * Update Structs (#486)
   * Added repo ListContents and changed GetContents doc to talk about a single file (#485)
   * Remove & Rename  TrackedTimes list functions (#467)
+  * UrlEscape Function Arguments used in UrlPath (#273)
 * FEATURES
   * Add Create/Delete ReviewRequests (#493)
   * Add Un-/DismissPullReview funcs (#489)
