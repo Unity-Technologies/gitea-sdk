@@ -9,6 +9,7 @@ feel free to create an issue.
 -   [Removed Functions (#467)](#removed-functions)
 -   [Renamed Functions (#467)](#renamed-functions)
 -   [New Optional Fields (#486)](#new-optional-fields)
+-   [Arguemnts are escapted by the SDK iteslve now (#273)](#escape-function-arguments)
 
 <!-- tocstop -->
 
@@ -38,3 +39,9 @@ The easiest migration path is, to wrap your options with:
 
 Pulls:
 -   [#486 Update Structs](https://gitea.com/gitea/go-sdk/pulls/486)
+
+
+## Escape Function Arguments
+
+String arguments like `user`, `repo`, `tag`, ... are now url/path/query escapted as they need.
+If you had issues and did escape arguments by yourselve you have to remove this now.
