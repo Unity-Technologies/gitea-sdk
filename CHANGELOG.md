@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.13.3](https://gitea.com/gitea/go-sdk/releases/tag/v0.13.3) - 2021-03-22
+
+* BUGFIXES
+  * Fix GetCombinedStatus() (#470) (#472)
+* ENHANCEMENTS
+  * Add html_url field to Release struct (#477) (#478)
+
+
 ## [v0.13.2](https://gitea.com/gitea/go-sdk/releases/tag/gitea/v0.13.2) - 2020-12-07
 
 * BUGFIXES
