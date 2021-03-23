@@ -57,7 +57,7 @@ test:
 test-instance:
 	rm -f -r ${WORK_DIR}/test 2> /dev/null; \
 	mkdir -p ${WORK_DIR}/test/conf/ ${WORK_DIR}/test/data/
-	wget "https://dl.gitea.io/gitea/master/gitea-master-linux-amd64" -O ${WORK_DIR}/test/gitea-master; \
+	wget "https://dl.gitea.io/gitea/1.13/gitea-1.13-linux-amd64" -O ${WORK_DIR}/test/gitea-master; \
 	chmod +x ${WORK_DIR}/test/gitea-master; \
 	echo "[security]" > ${WORK_DIR}/test/conf/app.ini; \
 	echo "INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1NTg4MzY4ODB9.LoKQyK5TN_0kMJFVHWUW0uDAyoGjDP6Mkup4ps2VJN4" >> ${WORK_DIR}/test/conf/app.ini; \
@@ -71,7 +71,7 @@ test-instance:
 	echo "[server]" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "ROOT_URL = ${GITEA_SDK_TEST_URL}" >> ${WORK_DIR}/test/conf/app.ini; \
 	${WORK_DIR}/test/gitea-master migrate -c ${WORK_DIR}/test/conf/app.ini; \
-	${WORK_DIR}/test/gitea-master admin user create --username=${GITEA_SDK_TEST_USERNAME} --password=${GITEA_SDK_TEST_PASSWORD} --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c ${WORK_DIR}/test/conf/app.ini; \
+	${WORK_DIR}/test/gitea-master admin create-user --username=${GITEA_SDK_TEST_USERNAME} --password=${GITEA_SDK_TEST_PASSWORD} --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c ${WORK_DIR}/test/conf/app.ini; \
 	${WORK_DIR}/test/gitea-master web -c ${WORK_DIR}/test/conf/app.ini
 
 .PHONY: bench
