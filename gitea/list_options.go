@@ -26,7 +26,8 @@ func (o ListOptions) getURLQuery() url.Values {
 	return query
 }
 
-func (o ListOptions) setDefaults() {
+// setDefaults set default pagination options if none or wrong are set
+func (o *ListOptions) setDefaults() {
 	if o.Page < 1 {
 		o.Page = 1
 	}
