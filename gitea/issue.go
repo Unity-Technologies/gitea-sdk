@@ -42,10 +42,7 @@ type Issue struct {
 	Ref              string     `json:"ref"`
 	Labels           []*Label   `json:"labels"`
 	Milestone        *Milestone `json:"milestone"`
-	// deprecated
-	// TODO: rm on sdk 0.15.0
-	Assignee  *User   `json:"assignee"`
-	Assignees []*User `json:"assignees"`
+	Assignees        []*User    `json:"assignees"`
 	// Whether the issue is open or closed
 	State       StateType        `json:"state"`
 	IsLocked    bool             `json:"is_locked"`
@@ -178,12 +175,9 @@ func (c *Client) GetIssue(owner, repo string, index int64) (*Issue, *Response, e
 
 // CreateIssueOption options to create one issue
 type CreateIssueOption struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
-	Ref   string `json:"ref"`
-	// deprecated
-	// TODO: rm on sdk 0.15.0
-	Assignee  string     `json:"assignee"`
+	Title     string     `json:"title"`
+	Body      string     `json:"body"`
+	Ref       string     `json:"ref"`
 	Assignees []string   `json:"assignees"`
 	Deadline  *time.Time `json:"due_date"`
 	// milestone id
@@ -222,12 +216,9 @@ func (c *Client) CreateIssue(owner, repo string, opt CreateIssueOption) (*Issue,
 
 // EditIssueOption options for editing an issue
 type EditIssueOption struct {
-	Title string  `json:"title"`
-	Body  *string `json:"body"`
-	Ref   *string `json:"ref"`
-	// deprecated
-	// TODO: rm on sdk 0.15.0
-	Assignee       *string    `json:"assignee"`
+	Title          string     `json:"title"`
+	Body           *string    `json:"body"`
+	Ref            *string    `json:"ref"`
 	Assignees      []string   `json:"assignees"`
 	Milestone      *int64     `json:"milestone"`
 	State          *StateType `json:"state"`
