@@ -157,6 +157,20 @@ func TestGetArchiveReader(t *testing.T) {
 	assert.EqualValues(t, nBytes, len(archive.Bytes()))
 }
 
+func TestGetRepoByID(t *testing.T) {
+	log.Println("== TestGetRepoByID ==")
+	c := newTestClient()
+	testrepo, _ := createTestRepo(t, "TestGetRepoByID", c)
+
+	repo, _, err := c.GetRepoByID(testrepo.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, repo)
+	assert.EqualValues(t, testrepo.ID, repo.ID)
+
+	_, err = c.DeleteRepo(repo.Owner.UserName, repo.Name)
+	assert.NoError(t, err)
+}
+
 // standard func to create a init repo for test routines
 func createTestRepo(t *testing.T, name string, c *Client) (*Repository, error) {
 	user, _, uErr := c.GetMyUserInfo()
