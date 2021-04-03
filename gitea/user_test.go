@@ -50,7 +50,7 @@ func TestUserSearch(t *testing.T) {
 	log.Println("== TestUserSearch ==")
 	c := newTestClient()
 
-	createTestUser(t, "tu1", c)
+	user := createTestUser(t, "tu1", c)
 	createTestUser(t, "eatIt_2", c)
 	createTestUser(t, "thirdIs3", c)
 	createTestUser(t, "advancedUser", c)
@@ -68,6 +68,10 @@ func TestUserSearch(t *testing.T) {
 	ul, _, err = c.SearchUsers(SearchUsersOption{KeyWord: "It"})
 	assert.NoError(t, err)
 	assert.Len(t, ul, 2)
+
+	ul, _, err = c.SearchUsers(SearchUsersOption{UID: user.ID})
+	assert.NoError(t, err)
+	assert.Len(t, ul, 1)
 }
 
 func TestUserFollow(t *testing.T) {

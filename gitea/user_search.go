@@ -7,6 +7,7 @@ package gitea
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 )
 
 type searchUsersResponse struct {
@@ -17,6 +18,7 @@ type searchUsersResponse struct {
 type SearchUsersOption struct {
 	ListOptions
 	KeyWord string
+	UID     int64
 }
 
 // QueryEncode turns options into querystring argument
@@ -30,6 +32,9 @@ func (opt *SearchUsersOption) QueryEncode() string {
 	}
 	if len(opt.KeyWord) > 0 {
 		query.Add("q", opt.KeyWord)
+	}
+	if opt.UID > 0 {
+		query.Add("uid", strconv.FormatInt(opt.UID, 10))
 	}
 	return query.Encode()
 }
