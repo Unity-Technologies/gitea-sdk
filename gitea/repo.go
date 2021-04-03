@@ -382,6 +382,13 @@ func (c *Client) GetRepo(owner, reponame string) (*Repository, *Response, error)
 	return repo, resp, err
 }
 
+// GetRepoByID returns information of a repository by a giver repository ID.
+func (c *Client) GetRepoByID(id int64) (*Repository, *Response, error) {
+	repo := new(Repository)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repositories/%d", id), nil, nil, repo)
+	return repo, resp, err
+}
+
 // EditRepoOption options when editing a repository's properties
 type EditRepoOption struct {
 	// name of the repository
