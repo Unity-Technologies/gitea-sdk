@@ -6,6 +6,8 @@ package gitea
 
 import (
 	"fmt"
+	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -43,4 +45,25 @@ func (c *Client) GetMyUserInfo() (*User, *Response, error) {
 	u := new(User)
 	resp, err := c.getParsedResponse("GET", "/user", nil, nil, u)
 	return u, resp, err
+}
+
+// GetUserByID returns user by a given user ID
+func (c *Client) GetUserByID(id int64) (*User, *Response, error) {
+	if id < 0 {
+		return nil, nil, fmt.Errorf("invalid user id %d", id)
+	}
+
+	query := make(url.Values)
+	query.Add("uid", strconv.FormatInt(id, 10))
+	users, resp, err := c.searchUsers(query.Encode())
+
+	if err != nil {
+		return nil, resp, err
+	}
+
+	if len(users) == 1 {
+		return users[0], resp, err
+	}
+
+	return nil, resp, fmt.Errorf("user not found with id %d", id)
 }
