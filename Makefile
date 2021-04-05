@@ -27,7 +27,7 @@ ifeq ($(UNAME_S),Linux)
   endif
 endif
 ifeq ($(UNAME_S),Darwin)
-  GITEA_DL := $(GITEA_DL)darwin-10.6-amd64
+  GITEA_DL := $(GITEA_DL)darwin-10.12-amd64
 endif
 
 .PHONY: all
