@@ -12,7 +12,7 @@ workspace:
 
 steps:
 - name: gitea
-  image: gitea/gitea:1.14.0-rc1
+  image: gitea/gitea:1.14
   detach: true
   commands:
   - mkdir -p /tmp/conf/
