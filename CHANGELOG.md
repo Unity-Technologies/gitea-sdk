@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.14.1](https://gitea.com/gitea/go-sdk/releases/tag/v0.14.1) - 2021-06-30
+
+* BUGFIXES
+  * Fix setDefaults (#508) (#510)
+
+
 ## [v0.14.0](https://gitea.com/gitea/go-sdk/releases/tag/v0.14.0) - 2021-03-21
 
 * BREAKING
