@@ -8,6 +8,7 @@ package gitea
 type GlobalUISettings struct {
 	DefaultTheme     string   `json:"default_theme"`
 	AllowedReactions []string `json:"allowed_reactions"`
+	CustomEmojis     []string `json:"custom_emojis"`
 }
 
 // GlobalRepoSettings represent the global repository settings of a gitea instance witch is exposed by API
