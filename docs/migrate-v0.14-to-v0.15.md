@@ -12,6 +12,7 @@ Just follow this guid and if you still encounter problems, ask for help on disco
 ## Changed Struct Fields
 
  - the `State` field at **NotificationSubject** changed from **StateType** to **NotifySubjectState**, it also contains `"open"`, `"closed"` and add `"merged"`
+ - `Type` field at **CreateHookOption** now use HookType instead of pure string
 
 Pulls:
 -   [#520 Introduce NotifySubjectState](https://gitea.com/gitea/go-sdk/pulls/520)
