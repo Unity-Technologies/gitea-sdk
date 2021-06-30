@@ -63,6 +63,14 @@ type ListIssueOption struct {
 	Labels     []string
 	Milestones []string
 	KeyWord    string
+	Since      time.Time
+	Before     time.Time
+	// filter by created by username
+	CreatedBy string
+	// filter by assigned to username
+	AssignedBy string
+	// filter by username mentioned
+	MentionedBy string
 }
 
 // StateType issue state type
@@ -109,6 +117,23 @@ func (opt *ListIssueOption) QueryEncode() string {
 
 	if len(opt.Milestones) > 0 {
 		query.Add("milestones", strings.Join(opt.Milestones, ","))
+	}
+
+	if !opt.Since.IsZero() {
+		query.Add("since", opt.Since.Format(time.RFC3339))
+	}
+	if !opt.Before.IsZero() {
+		query.Add("before", opt.Before.Format(time.RFC3339))
+	}
+
+	if len(opt.CreatedBy) > 0 {
+		query.Add("created_by", opt.CreatedBy)
+	}
+	if len(opt.AssignedBy) > 0 {
+		query.Add("assigned_by", opt.AssignedBy)
+	}
+	if len(opt.MentionedBy) > 0 {
+		query.Add("mentioned_by", opt.MentionedBy)
 	}
 
 	return query.Encode()
