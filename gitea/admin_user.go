@@ -26,14 +26,15 @@ func (c *Client) AdminListUsers(opt AdminListUsersOptions) ([]*User, *Response, 
 
 // CreateUserOption create user options
 type CreateUserOption struct {
-	SourceID           int64  `json:"source_id"`
-	LoginName          string `json:"login_name"`
-	Username           string `json:"username"`
-	FullName           string `json:"full_name"`
-	Email              string `json:"email"`
-	Password           string `json:"password"`
-	MustChangePassword *bool  `json:"must_change_password"`
-	SendNotify         bool   `json:"send_notify"`
+	SourceID           int64        `json:"source_id"`
+	LoginName          string       `json:"login_name"`
+	Username           string       `json:"username"`
+	FullName           string       `json:"full_name"`
+	Email              string       `json:"email"`
+	Password           string       `json:"password"`
+	MustChangePassword *bool        `json:"must_change_password"`
+	SendNotify         bool         `json:"send_notify"`
+	Visibility         *VisibleType `json:"visibility"`
 }
 
 // Validate the CreateUserOption struct
