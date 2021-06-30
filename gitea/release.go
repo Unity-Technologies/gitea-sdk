@@ -35,6 +35,22 @@ type Release struct {
 // ListReleasesOptions options for listing repository's releases
 type ListReleasesOptions struct {
 	ListOptions
+	IsDraft      *bool
+	IsPreRelease *bool
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListReleasesOptions) QueryEncode() string {
+	query := opt.getURLQuery()
+
+	if opt.IsDraft != nil {
+		query.Add("draft", fmt.Sprintf("%t", *opt.IsDraft))
+	}
+	if opt.IsPreRelease != nil {
+		query.Add("draft", fmt.Sprintf("%t", *opt.IsPreRelease))
+	}
+
+	return query.Encode()
 }
 
 // ListReleases list releases of a repository
@@ -45,7 +61,7 @@ func (c *Client) ListReleases(owner, repo string, opt ListReleasesOptions) ([]*R
 	opt.setDefaults()
 	releases := make([]*Release, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET",
-		fmt.Sprintf("/repos/%s/%s/releases?%s", owner, repo, opt.getURLQuery().Encode()),
+		fmt.Sprintf("/repos/%s/%s/releases?%s", owner, repo, opt.QueryEncode()),
 		nil, nil, &releases)
 	return releases, resp, err
 }
