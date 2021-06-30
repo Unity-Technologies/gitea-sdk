@@ -25,9 +25,30 @@ type User struct {
 	// User locale
 	Language string `json:"language"`
 	// Is the user an administrator
-	IsAdmin   bool      `json:"is_admin"`
-	LastLogin time.Time `json:"last_login,omitempty"`
-	Created   time.Time `json:"created,omitempty"`
+	IsAdmin bool `json:"is_admin"`
+	// Date and Time of last login
+	LastLogin time.Time `json:"last_login"`
+	// Date and Time of user creation
+	Created time.Time `json:"created"`
+	// Is user restricted
+	Restricted bool `json:"restricted"`
+	// Is user active
+	IsActive bool `json:"active"`
+	// Is user login prohibited
+	ProhibitLogin bool `json:"prohibit_login"`
+	// the user's location
+	Location string `json:"location"`
+	// the user's website
+	Website string `json:"website"`
+	// the user's description
+	Description string `json:"description"`
+	// User visibility level option
+	Visibility VisibleType `json:"visibility"`
+
+	// user counts
+	FollowerCount    int `json:"followers_count"`
+	FollowingCount   int `json:"following_count"`
+	StarredRepoCount int `json:"starred_repos_count"`
 }
 
 // GetUserInfo get user info by user's name
