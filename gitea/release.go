@@ -184,7 +184,7 @@ func (c *Client) DeleteReleaseByTag(user, repo string, tag string) (*Response, e
 // fallbackGetReleaseByTag is fallback for old gitea installations ( < 1.13.0 )
 func (c *Client) fallbackGetReleaseByTag(owner, repo string, tag string) (*Release, *Response, error) {
 	for i := 1; ; i++ {
-		rl, resp, err := c.ListReleases(owner, repo, ListReleasesOptions{ListOptions{Page: i}})
+		rl, resp, err := c.ListReleases(owner, repo, ListReleasesOptions{ListOptions: ListOptions{Page: i}})
 		if err != nil {
 			return nil, resp, err
 		}
