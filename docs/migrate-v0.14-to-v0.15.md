@@ -5,14 +5,15 @@ Just follow this guid and if you still encounter problems, ask for help on disco
 
 <!-- toc -->
 
--   [Changed Struct Fields (#520)](#changed-struct-fields)
+-   [Changed Struct Fields (#503) (#520)](#changed-struct-fields)
 
 <!-- tocstop -->
 
 ## Changed Struct Fields
 
- - the `State` field at **NotificationSubject** changed from **StateType** to **NotifySubjectState**, it also contains `"open"`, `"closed"` and add `"merged"`
+ - The `State` field at **NotificationSubject** changed from **StateType** to **NotifySubjectState**, it also contains `"open"`, `"closed"` and add `"merged"`.
+ - In **Issue**, **CreateIssueOption** and **EditIssueOption** structs, `Assignee` got removed. Use `Assignees`.
 
 Pulls:
+-   [#503 Drop deprecations](https://gitea.com/gitea/go-sdk/pulls/503)
 -   [#520 Introduce NotifySubjectState](https://gitea.com/gitea/go-sdk/pulls/520)
-
