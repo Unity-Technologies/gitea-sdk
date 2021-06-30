@@ -11,7 +11,7 @@ Just follow this guid and if you still encounter problems, ask for help on disco
 
 ## Changed Struct Fields
 
- - the State field at **NotificationSubject** changed from **StateType** to **NotifySubjectState**, it also contains "open", "closed" and add "merged"
+ - the `State` field at **NotificationSubject** changed from **StateType** to **NotifySubjectState**, it also contains `"open"`, `"closed"` and add `"merged"`
 
 Pulls:
 -   [#520 Introduce NotifySubjectState](https://gitea.com/gitea/go-sdk/pulls/520)
