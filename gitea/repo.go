@@ -93,6 +93,7 @@ type Repository struct {
 	AvatarURL                 string           `json:"avatar_url"`
 	Internal                  bool             `json:"internal"`
 	MirrorInterval            string           `json:"mirror_interval"`
+	DefaultMergeStyle         MergeStyle       `json:"default_merge_style"`
 }
 
 // RepoType represent repo type
@@ -433,6 +434,13 @@ type EditRepoOption struct {
 	Archived *bool `json:"archived,omitempty"`
 	// set to a string like `8h30m0s` to set the mirror interval time
 	MirrorInterval *string `json:"mirror_interval,omitempty"`
+	// either `true` to allow mark pr as merged manually, or `false` to prevent it. `has_pull_requests` must be `true`.
+	AllowManualMerge *bool `json:"allow_manual_merge,omitempty"`
+	// either `true` to enable AutodetectManualMerge, or `false` to prevent it. `has_pull_requests` must be `true`, Note: In some special cases, misjudgments can occur.
+	AutodetectManualMerge *bool `json:"autodetect_manual_merge,omitempty"`
+	// set to a merge style to be used by this repository: "merge", "rebase", "rebase-merge", or "squash". `has_pull_requests` must be `true`.
+	DefaultMergeStyle *MergeStyle `json:"default_merge_style,omitempty"`
+	// set to `true` to archive this repository.
 }
 
 // EditRepo edit the properties of a repository

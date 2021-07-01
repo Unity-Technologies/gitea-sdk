@@ -13,6 +13,7 @@ Just follow this guid and if you still encounter problems, ask for help on disco
 
  - The `State` field at **NotificationSubject** changed from **StateType** to **NotifySubjectState**, it also contains `"open"`, `"closed"` and add `"merged"`.
  - In **Issue**, **CreateIssueOption** and **EditIssueOption** structs, `Assignee` got removed. Use `Assignees`.
+ - `Type` field at **CreateHookOption** now use **HookType** instead of pure string.
 
 Pulls:
 -   [#503 Drop deprecations](https://gitea.com/gitea/go-sdk/pulls/503)
