@@ -45,6 +45,7 @@ var (
 	version1_12_0, _ = version.NewVersion("1.12.0")
 	version1_13_0, _ = version.NewVersion("1.13.0")
 	version1_14_0, _ = version.NewVersion("1.14.0")
+	version1_15_0, _ = version.NewVersion("1.15.0")
 )
 
 // checkServerVersionGreaterThanOrEqual is internally used to speed up things and ignore issues with prerelease
