@@ -22,7 +22,7 @@ func TestMyUser(t *testing.T) {
 	assert.EqualValues(t, "test01@gitea.io", user.Email)
 	assert.EqualValues(t, "", user.FullName)
 	assert.EqualValues(t, getGiteaURL()+"/user/avatar/test01/-1", user.AvatarURL)
-	assert.Equal(t, true, user.IsAdmin)
+	assert.True(t, user.IsAdmin)
 }
 
 func TestUserApp(t *testing.T) {
