@@ -285,6 +285,24 @@ func (c *Client) GetPullRequestDiff(owner, repo string, index int64) ([]byte, *R
 	return c.getPullRequestDiffOrPatch(owner, repo, "diff", index)
 }
 
+// ListPullRequestCommitsOptions options for listing pull requests
+type ListPullRequestCommitsOptions struct {
+	ListOptions
+}
+
+// ListPullRequestCommits list commits for a pull request
+func (c *Client) ListPullRequestCommits(owner, repo string, index int64, opt ListPullRequestCommitsOptions) ([]*Commit, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls/%d/commits", owner, repo, index))
+	opt.setDefaults()
+	commits := make([]*Commit, 0, opt.PageSize)
+	link.RawQuery = opt.getURLQuery().Encode()
+	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &commits)
+	return commits, resp, err
+}
+
 // fixPullHeadSha is a workaround for https://github.com/go-gitea/gitea/issues/12675
 // When no head sha is available, this is because the branch got deleted in the base repo.
 // pr.Head.Ref points in this case not to the head repo branch name, but the base repo ref,
