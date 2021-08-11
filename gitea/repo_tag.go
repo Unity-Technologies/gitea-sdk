@@ -5,6 +5,8 @@
 package gitea
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -36,14 +38,6 @@ type AnnotatedTagObject struct {
 	SHA  string `json:"sha"`
 }
 
-// CreateTagOption options when creating a tag
-type CreateTagOption struct {
-	// required: true
-	TagName string `json:"tag_name" binding:"Required"`
-	Message string `json:"message"`
-	Target  string `json:"target"`
-}
-
 // ListRepoTagsOptions options for listing a repository's tags
 type ListRepoTagsOptions struct {
 	ListOptions
@@ -60,8 +54,59 @@ func (c *Client) ListRepoTags(user, repo string, opt ListRepoTagsOptions) ([]*Ta
 	return tags, resp, err
 }
 
+// GetTag get the tag of a repository
+func (c *Client) GetTag(user, repo, tag string) (*Tag, *Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo, &tag); err != nil {
+		return nil, nil, err
+	}
+	t := new(Tag)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/tags/%s", user, repo, tag), nil, nil, &t)
+	return t, resp, err
+}
+
+// GetAnnotatedTag get the tag object of an annotated tag (not lightweight tags) of a repository
+func (c *Client) GetAnnotatedTag(user, repo, sha string) (*AnnotatedTag, *Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo, &sha); err != nil {
+		return nil, nil, err
+	}
+	t := new(AnnotatedTag)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/git/tags/%s", user, repo, sha), nil, nil, &t)
+	return t, resp, err
+}
+
+// CreateTagOption options when creating a tag
+type CreateTagOption struct {
+	TagName string `json:"tag_name"`
+	Message string `json:"message"`
+	Target  string `json:"target"`
+}
+
+func (opt CreateTagOption) Validate() error {
+	if len(opt.TagName) == 0 {
+		return fmt.Errorf("TagName is required")
+	}
+	return nil
+}
+
+// CreateTag create a new git tag in a repository
+func (c *Client) CreateTag(user, repo string, opt CreateTagOption) (*Tag, *Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
+		return nil, nil, err
+	}
+	if err := opt.Validate(); err != nil {
+		return nil, nil, err
+	}
+	body, err := json.Marshal(opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	t := new(Tag)
+	resp, err := c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/tags", user, repo), jsonHeader, bytes.NewReader(body), &t)
+	return t, resp, err
+}
+
 // DeleteTag deletes a tag from a repository, if no release refers to it
-func (c *Client) DeleteTag(user, repo string, tag string) (*Response, error) {
+func (c *Client) DeleteTag(user, repo, tag string) (*Response, error) {
 	if err := escapeValidatePathSegments(&user, &repo, &tag); err != nil {
 		return nil, err
 	}
