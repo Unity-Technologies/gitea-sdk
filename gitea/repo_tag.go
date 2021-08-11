@@ -91,6 +91,7 @@ type CreateTagOption struct {
 	Target  string `json:"target"`
 }
 
+// Validate validates CreateTagOption
 func (opt CreateTagOption) Validate() error {
 	if len(opt.TagName) == 0 {
 		return fmt.Errorf("TagName is required")
