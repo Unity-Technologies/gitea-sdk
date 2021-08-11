@@ -45,7 +45,7 @@ func TestTags(t *testing.T) {
 	assert.EqualValues(t, cTag.Name, aTag.Tag)
 	assert.EqualValues(t, cTag.ID, aTag.SHA)
 	assert.EqualValues(t, fmt.Sprintf("%s/api/v1/repos/test01/TestTags/git/tags/%s", c.url, cTag.ID), aTag.URL)
-	assert.EqualValues(t, cTag.Message, aTag.Message)
+	assert.EqualValues(t, cTag.Message+"\n", aTag.Message)
 	assert.EqualValues(t, false, aTag.Verification.Verified)
 	assert.EqualValues(t, "commit", aTag.Object.Type)
 
