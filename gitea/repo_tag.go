@@ -57,6 +57,9 @@ func (c *Client) ListRepoTags(user, repo string, opt ListRepoTagsOptions) ([]*Ta
 
 // GetTag get the tag of a repository
 func (c *Client) GetTag(user, repo, tag string) (*Tag, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_15_0); err != nil {
+		return nil, nil, err
+	}
 	if err := escapeValidatePathSegments(&user, &repo, &tag); err != nil {
 		return nil, nil, err
 	}
@@ -67,6 +70,9 @@ func (c *Client) GetTag(user, repo, tag string) (*Tag, *Response, error) {
 
 // GetAnnotatedTag get the tag object of an annotated tag (not lightweight tags) of a repository
 func (c *Client) GetAnnotatedTag(user, repo, sha string) (*AnnotatedTag, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_15_0); err != nil {
+		return nil, nil, err
+	}
 	if err := escapeValidatePathSegments(&user, &repo, &sha); err != nil {
 		return nil, nil, err
 	}
@@ -94,6 +100,9 @@ func (opt CreateTagOption) Validate() error {
 
 // CreateTag create a new git tag in a repository
 func (c *Client) CreateTag(user, repo string, opt CreateTagOption) (*Tag, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_15_0); err != nil {
+		return nil, nil, err
+	}
 	if err := escapeValidatePathSegments(&user, &repo); err != nil {
 		return nil, nil, err
 	}
