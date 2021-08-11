@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // Tag represents a repository tag
@@ -71,6 +72,9 @@ func (c *Client) GetAnnotatedTag(user, repo, sha string) (*AnnotatedTag, *Respon
 	}
 	t := new(AnnotatedTag)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/git/tags/%s", user, repo, sha), nil, nil, &t)
+	if t != nil {
+		t.Message = strings.TrimSpace(t.Message)
+	}
 	return t, resp, err
 }
 
