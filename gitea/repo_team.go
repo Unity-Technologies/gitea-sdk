@@ -1,3 +1,7 @@
+// Copyright 2021 The Gitea Authors. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
 package gitea
 
 import (
@@ -5,8 +9,11 @@ import (
 	"net/http"
 )
 
-// GetTeamsOfRepo return teams from a repository
-func (c *Client) GetTeamsOfRepo(user, repo string) ([]*Team, *Response, error) {
+// GetRepoTeams return teams from a repository
+func (c *Client) GetRepoTeams(user, repo string) ([]*Team, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_15_0); err != nil {
+		return nil, nil, err
+	}
 	if err := escapeValidatePathSegments(&user, &repo); err != nil {
 		return nil, nil, err
 	}
@@ -15,8 +22,11 @@ func (c *Client) GetTeamsOfRepo(user, repo string) ([]*Team, *Response, error) {
 	return teams, resp, err
 }
 
-// AddTeamToRepo add a team to a repository
-func (c *Client) AddTeamToRepo(user, repo, team string) (*Response, error) {
+// AddRepoTeam add a team to a repository
+func (c *Client) AddRepoTeam(user, repo, team string) (*Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_15_0); err != nil {
+		return nil, err
+	}
 	if err := escapeValidatePathSegments(&user, &repo, &team); err != nil {
 		return nil, err
 	}
@@ -24,8 +34,11 @@ func (c *Client) AddTeamToRepo(user, repo, team string) (*Response, error) {
 	return resp, err
 }
 
-// RemoveTeamFromRepo delete a team from a repository
-func (c *Client) RemoveTeamFromRepo(user, repo, team string) (*Response, error) {
+// RemoveRepoTeam delete a team from a repository
+func (c *Client) RemoveRepoTeam(user, repo, team string) (*Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_15_0); err != nil {
+		return nil, err
+	}
 	if err := escapeValidatePathSegments(&user, &repo, &team); err != nil {
 		return nil, err
 	}
@@ -33,8 +46,12 @@ func (c *Client) RemoveTeamFromRepo(user, repo, team string) (*Response, error) 
 	return resp, err
 }
 
-// IsTeamAssignedToRepo return team if assigned to repo else nil
-func (c *Client) IsTeamAssignedToRepo(user, repo, team string) (*Team, *Response, error) {
+// CheckRepoTeam check if team is assigned to repo by name and return it.
+// If not assigned, it will return nil.
+func (c *Client) CheckRepoTeam(user, repo, team string) (*Team, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_15_0); err != nil {
+		return nil, nil, err
+	}
 	if err := escapeValidatePathSegments(&user, &repo, &team); err != nil {
 		return nil, nil, err
 	}
