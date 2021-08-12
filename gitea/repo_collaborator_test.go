@@ -17,7 +17,9 @@ func TestRepoCollaborator(t *testing.T) {
 
 	repo, _ := createTestRepo(t, "RepoCollaborators", c)
 	createTestUser(t, "ping", c)
+	createTestUser(t, "pong", c)
 	defer c.AdminDeleteUser("ping")
+	defer c.AdminDeleteUser("pong")
 
 	collaborators, _, err := c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)
@@ -28,21 +30,24 @@ func TestRepoCollaborator(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, 204, resp.StatusCode)
 
-	reviewers, _, err := c.GetReviewers(repo.Owner.UserName, repo.Name)
+	mode = AccessModeRead
+	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, "pong", AddCollaboratorOption{Permission: &mode})
 	assert.NoError(t, err)
-	if assert.Len(t, reviewers, 1) {
-		assert.EqualValues(t, "ping", reviewers[0].UserName)
-	}
-
-	assignees, _, err := c.GetAssignees(repo.Owner.UserName, repo.Name)
-	assert.NoError(t, err)
-	if assert.Len(t, assignees, 2) {
-		assert.EqualValues(t, "ping", assignees[0].UserName)
-	}
 
 	collaborators, _, err = c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)
-	assert.Len(t, collaborators, 1)
+	assert.Len(t, collaborators, 2)
+	assert.EqualValues(t, []string{"ping", "pong"}, userToStringSlice(collaborators))
+
+	reviewers, _, err := c.GetReviewers(repo.Owner.UserName, repo.Name)
+	assert.NoError(t, err)
+	assert.Len(t, reviewers, 2)
+	assert.EqualValues(t, []string{"ping", "pong"}, userToStringSlice(reviewers))
+
+	assignees, _, err := c.GetAssignees(repo.Owner.UserName, repo.Name)
+	assert.NoError(t, err)
+	assert.Len(t, assignees, 2)
+	assert.EqualValues(t, []string{"ping", "test01"}, userToStringSlice(assignees))
 
 	resp, err = c.DeleteCollaborator(repo.Owner.UserName, repo.Name, "ping")
 	assert.NoError(t, err)
@@ -50,5 +55,5 @@ func TestRepoCollaborator(t *testing.T) {
 
 	collaborators, _, err = c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)
-	assert.Len(t, collaborators, 0)
+	assert.Len(t, collaborators, 1)
 }
