@@ -1,9 +1,7 @@
 # Migration Guide: v0.11 to v0.12
 
-v0.12.0 introduces a number of breaking changes, throu it should not be hard to
-migrate.
-Just follow this guid and if issues still ocure ask for help on discord or
-feel free to create an issue.
+v0.12.0 introduces a number of breaking changes, through which it should not be difficult to migrate.
+Just follow this guid and if you still encounter problems, ask for help on discord or feel free to create an issue.
 
 <!-- toc -->
 

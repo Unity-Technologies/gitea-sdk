@@ -93,6 +93,7 @@ type Repository struct {
 	AvatarURL                 string           `json:"avatar_url"`
 	Internal                  bool             `json:"internal"`
 	MirrorInterval            string           `json:"mirror_interval"`
+	DefaultMergeStyle         MergeStyle       `json:"default_merge_style"`
 }
 
 // RepoType represent repo type
@@ -138,6 +139,9 @@ func (c *Client) ListMyRepos(opt ListReposOptions) ([]*Repository, *Response, er
 
 // ListUserRepos list all repositories of one user by user's name
 func (c *Client) ListUserRepos(user string, opt ListReposOptions) ([]*Repository, *Response, error) {
+	if err := escapeValidatePathSegments(&user); err != nil {
+		return nil, nil, err
+	}
 	opt.setDefaults()
 	repos := make([]*Repository, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/users/%s/repos?%s", user, opt.getURLQuery().Encode()), nil, nil, &repos)
@@ -151,6 +155,9 @@ type ListOrgReposOptions struct {
 
 // ListOrgRepos list all repositories of one organization by organization's name
 func (c *Client) ListOrgRepos(org string, opt ListOrgReposOptions) ([]*Repository, *Response, error) {
+	if err := escapeValidatePathSegments(&org); err != nil {
+		return nil, nil, err
+	}
 	opt.setDefaults()
 	repos := make([]*Repository, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/repos?%s", org, opt.getURLQuery().Encode()), nil, nil, &repos)
@@ -351,6 +358,9 @@ func (c *Client) CreateRepo(opt CreateRepoOption) (*Repository, *Response, error
 
 // CreateOrgRepo creates an organization repository for authenticated user.
 func (c *Client) CreateOrgRepo(org string, opt CreateRepoOption) (*Repository, *Response, error) {
+	if err := escapeValidatePathSegments(&org); err != nil {
+		return nil, nil, err
+	}
 	if err := opt.Validate(c); err != nil {
 		return nil, nil, err
 	}
@@ -365,8 +375,18 @@ func (c *Client) CreateOrgRepo(org string, opt CreateRepoOption) (*Repository, *
 
 // GetRepo returns information of a repository of given owner.
 func (c *Client) GetRepo(owner, reponame string) (*Repository, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &reponame); err != nil {
+		return nil, nil, err
+	}
 	repo := new(Repository)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s", owner, reponame), nil, nil, repo)
+	return repo, resp, err
+}
+
+// GetRepoByID returns information of a repository by a giver repository ID.
+func (c *Client) GetRepoByID(id int64) (*Repository, *Response, error) {
+	repo := new(Repository)
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/repositories/%d", id), nil, nil, repo)
 	return repo, resp, err
 }
 
@@ -414,10 +434,20 @@ type EditRepoOption struct {
 	Archived *bool `json:"archived,omitempty"`
 	// set to a string like `8h30m0s` to set the mirror interval time
 	MirrorInterval *string `json:"mirror_interval,omitempty"`
+	// either `true` to allow mark pr as merged manually, or `false` to prevent it. `has_pull_requests` must be `true`.
+	AllowManualMerge *bool `json:"allow_manual_merge,omitempty"`
+	// either `true` to enable AutodetectManualMerge, or `false` to prevent it. `has_pull_requests` must be `true`, Note: In some special cases, misjudgments can occur.
+	AutodetectManualMerge *bool `json:"autodetect_manual_merge,omitempty"`
+	// set to a merge style to be used by this repository: "merge", "rebase", "rebase-merge", or "squash". `has_pull_requests` must be `true`.
+	DefaultMergeStyle *MergeStyle `json:"default_merge_style,omitempty"`
+	// set to `true` to archive this repository.
 }
 
 // EditRepo edit the properties of a repository
 func (c *Client) EditRepo(owner, reponame string, opt EditRepoOption) (*Repository, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &reponame); err != nil {
+		return nil, nil, err
+	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return nil, nil, err
@@ -429,18 +459,27 @@ func (c *Client) EditRepo(owner, reponame string, opt EditRepoOption) (*Reposito
 
 // DeleteRepo deletes a repository of user or organization.
 func (c *Client) DeleteRepo(owner, repo string) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
 	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s", owner, repo), nil, nil)
 	return resp, err
 }
 
 // MirrorSync adds a mirrored repository to the mirror sync queue.
 func (c *Client) MirrorSync(owner, repo string) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
 	_, resp, err := c.getResponse("POST", fmt.Sprintf("/repos/%s/%s/mirror-sync", owner, repo), nil, nil)
 	return resp, err
 }
 
 // GetRepoLanguages return language stats of a repo
 func (c *Client) GetRepoLanguages(owner, repo string) (map[string]int64, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	langMap := make(map[string]int64)
 
 	data, resp, err := c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/languages", owner, repo), jsonHeader, nil)
@@ -466,7 +505,11 @@ const (
 // GetArchive get an archive of a repository by git reference
 // e.g.: ref -> master, 70b7c74b33, v1.2.1, ...
 func (c *Client) GetArchive(owner, repo, ref string, ext ArchiveType) ([]byte, *Response, error) {
-	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, url.PathEscape(ref), ext), nil, nil)
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	ref = pathEscapeSegments(ref)
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, ref, ext), nil, nil)
 }
 
 // GetArchiveReader gets a `git archive` for a particular tree-ish git reference
@@ -474,7 +517,11 @@ func (c *Client) GetArchive(owner, repo, ref string, ext ArchiveType) ([]byte, *
 // (`v1.2.1`). The archive is returned as a byte stream in a ReadCloser. It is
 // the responsibility of the client to close the reader.
 func (c *Client) GetArchiveReader(owner, repo, ref string, ext ArchiveType) (io.ReadCloser, *Response, error) {
-	resp, err := c.doRequest("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, url.PathEscape(ref), ext), nil, nil)
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	ref = pathEscapeSegments(ref)
+	resp, err := c.doRequest("GET", fmt.Sprintf("/repos/%s/%s/archive/%s%s", owner, repo, ref, ext), nil, nil)
 	if err != nil {
 		return nil, resp, err
 	}

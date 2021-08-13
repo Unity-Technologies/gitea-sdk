@@ -57,6 +57,7 @@ type PullReviewComment struct {
 	Body     string `json:"body"`
 	Reviewer *User  `json:"user"`
 	ReviewID int64  `json:"pull_request_review_id"`
+	Resolver *User  `json:"resolver"`
 
 	Created time.Time `json:"created_at"`
 	Updated time.Time `json:"updated_at"`
@@ -147,6 +148,9 @@ func (opt CreatePullReviewComment) Validate() error {
 
 // ListPullReviews lists all reviews of a pull request
 func (c *Client) ListPullReviews(owner, repo string, index int64, opt ListPullReviewsOptions) ([]*PullReview, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
@@ -162,6 +166,9 @@ func (c *Client) ListPullReviews(owner, repo string, index int64, opt ListPullRe
 
 // GetPullReview gets a specific review of a pull request
 func (c *Client) GetPullReview(owner, repo string, index, id int64) (*PullReview, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
@@ -173,6 +180,9 @@ func (c *Client) GetPullReview(owner, repo string, index, id int64) (*PullReview
 
 // ListPullReviewComments lists all comments of a pull request review
 func (c *Client) ListPullReviewComments(owner, repo string, index, id int64) ([]*PullReviewComment, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
@@ -185,6 +195,9 @@ func (c *Client) ListPullReviewComments(owner, repo string, index, id int64) ([]
 
 // DeletePullReview delete a specific review from a pull request
 func (c *Client) DeletePullReview(owner, repo string, index, id int64) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, err
 	}
@@ -195,6 +208,9 @@ func (c *Client) DeletePullReview(owner, repo string, index, id int64) (*Respons
 
 // CreatePullReview create a review to an pull request
 func (c *Client) CreatePullReview(owner, repo string, index int64, opt CreatePullReviewOptions) (*PullReview, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
@@ -215,6 +231,9 @@ func (c *Client) CreatePullReview(owner, repo string, index int64, opt CreatePul
 
 // SubmitPullReview submit a pending review to an pull request
 func (c *Client) SubmitPullReview(owner, repo string, index, id int64, opt SubmitPullReviewOptions) (*PullReview, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
 	}
@@ -235,6 +254,9 @@ func (c *Client) SubmitPullReview(owner, repo string, index, id int64, opt Submi
 
 // CreateReviewRequests create review requests to an pull request
 func (c *Client) CreateReviewRequests(owner, repo string, index int64, opt PullReviewRequestOptions) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_14_0); err != nil {
 		return nil, err
 	}
@@ -251,6 +273,9 @@ func (c *Client) CreateReviewRequests(owner, repo string, index int64, opt PullR
 
 // DeleteReviewRequests delete review requests to an pull request
 func (c *Client) DeleteReviewRequests(owner, repo string, index int64, opt PullReviewRequestOptions) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_14_0); err != nil {
 		return nil, err
 	}
@@ -267,6 +292,9 @@ func (c *Client) DeleteReviewRequests(owner, repo string, index int64, opt PullR
 
 // DismissPullReview dismiss a review for a pull request
 func (c *Client) DismissPullReview(owner, repo string, index, id int64, opt DismissPullReviewOptions) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_14_0); err != nil {
 		return nil, err
 	}
@@ -283,6 +311,9 @@ func (c *Client) DismissPullReview(owner, repo string, index, id int64, opt Dism
 
 // UnDismissPullReview cancel to dismiss a review for a pull request
 func (c *Client) UnDismissPullReview(owner, repo string, index, id int64) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, err
+	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_14_0); err != nil {
 		return nil, err
 	}

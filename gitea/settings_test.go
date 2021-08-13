@@ -25,6 +25,7 @@ func TestGetGlobalSettings(t *testing.T) {
 	assert.EqualValues(t, &GlobalRepoSettings{
 		HTTPGitDisabled: false,
 		MirrorsDisabled: false,
+		LFSDisabled:     true,
 	}, repoSettings)
 
 	apiSettings, _, err := c.GetGlobalAPISettings()

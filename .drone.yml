@@ -35,7 +35,7 @@ steps:
 
 - name: testing
   pull: always
-  image: golang:1.14
+  image: golang:1.16
   environment:
     GOPROXY: "https://goproxy.cn"
     GO111MODULE: "on"

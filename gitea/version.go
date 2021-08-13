@@ -31,7 +31,10 @@ func (c *Client) CheckServerVersionConstraint(constraint string) error {
 		return err
 	}
 	if !check.Check(c.serverVersion) {
-		return fmt.Errorf("gitea server at %s does not satisfy version constraint %s", c.url, constraint)
+		c.mutex.RLock()
+		url := c.url
+		c.mutex.RUnlock()
+		return fmt.Errorf("gitea server at %s does not satisfy version constraint %s", url, constraint)
 	}
 	return nil
 }
@@ -42,6 +45,7 @@ var (
 	version1_12_0, _ = version.NewVersion("1.12.0")
 	version1_13_0, _ = version.NewVersion("1.13.0")
 	version1_14_0, _ = version.NewVersion("1.14.0")
+	version1_15_0, _ = version.NewVersion("1.15.0")
 )
 
 // checkServerVersionGreaterThanOrEqual is internally used to speed up things and ignore issues with prerelease
@@ -51,7 +55,10 @@ func (c *Client) checkServerVersionGreaterThanOrEqual(v *version.Version) error 
 	}
 
 	if !c.serverVersion.GreaterThanOrEqual(v) {
-		return fmt.Errorf("gitea server at %s is older than %s", c.url, v.Original())
+		c.mutex.RLock()
+		url := c.url
+		c.mutex.RUnlock()
+		return fmt.Errorf("gitea server at %s is older than %s", url, v.Original())
 	}
 	return nil
 }
