@@ -1,5 +1,25 @@
 # Changelog
 
+## [v0.15.0](https://gitea.com/gitea/go-sdk/releases/tag/v0.15.0) - 2021-08-13
+
+* BREAKING
+  * Introduce NotifySubjectState (#520)
+  * Drop deprecations (#503)
+* FEATURES
+  * Add Repo Team Management Functions (#537)
+  * Add CreateRepoFromTemplate (#536)
+  * Add GetReviewers & GetAssignees (#534)
+  * Add GetTag, GetAnnotatedTag & CreateTag (#533)
+  * Add GetUserSettings & UpdateUserSettings (#531)
+  * Add ListPullRequestCommits (#530)
+  * Add GetUserByID (#513)
+  * Add GetRepoByID (#511)
+* ENHANCEMENTS
+  * Update List Options (#527)
+  * Update Structs (#524)
+  * ListFunctions: option to disable pagination (#509)
+
+
 ## [v0.14.1](https://gitea.com/gitea/go-sdk/releases/tag/v0.14.1) - 2021-06-30
 
 * BUGFIXES
