@@ -5,6 +5,7 @@
 package gitea
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
@@ -18,30 +19,41 @@ func TestTags(t *testing.T) {
 	repo, _ := createTestRepo(t, "TestTags", c)
 
 	// Create Tags
-	createTestTag(t, c, repo, "tag1")
+	cTagMSG := "A tag message.\n\n:)"
+	cTag, resp, err := c.CreateTag(repo.Owner.UserName, repo.Name, CreateTagOption{
+		TagName: "tag1",
+		Message: cTagMSG,
+		Target:  "master",
+	})
+	assert.NoError(t, err)
+	assert.EqualValues(t, 201, resp.StatusCode)
+	assert.EqualValues(t, cTagMSG, cTag.Message)
+	assert.EqualValues(t, fmt.Sprintf("%s/test01/TestTags/archive/tag1.zip", c.url), cTag.ZipballURL)
 
 	tags, _, err := c.ListRepoTags(repo.Owner.UserName, repo.Name, ListRepoTagsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, tags, 1)
+	assert.EqualValues(t, cTag, tags[0])
+
+	// get tag
+	gTag, _, err := c.GetTag(repo.Owner.UserName, repo.Name, cTag.Name)
+	assert.NoError(t, err)
+	assert.EqualValues(t, cTag, gTag)
+
+	aTag, _, err := c.GetAnnotatedTag(repo.Owner.UserName, repo.Name, cTag.ID)
+	assert.NoError(t, err)
+	assert.EqualValues(t, cTag.Name, aTag.Tag)
+	assert.EqualValues(t, cTag.ID, aTag.SHA)
+	assert.EqualValues(t, fmt.Sprintf("%s/api/v1/repos/test01/TestTags/git/tags/%s", c.url, cTag.ID), aTag.URL)
+	assert.EqualValues(t, cTag.Message+"\n", aTag.Message)
+	assert.EqualValues(t, false, aTag.Verification.Verified)
+	assert.EqualValues(t, "commit", aTag.Object.Type)
 
 	// DeleteReleaseTag
-	resp, err := c.DeleteTag(repo.Owner.UserName, repo.Name, "tag1")
+	resp, err = c.DeleteTag(repo.Owner.UserName, repo.Name, "tag1")
 	assert.NoError(t, err)
 	assert.EqualValues(t, 204, resp.StatusCode)
 	tags, _, err = c.ListRepoTags(repo.Owner.UserName, repo.Name, ListRepoTagsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, tags, 0)
-}
-
-// createTestTag use create release api since there exist no api to create tag only
-// https://github.com/go-gitea/gitea/issues/14669
-func createTestTag(t *testing.T, c *Client, repo *Repository, name string) {
-	rel, _, err := c.CreateRelease(repo.Owner.UserName, repo.Name, CreateReleaseOption{
-		TagName: name,
-		Target:  "master",
-		Title:   "TMP Release",
-	})
-	assert.NoError(t, err)
-	_, err = c.DeleteRelease(repo.Owner.UserName, repo.Name, rel.ID)
-	assert.NoError(t, err)
 }
