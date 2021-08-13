@@ -206,3 +206,12 @@ func createTestUser(t *testing.T, username string, client *Client) *User {
 	assert.NoError(t, err)
 	return user
 }
+
+// userToStringSlice return string slice based on UserName of users
+func userToStringSlice(users []*User) []string {
+	result := make([]string, 0, len(users))
+	for i := range users {
+		result = append(result, users[i].UserName)
+	}
+	return result
+}
