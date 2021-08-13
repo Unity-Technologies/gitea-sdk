@@ -61,9 +61,9 @@ vet:
 	# Default vet
 	cd gitea && $(GO) vet $(PACKAGE)
 	# Custom vet
-	$(GO) get code.gitea.io/gitea-vet
-	$(GO) build code.gitea.io/gitea-vet
-	cd gitea && $(GO) vet -vettool=../gitea-vet $(PACKAGE)
+	cd gitea && $(GO) get code.gitea.io/gitea-vet
+	cd gitea && $(GO) build code.gitea.io/gitea-vet
+	cd gitea && $(GO) vet -vettool=gitea-vet $(PACKAGE)
 
 .PHONY: lint
 lint:
