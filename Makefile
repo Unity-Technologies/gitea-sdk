@@ -8,7 +8,7 @@ GITEA_SDK_TEST_PASSWORD ?= test01
 
 PACKAGE := code.gitea.io/sdk/gitea
 
-GITEA_DL := https://dl.gitea.io/gitea/master/gitea-master-
+GITEA_DL := https://dl.gitea.io/gitea/main/gitea-main-
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
   GITEA_DL := $(GITEA_DL)linux-
@@ -28,7 +28,7 @@ ifeq ($(UNAME_S),Linux)
   endif
 endif
 ifeq ($(UNAME_S),Darwin)
-  GITEA_DL := $(GITEA_DL)darwin-10.6-amd64
+  GITEA_DL := $(GITEA_DL)darwin-10.12-amd64
 endif
 
 .PHONY: all
@@ -87,8 +87,8 @@ test:
 test-instance:
 	rm -f -r ${WORK_DIR}/test 2> /dev/null; \
 	mkdir -p ${WORK_DIR}/test/conf/ ${WORK_DIR}/test/data/
-	wget ${GITEA_DL} -O ${WORK_DIR}/test/gitea-master; \
-	chmod +x ${WORK_DIR}/test/gitea-master; \
+	wget ${GITEA_DL} -O ${WORK_DIR}/test/gitea-main; \
+	chmod +x ${WORK_DIR}/test/gitea-main; \
 	echo "[security]" > ${WORK_DIR}/test/conf/app.ini; \
 	echo "INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1NTg4MzY4ODB9.LoKQyK5TN_0kMJFVHWUW0uDAyoGjDP6Mkup4ps2VJN4" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "INSTALL_LOCK   = true" >> ${WORK_DIR}/test/conf/app.ini; \
@@ -100,9 +100,9 @@ test-instance:
 	echo "ROOT = ${WORK_DIR}/test/data/" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "[server]" >> ${WORK_DIR}/test/conf/app.ini; \
 	echo "ROOT_URL = ${GITEA_SDK_TEST_URL}" >> ${WORK_DIR}/test/conf/app.ini; \
-	${WORK_DIR}/test/gitea-master migrate -c ${WORK_DIR}/test/conf/app.ini; \
-	${WORK_DIR}/test/gitea-master admin user create --username=${GITEA_SDK_TEST_USERNAME} --password=${GITEA_SDK_TEST_PASSWORD} --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c ${WORK_DIR}/test/conf/app.ini; \
-	${WORK_DIR}/test/gitea-master web -c ${WORK_DIR}/test/conf/app.ini
+	${WORK_DIR}/test/gitea-main migrate -c ${WORK_DIR}/test/conf/app.ini; \
+	${WORK_DIR}/test/gitea-main admin user create --username=${GITEA_SDK_TEST_USERNAME} --password=${GITEA_SDK_TEST_PASSWORD} --email=test01@gitea.io --admin=true --must-change-password=false --access-token -c ${WORK_DIR}/test/conf/app.ini; \
+	${WORK_DIR}/test/gitea-main web -c ${WORK_DIR}/test/conf/app.ini
 
 .PHONY: bench
 bench:

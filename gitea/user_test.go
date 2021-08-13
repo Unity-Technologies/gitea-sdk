@@ -22,7 +22,7 @@ func TestMyUser(t *testing.T) {
 	assert.EqualValues(t, "test01@gitea.io", user.Email)
 	assert.EqualValues(t, "", user.FullName)
 	assert.EqualValues(t, getGiteaURL()+"/user/avatar/test01/-1", user.AvatarURL)
-	assert.Equal(t, true, user.IsAdmin)
+	assert.True(t, user.IsAdmin)
 }
 
 func TestUserApp(t *testing.T) {
@@ -169,6 +169,32 @@ func TestUserEmail(t *testing.T) {
 	assert.Len(t, el, 2)
 	_, err = c.DeleteEmail(DeleteEmailOption{Emails: []string{mails[0]}})
 	assert.NoError(t, err)
+}
+
+func TestGetUserByID(t *testing.T) {
+	log.Println("== TestGetUserByID ==")
+	c := newTestClient()
+
+	user1 := createTestUser(t, "user1", c)
+	user2 := createTestUser(t, "user2", c)
+
+	r1, _, err := c.GetUserByID(user1.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, r1)
+	assert.Equal(t, user1.UserName, r1.UserName)
+
+	r2, _, err := c.GetUserByID(user2.ID)
+	assert.NoError(t, err)
+	assert.NotNil(t, r2)
+	assert.Equal(t, user2.UserName, r2.UserName)
+
+	r3, _, err := c.GetUserByID(42)
+	assert.Error(t, err)
+	assert.Nil(t, r3)
+
+	r4, _, err := c.GetUserByID(-1)
+	assert.Error(t, err)
+	assert.Nil(t, r4)
 }
 
 func createTestUser(t *testing.T, username string, client *Client) *User {

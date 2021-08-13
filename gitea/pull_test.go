@@ -58,10 +58,16 @@ func TestPull(t *testing.T) {
 
 	diff, _, err := c.GetPullRequestDiff(c.username, repoName, pullUpdateFile.Index)
 	assert.NoError(t, err)
-	assert.Len(t, diff, 1310)
+	assert.True(t, len(diff) > 1100 && len(diff) < 1300)
 	patch, _, err := c.GetPullRequestPatch(c.username, repoName, pullUpdateFile.Index)
 	assert.NoError(t, err)
 	assert.True(t, len(patch) > len(diff))
+
+	commits, _, err := c.ListPullRequestCommits(c.username, repoName, pullUpdateFile.Index, ListPullRequestCommitsOptions{})
+	assert.NoError(t, err)
+	if assert.Len(t, commits, 1) && assert.Len(t, commits[0].Files, 1) {
+		assert.EqualValues(t, "LICENSE", commits[0].Files[0].Filename)
+	}
 
 	// test Update pull
 	pr, _, err := c.GetPullRequest(user.UserName, repoName, pullUpdateFile.Index)

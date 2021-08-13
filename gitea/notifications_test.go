@@ -60,6 +60,8 @@ func TestNotifications(t *testing.T) {
 	for _, n := range nList {
 		assert.EqualValues(t, true, n.Unread)
 		assert.EqualValues(t, "Issue", n.Subject.Type)
+		assert.EqualValues(t, NotifySubjectOpen, nList[0].Subject.State)
+		assert.EqualValues(t, NotifySubjectOpen, nList[1].Subject.State)
 		if n.Subject.Title == "A Issue" {
 			assert.EqualValues(t, repoA.Name, n.Repository.Name)
 		} else if n.Subject.Title == "B Issue" {
@@ -104,8 +106,8 @@ func TestNotifications(t *testing.T) {
 	count, _, err = c.CheckNotifications()
 	assert.NoError(t, err)
 	assert.EqualValues(t, 1, count)
-	assert.Len(t, nList, 1)
-	if len(nList) > 0 {
+	if assert.Len(t, nList, 1) {
+		assert.EqualValues(t, NotifySubjectClosed, nList[0].Subject.State)
 		_, err = c.ReadNotification(nList[0].ID)
 		assert.NoError(t, err)
 	}
@@ -113,6 +115,7 @@ func TestNotifications(t *testing.T) {
 	c.sudo = ""
 	_, err = c.ReadNotifications(MarkNotificationOptions{})
 	assert.NoError(t, err)
+	_, _ = c.DeleteRepo("test01", "Reviews")
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusRead}})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 4)
@@ -123,5 +126,8 @@ func TestNotifications(t *testing.T) {
 	assert.NoError(t, err)
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusPinned, NotifyStatusUnread}})
 	assert.NoError(t, err)
-	assert.Len(t, nList, 2)
+	if assert.Len(t, nList, 2) {
+		assert.EqualValues(t, NotifySubjectClosed, nList[0].Subject.State)
+		assert.EqualValues(t, NotifySubjectClosed, nList[1].Subject.State)
+	}
 }

@@ -20,8 +20,6 @@ func TestPullReview(t *testing.T) {
 	if !success {
 		return
 	}
-	defer c.AdminDeleteUser(reviewer.UserName)
-	defer c.AdminDeleteUser(submitter.UserName)
 
 	// CreatePullReview
 	r1, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
@@ -64,9 +62,7 @@ func TestPullReview(t *testing.T) {
 	// ListPullReviews
 	c.SetSudo("")
 	rl, _, err := c.ListPullReviews(repo.Owner.UserName, repo.Name, pull.Index, ListPullReviewsOptions{})
-	if !assert.NoError(t, err) {
-		return
-	}
+	assert.NoError(t, err)
 	assert.Len(t, rl, 3)
 	for i := range rl {
 		assert.EqualValues(t, pull.HTMLURL, rl[i].HTMLPullURL)
@@ -89,7 +85,7 @@ func TestPullReview(t *testing.T) {
 
 	// SubmitPullReview
 	c.SetSudo("")
-	r4, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
+	r4, resp, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		Body: "...",
 		Comments: []CreatePullReviewComment{{
 			Path:       "WOW-file",
@@ -99,6 +95,7 @@ func TestPullReview(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err)
+	assert.NotNil(t, resp)
 	r5, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		Body: "...",
 		Comments: []CreatePullReviewComment{{
@@ -133,6 +130,55 @@ func TestPullReview(t *testing.T) {
 		}
 	}
 
+	r, _, err = c.GetPullReview(repo.Owner.UserName, repo.Name, pull.Index, r.ID)
+	assert.NoError(t, err)
+	assert.False(t, r.Dismissed)
+
+	// DismissPullReview
+	resp, err = c.DismissPullReview(repo.Owner.UserName, repo.Name, pull.Index, r.ID, DismissPullReviewOptions{Message: "stale"})
+	assert.NoError(t, err)
+	if assert.NotNil(t, resp) {
+		assert.EqualValues(t, 200, resp.StatusCode)
+	}
+	r, _, _ = c.GetPullReview(repo.Owner.UserName, repo.Name, pull.Index, r.ID)
+	assert.True(t, r.Dismissed)
+
+	// UnDismissPullReview
+	resp, err = c.UnDismissPullReview(repo.Owner.UserName, repo.Name, pull.Index, r.ID)
+	assert.NoError(t, err)
+	if assert.NotNil(t, resp) {
+		assert.EqualValues(t, 200, resp.StatusCode)
+	}
+	r, _, _ = c.GetPullReview(repo.Owner.UserName, repo.Name, pull.Index, r.ID)
+	assert.False(t, r.Dismissed)
+
+	rl, _, err = c.ListPullReviews(repo.Owner.UserName, repo.Name, pull.Index, ListPullReviewsOptions{})
+	assert.NoError(t, err)
+	assert.Len(t, rl, 3)
+
+	c.SetSudo(submitter.UserName)
+	resp, err = c.CreateReviewRequests(repo.Owner.UserName, repo.Name, pull.Index, PullReviewRequestOptions{Reviewers: []string{reviewer.UserName}})
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+
+	rl, _, _ = c.ListPullReviews(repo.Owner.UserName, repo.Name, pull.Index, ListPullReviewsOptions{})
+	if assert.Len(t, rl, 4) {
+		assert.EqualValues(t, ReviewStateRequestReview, rl[3].State)
+	}
+
+	c.SetSudo(reviewer.UserName)
+	resp, err = c.DeleteReviewRequests(repo.Owner.UserName, repo.Name, pull.Index, PullReviewRequestOptions{Reviewers: []string{reviewer.UserName}})
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+
+	rl, _, _ = c.ListPullReviews(repo.Owner.UserName, repo.Name, pull.Index, ListPullReviewsOptions{})
+	assert.Len(t, rl, 3)
+
+	c.SetSudo("")
+	_, err = c.AdminDeleteUser(reviewer.UserName)
+	assert.NoError(t, err)
+	_, err = c.AdminDeleteUser(submitter.UserName)
+	assert.NoError(t, err)
 }
 
 func preparePullReviewTest(t *testing.T, c *Client, repoName string) (*Repository, *PullRequest, *User, *User, bool) {
