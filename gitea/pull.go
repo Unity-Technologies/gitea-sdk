@@ -258,7 +258,7 @@ func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, *Re
 }
 
 // getPullRequestDiffOrPatch gets the patch or diff file as bytes for a PR
-func (c *Client) getPullRequestDiffOrPatch(owner, repo, kind string, index int64) ([]byte, *Response, error) {
+func (c *Client) getPullRequestDiffOrPatch(owner, repo, kind string, index int64, binary bool) ([]byte, *Response, error) {
 	if err := escapeValidatePathSegments(&owner, &repo, &kind); err != nil {
 		return nil, nil, err
 	}
@@ -270,19 +270,19 @@ func (c *Client) getPullRequestDiffOrPatch(owner, repo, kind string, index int64
 		if r.Private {
 			return nil, nil, err
 		}
-		return c.getWebResponse("GET", fmt.Sprintf("/%s/%s/pulls/%d.%s", owner, repo, index, kind), nil)
+		return c.getWebResponse("GET", fmt.Sprintf("/%s/%s/pulls/%d.%s?binary=%v", owner, repo, index, kind, binary), nil)
 	}
 	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/pulls/%d.%s", owner, repo, index, kind), nil, nil)
 }
 
-// GetPullRequestPatch gets the .patch file as bytes for a PR
+// GetPullRequestPatch gets the git patchset of a PR
 func (c *Client) GetPullRequestPatch(owner, repo string, index int64) ([]byte, *Response, error) {
-	return c.getPullRequestDiffOrPatch(owner, repo, "patch", index)
+	return c.getPullRequestDiffOrPatch(owner, repo, "patch", index, false)
 }
 
-// GetPullRequestDiff gets the .diff file as bytes for a PR
-func (c *Client) GetPullRequestDiff(owner, repo string, index int64) ([]byte, *Response, error) {
-	return c.getPullRequestDiffOrPatch(owner, repo, "diff", index)
+// GetPullRequestDiff gets the diff of a PR. For Gitea >= 1.16, you must set includeBinary to get an applicable diff
+func (c *Client) GetPullRequestDiff(owner, repo string, index int64, includeBinary bool) ([]byte, *Response, error) {
+	return c.getPullRequestDiffOrPatch(owner, repo, "diff", index, includeBinary)
 }
 
 // ListPullRequestCommitsOptions options for listing pull requests
