@@ -6,6 +6,7 @@
 package gitea
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -192,7 +193,9 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	c.mutex.RLock()
 	debug := c.debug
 	if debug {
-		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+"/api/v1"+path, header, body)
+		bs, _ := ioutil.ReadAll(body)
+		body = bytes.NewReader(bs)
+		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+"/api/v1"+path, header, string(bs))
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
 	if err != nil {
