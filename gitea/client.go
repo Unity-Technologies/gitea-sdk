@@ -193,9 +193,13 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	c.mutex.RLock()
 	debug := c.debug
 	if debug {
-		bs, _ := ioutil.ReadAll(body)
-		body = bytes.NewReader(bs)
-		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+"/api/v1"+path, header, string(bs))
+		var bodyStr string
+		if body != nil {
+			bs, _ := ioutil.ReadAll(body)
+			body = bytes.NewReader(bs)
+			bodyStr = string(bs)
+		}
+		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+"/api/v1"+path, header, bodyStr)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
 	if err != nil {
