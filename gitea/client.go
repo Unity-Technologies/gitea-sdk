@@ -30,17 +30,17 @@ func Version() string {
 
 // Client represents a thread-safe Gitea API client.
 type Client struct {
-	url         string
-	accessToken string
-	username    string
-	password    string
-	otp         string
-	sudo        string
-	debug       bool
-	client      *http.Client
-	ctx         context.Context
-	mutex       sync.RWMutex
-
+	url            string
+	accessToken    string
+	username       string
+	password       string
+	otp            string
+	sudo           string
+	debug          bool
+	httpsigner     *HTTPSign
+	client         *http.Client
+	ctx            context.Context
+	mutex          sync.RWMutex
 	serverVersion  *version.Version
 	getVersionOnce sync.Once
 	ignoreVersion  bool // only set by SetGiteaVersion so don't need a mutex lock
@@ -58,9 +58,10 @@ type ClientOption func(*Client) error
 // Usage of all gitea.Client methods is concurrency-safe.
 func NewClient(url string, options ...ClientOption) (*Client, error) {
 	client := &Client{
-		url:    strings.TrimSuffix(url, "/"),
-		client: &http.Client{},
-		ctx:    context.Background(),
+		url:        strings.TrimSuffix(url, "/"),
+		client:     &http.Client{},
+		httpsigner: NewHTTPSign(),
+		ctx:        context.Background(),
 	}
 	for _, opt := range options {
 		if err := opt(client); err != nil {
@@ -238,6 +239,13 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 
 	for k, v := range header {
 		req.Header[k] = v
+	}
+
+	if c.httpsigner != nil {
+		err = c.SignRequest(req)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := client.Do(req)
