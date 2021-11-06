@@ -17,11 +17,12 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// HTTPSign contains the signer used for signing requests
 type HTTPSign struct {
 	ssh.Signer
 }
 
-// NewHTTPSigner returns a new HTTPSigner
+// NewHTTPSign returns a new HTTPSign
 // For now this only works with a ssh agent.
 // It will try to find a valid certificate in the loaded keys and use it for signing.
 func NewHTTPSign() *HTTPSign {
@@ -51,7 +52,7 @@ func NewHTTPSign() *HTTPSign {
 
 // SignRequest signs a HTTP request
 func (c *Client) SignRequest(r *http.Request) error {
-	var contents []byte = nil
+	var contents []byte
 
 	headersToSign := []string{httpsig.RequestTarget, "(created)", "(expires)"}
 
