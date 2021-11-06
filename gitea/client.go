@@ -58,10 +58,9 @@ type ClientOption func(*Client) error
 // Usage of all gitea.Client methods is concurrency-safe.
 func NewClient(url string, options ...ClientOption) (*Client, error) {
 	client := &Client{
-		url:        strings.TrimSuffix(url, "/"),
-		client:     &http.Client{},
-		httpsigner: NewHTTPSign(),
-		ctx:        context.Background(),
+		url:    strings.TrimSuffix(url, "/"),
+		client: &http.Client{},
+		ctx:    context.Background(),
 	}
 	for _, opt := range options {
 		if err := opt(client); err != nil {
@@ -111,6 +110,15 @@ func SetBasicAuth(username, password string) ClientOption {
 	return func(client *Client) error {
 		client.SetBasicAuth(username, password)
 		return nil
+	}
+}
+
+// UseSSHCert is an option for NewClient to enable SSH certificate authentication via HTTPSign
+func UseSSHCert() func(client *Client) {
+	return func(client *Client) {
+		client.mutex.Lock()
+		client.httpsigner = NewHTTPSign()
+		client.mutex.Unlock()
 	}
 }
 
