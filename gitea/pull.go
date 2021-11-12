@@ -209,9 +209,12 @@ func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRe
 
 // MergePullRequestOption options when merging a pull request
 type MergePullRequestOption struct {
-	Style   MergeStyle `json:"Do"`
-	Title   string     `json:"MergeTitleField"`
-	Message string     `json:"MergeMessageField"`
+	Style                  MergeStyle `json:"Do"`
+	MergeCommitID          string     `json:"MergeCommitID"`
+	Title                  string     `json:"MergeTitleField"`
+	Message                string     `json:"MergeMessageField"`
+	DeleteBranchAfterMerge bool       `json:"delete_branch_after_merge"`
+	ForceMerge             bool       `json:"force_merge"`
 }
 
 // Validate the MergePullRequestOption struct
