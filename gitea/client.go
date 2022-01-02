@@ -30,16 +30,17 @@ func Version() string {
 
 // Client represents a thread-safe Gitea API client.
 type Client struct {
-	url            string
-	accessToken    string
-	username       string
-	password       string
-	otp            string
-	sudo           string
-	debug          bool
-	client         *http.Client
-	ctx            context.Context
-	mutex          sync.RWMutex
+	url         string
+	accessToken string
+	username    string
+	password    string
+	otp         string
+	sudo        string
+	debug       bool
+	client      *http.Client
+	ctx         context.Context
+	mutex       sync.RWMutex
+
 	serverVersion  *version.Version
 	getVersionOnce sync.Once
 }
