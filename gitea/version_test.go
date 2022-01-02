@@ -26,7 +26,7 @@ func TestVersion(t *testing.T) {
 	c.ignoreVersion = true
 	assert.NoError(t, c.checkServerVersionGreaterThanOrEqual(version1_15_0))
 
-	c, err = NewClient(getGiteaURL(), newTestClientAuth(), SetGiteaVersion("1.1.1"))
+	c, err = NewClient(getGiteaURL(), newTestClientAuth(), SetGiteaVersion("1.12.123"))
 	assert.NoError(t, err)
-	assert.NoError(t, c.CheckServerVersionConstraint("=1.1.1"))
+	assert.NoError(t, c.CheckServerVersionConstraint("=1.12.123"))
 }
