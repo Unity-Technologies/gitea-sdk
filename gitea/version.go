@@ -39,6 +39,21 @@ func (c *Client) CheckServerVersionConstraint(constraint string) error {
 	return nil
 }
 
+// SetGiteaVersion sets the Gitea version manually instead of querying it.
+// use "0.0.0" to skip all version checks
+func SetGiteaVersion(v string) ClientOptions {
+	if v == "0.0.0" {
+		return func(c *Client) error {
+			c.ignoreVersion = true
+			return nil
+		}
+	}
+	return func(c *Client) (err error) {
+		c.serverVersion, err = version.NewVersion(v)
+		return
+	}
+}
+
 // predefined versions only have to be parsed by library once
 var (
 	version1_11_0, _ = version.NewVersion("1.11.0")
@@ -50,6 +65,9 @@ var (
 
 // checkServerVersionGreaterThanOrEqual is internally used to speed up things and ignore issues with prerelease
 func (c *Client) checkServerVersionGreaterThanOrEqual(v *version.Version) error {
+	if c.ignoreVersion {
+		return nil
+	}
 	if err := c.loadServerVersion(); err != nil {
 		return err
 	}

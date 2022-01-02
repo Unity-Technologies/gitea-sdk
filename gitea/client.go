@@ -43,6 +43,7 @@ type Client struct {
 
 	serverVersion  *version.Version
 	getVersionOnce sync.Once
+	ignoreVersion  bool // only set by SetGiteaVersion so don't need a mutex lock
 }
 
 // Response represents the gitea response
