@@ -24,7 +24,7 @@ var jsonHeader = http.Header{"content-type": []string{"application/json"}}
 
 // Version return the library version
 func Version() string {
-	return "0.14.0"
+	return "0.15.1"
 }
 
 // Client represents a thread-safe Gitea API client.
