@@ -49,7 +49,10 @@ func SetGiteaVersion(v string) ClientOptions {
 		}
 	}
 	return func(c *Client) (err error) {
-		c.serverVersion, err = version.NewVersion(v)
+		c.getVersionOnce.Do(func() {
+			c.serverVersion, err = version.NewVersion(v)
+			return
+		})
 		return
 	}
 }
