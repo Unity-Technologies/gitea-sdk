@@ -49,16 +49,21 @@ type Response struct {
 	*http.Response
 }
 
+// ClientOptions are functions used to init a new client
+type ClientOptions func(*Client) error
+
 // NewClient initializes and returns a API client.
 // Usage of all gitea.Client methods is concurrency-safe.
-func NewClient(url string, options ...func(*Client)) (*Client, error) {
+func NewClient(url string, options ...ClientOptions) (*Client, error) {
 	client := &Client{
 		url:    strings.TrimSuffix(url, "/"),
 		client: &http.Client{},
 		ctx:    context.Background(),
 	}
 	for _, opt := range options {
-		opt(client)
+		if err := opt(client); err != nil {
+			return nil, err
+		}
 	}
 	if err := client.checkServerVersionGreaterThanOrEqual(version1_11_0); err != nil {
 		return nil, err
@@ -74,9 +79,10 @@ func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
 }
 
 // SetHTTPClient is an option for NewClient to set custom http client
-func SetHTTPClient(httpClient *http.Client) func(client *Client) {
-	return func(client *Client) {
+func SetHTTPClient(httpClient *http.Client) ClientOptions {
+	return func(client *Client) error {
 		client.SetHTTPClient(httpClient)
+		return nil
 	}
 }
 
@@ -88,18 +94,20 @@ func (c *Client) SetHTTPClient(client *http.Client) {
 }
 
 // SetToken is an option for NewClient to set token
-func SetToken(token string) func(client *Client) {
-	return func(client *Client) {
+func SetToken(token string) ClientOptions {
+	return func(client *Client) error {
 		client.mutex.Lock()
 		client.accessToken = token
 		client.mutex.Unlock()
+		return nil
 	}
 }
 
 // SetBasicAuth is an option for NewClient to set username and password
-func SetBasicAuth(username, password string) func(client *Client) {
-	return func(client *Client) {
+func SetBasicAuth(username, password string) ClientOptions {
+	return func(client *Client) error {
 		client.SetBasicAuth(username, password)
+		return nil
 	}
 }
 
@@ -111,9 +119,10 @@ func (c *Client) SetBasicAuth(username, password string) {
 }
 
 // SetOTP is an option for NewClient to set OTP for 2FA
-func SetOTP(otp string) func(client *Client) {
-	return func(client *Client) {
+func SetOTP(otp string) ClientOptions {
+	return func(client *Client) error {
 		client.SetOTP(otp)
+		return nil
 	}
 }
 
@@ -124,14 +133,15 @@ func (c *Client) SetOTP(otp string) {
 	c.mutex.Unlock()
 }
 
-// SetContext is an option for NewClient to set context
-func SetContext(ctx context.Context) func(client *Client) {
-	return func(client *Client) {
+// SetContext is an option for NewClient to set the default context
+func SetContext(ctx context.Context) ClientOptions {
+	return func(client *Client) error {
 		client.SetContext(ctx)
+		return nil
 	}
 }
 
-// SetContext set context witch is used for http requests
+// SetContext set default context witch is used for http requests
 func (c *Client) SetContext(ctx context.Context) {
 	c.mutex.Lock()
 	c.ctx = ctx
@@ -139,9 +149,10 @@ func (c *Client) SetContext(ctx context.Context) {
 }
 
 // SetSudo is an option for NewClient to set sudo header
-func SetSudo(sudo string) func(client *Client) {
-	return func(client *Client) {
+func SetSudo(sudo string) ClientOptions {
+	return func(client *Client) error {
 		client.SetSudo(sudo)
+		return nil
 	}
 }
 
@@ -153,11 +164,12 @@ func (c *Client) SetSudo(sudo string) {
 }
 
 // SetDebugMode is an option for NewClient to enable debug mode
-func SetDebugMode() func(client *Client) {
-	return func(client *Client) {
+func SetDebugMode() ClientOptions {
+	return func(client *Client) error {
 		client.mutex.Lock()
 		client.debug = true
 		client.mutex.Unlock()
+		return nil
 	}
 }
 
