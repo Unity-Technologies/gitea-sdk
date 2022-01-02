@@ -44,7 +44,7 @@ func newTestClient() *Client {
 	return c
 }
 
-func newTestClientAuth() ClientOptions {
+func newTestClientAuth() ClientOption {
 	token := getGiteaToken()
 	if token == "" {
 		return SetBasicAuth(getGiteaUsername(), getGiteaPassword())

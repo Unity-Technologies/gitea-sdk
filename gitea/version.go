@@ -41,7 +41,7 @@ func (c *Client) CheckServerVersionConstraint(constraint string) error {
 
 // SetGiteaVersion sets the Gitea version manually instead of querying it.
 // use "0.0.0" to skip all version checks
-func SetGiteaVersion(v string) ClientOptions {
+func SetGiteaVersion(v string) ClientOption {
 	if v == "0.0.0" {
 		return func(c *Client) error {
 			c.ignoreVersion = true

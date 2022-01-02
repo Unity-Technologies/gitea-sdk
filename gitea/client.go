@@ -51,12 +51,12 @@ type Response struct {
 	*http.Response
 }
 
-// ClientOptions are functions used to init a new client
-type ClientOptions func(*Client) error
+// ClientOption are functions used to init a new client
+type ClientOption func(*Client) error
 
 // NewClient initializes and returns a API client.
 // Usage of all gitea.Client methods is concurrency-safe.
-func NewClient(url string, options ...ClientOptions) (*Client, error) {
+func NewClient(url string, options ...ClientOption) (*Client, error) {
 	client := &Client{
 		url:    strings.TrimSuffix(url, "/"),
 		client: &http.Client{},
@@ -81,7 +81,7 @@ func NewClientWithHTTP(url string, httpClient *http.Client) *Client {
 }
 
 // SetHTTPClient is an option for NewClient to set custom http client
-func SetHTTPClient(httpClient *http.Client) ClientOptions {
+func SetHTTPClient(httpClient *http.Client) ClientOption {
 	return func(client *Client) error {
 		client.SetHTTPClient(httpClient)
 		return nil
@@ -96,7 +96,7 @@ func (c *Client) SetHTTPClient(client *http.Client) {
 }
 
 // SetToken is an option for NewClient to set token
-func SetToken(token string) ClientOptions {
+func SetToken(token string) ClientOption {
 	return func(client *Client) error {
 		client.mutex.Lock()
 		client.accessToken = token
@@ -106,7 +106,7 @@ func SetToken(token string) ClientOptions {
 }
 
 // SetBasicAuth is an option for NewClient to set username and password
-func SetBasicAuth(username, password string) ClientOptions {
+func SetBasicAuth(username, password string) ClientOption {
 	return func(client *Client) error {
 		client.SetBasicAuth(username, password)
 		return nil
@@ -121,7 +121,7 @@ func (c *Client) SetBasicAuth(username, password string) {
 }
 
 // SetOTP is an option for NewClient to set OTP for 2FA
-func SetOTP(otp string) ClientOptions {
+func SetOTP(otp string) ClientOption {
 	return func(client *Client) error {
 		client.SetOTP(otp)
 		return nil
@@ -136,7 +136,7 @@ func (c *Client) SetOTP(otp string) {
 }
 
 // SetContext is an option for NewClient to set the default context
-func SetContext(ctx context.Context) ClientOptions {
+func SetContext(ctx context.Context) ClientOption {
 	return func(client *Client) error {
 		client.SetContext(ctx)
 		return nil
@@ -151,7 +151,7 @@ func (c *Client) SetContext(ctx context.Context) {
 }
 
 // SetSudo is an option for NewClient to set sudo header
-func SetSudo(sudo string) ClientOptions {
+func SetSudo(sudo string) ClientOption {
 	return func(client *Client) error {
 		client.SetSudo(sudo)
 		return nil
@@ -166,7 +166,7 @@ func (c *Client) SetSudo(sudo string) {
 }
 
 // SetDebugMode is an option for NewClient to enable debug mode
-func SetDebugMode() ClientOptions {
+func SetDebugMode() ClientOption {
 	return func(client *Client) error {
 		client.mutex.Lock()
 		client.debug = true
