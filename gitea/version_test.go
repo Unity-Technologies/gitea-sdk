@@ -20,4 +20,9 @@ func TestVersion(t *testing.T) {
 
 	assert.NoError(t, c.checkServerVersionGreaterThanOrEqual(version1_11_0))
 	assert.Error(t, c.CheckServerVersionConstraint("< 1.11.0"))
+
+	c.serverVersion = version1_11_0
+	assert.Error(t, c.checkServerVersionGreaterThanOrEqual(version1_15_0))
+	c.ignoreVersion = true
+	assert.NoError(t, c.checkServerVersionGreaterThanOrEqual(version1_15_0))
 }
