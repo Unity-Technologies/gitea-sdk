@@ -18,6 +18,6 @@ func TestVersion(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, true, rawVersion != "")
 
-	assert.NoError(t, c.CheckServerVersionConstraint(">= 1.11.0"))
+	assert.NoError(t, c.checkServerVersionGreaterThanOrEqual(version1_11_0))
 	assert.Error(t, c.CheckServerVersionConstraint("< 1.11.0"))
 }
