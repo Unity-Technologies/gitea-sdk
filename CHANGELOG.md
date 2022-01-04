@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.15.1](https://gitea.com/gitea/go-sdk/releases/tag/v0.15.1) - 2022-01-04
+
+* FEATURES
+  * Add ignoreVersion & manuall version set option (#560) (#562)
+* BUGFIXES
+  * Fix version string for next release (#559)
+
+
 ## [v0.15.0](https://gitea.com/gitea/go-sdk/releases/tag/v0.15.0) - 2021-08-13
 
 * BREAKING
