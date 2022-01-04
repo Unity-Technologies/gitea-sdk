@@ -40,14 +40,16 @@ func enableRunGitea() bool {
 }
 
 func newTestClient() *Client {
+	c, _ := NewClient(getGiteaURL(), newTestClientAuth())
+	return c
+}
+
+func newTestClientAuth() ClientOption {
 	token := getGiteaToken()
 	if token == "" {
-		client := NewClientWithHTTP(getGiteaURL(), &http.Client{})
-		client.SetBasicAuth(getGiteaUsername(), getGiteaPassword())
-		return client
+		return SetBasicAuth(getGiteaUsername(), getGiteaPassword())
 	}
-	c, _ := NewClient(getGiteaURL(), SetToken(getGiteaToken()))
-	return c
+	return SetToken(getGiteaToken())
 }
 
 func giteaMasterPath() string {
