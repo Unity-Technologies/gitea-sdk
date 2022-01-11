@@ -12,6 +12,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/go-version"
 )
 
 // PRBranchInfo information about a branch
@@ -209,15 +211,20 @@ func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRe
 
 // MergePullRequestOption options when merging a pull request
 type MergePullRequestOption struct {
-	Style   MergeStyle `json:"Do"`
-	Title   string     `json:"MergeTitleField"`
-	Message string     `json:"MergeMessageField"`
+	Style                  MergeStyle `json:"Do"`
+	MergeCommitID          string     `json:"MergeCommitID"`
+	Title                  string     `json:"MergeTitleField"`
+	Message                string     `json:"MergeMessageField"`
+	DeleteBranchAfterMerge bool       `json:"delete_branch_after_merge"`
+	ForceMerge             bool       `json:"force_merge"`
 }
+
+var version1_11_5, _ = version.NewVersion("1.11.5")
 
 // Validate the MergePullRequestOption struct
 func (opt MergePullRequestOption) Validate(c *Client) error {
 	if opt.Style == MergeStyleSquash {
-		if err := c.CheckServerVersionConstraint(">=1.11.5"); err != nil {
+		if err := c.checkServerVersionGreaterThanOrEqual(version1_11_5); err != nil {
 			return err
 		}
 	}
