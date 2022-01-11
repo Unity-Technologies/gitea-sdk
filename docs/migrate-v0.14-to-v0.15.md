@@ -1,7 +1,7 @@
 # Migration Guide: v0.14 to v0.15
 
-v0.15.0 introduces a number of api changes, through which it should not be difficult to migrate.
-Just follow this guid and if you still encounter problems, ask for help on discord or feel free to create an issue.
+v0.15.0 introduces a number of API changes, which should be simple to migrate.
+Just follow this guide and if you still encounter problems, ask for help on Discord or feel free to create an issue.
 
 <!-- toc -->
 
