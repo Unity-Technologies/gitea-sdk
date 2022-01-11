@@ -270,6 +270,7 @@ type PullRequestDiffOptions struct {
 	Binary bool
 }
 
+// QueryEncode converts the options to a query string
 func (o PullRequestDiffOptions) QueryEncode() string {
 	query := make(url.Values)
 	query.Add("binary", fmt.Sprintf("%v", o.Binary))
