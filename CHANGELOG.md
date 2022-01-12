@@ -1,6 +1,14 @@
 # Changelog
 
-## [v0.15.0](https://gitea.com/gitea/go-sdk/releases/tag/v0.15.0) - 2021-08-13
+## [v0.15.1](https://gitea.com/gitea/go-sdk/releases/tag/gitea/v0.15.1) - 2022-01-04
+
+* FEATURES
+  * Add ignoreVersion & manuall version set option (#560) (#562)
+* BUGFIXES
+  * Fix version string for next release (#559)
+
+
+## [v0.15.0](https://gitea.com/gitea/go-sdk/releases/tag/gitea/v0.15.0) - 2021-08-13
 
 * BREAKING
   * Introduce NotifySubjectState (#520)
@@ -20,13 +28,13 @@
   * ListFunctions: option to disable pagination (#509)
 
 
-## [v0.14.1](https://gitea.com/gitea/go-sdk/releases/tag/v0.14.1) - 2021-06-30
+## [v0.14.1](https://gitea.com/gitea/go-sdk/releases/tag/gitea/v0.14.1) - 2021-06-30
 
 * BUGFIXES
   * Fix setDefaults (#508) (#510)
 
 
-## [v0.14.0](https://gitea.com/gitea/go-sdk/releases/tag/v0.14.0) - 2021-03-21
+## [v0.14.0](https://gitea.com/gitea/go-sdk/releases/tag/gitea/v0.14.0) - 2021-03-21
 
 * BREAKING
   * Update Structs (#486)
@@ -64,7 +72,7 @@
   * Improve PullReview docs (#469)
 
 
-## [v0.13.3](https://gitea.com/gitea/go-sdk/releases/tag/v0.13.3) - 2021-03-22
+## [v0.13.3](https://gitea.com/gitea/go-sdk/releases/tag/gitea/v0.13.3) - 2021-03-22
 
 * BUGFIXES
   * Fix GetCombinedStatus() (#470) (#472)
