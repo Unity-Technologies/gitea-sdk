@@ -93,6 +93,7 @@ type Repository struct {
 	AvatarURL                 string           `json:"avatar_url"`
 	Internal                  bool             `json:"internal"`
 	MirrorInterval            string           `json:"mirror_interval"`
+	MirrorUpdated             time.Time        `json:"mirror_updated,omitempty"`
 	DefaultMergeStyle         MergeStyle       `json:"default_merge_style"`
 }
 
