@@ -9,9 +9,6 @@ import (
 	"net/url"
 )
 
-const defaultPageSize = 10
-const maxPageSize = 50
-
 // ListOptions options for using Gitea's API pagination
 type ListOptions struct {
 	Page     int
@@ -34,9 +31,5 @@ func (o *ListOptions) setDefaults() {
 		return
 	} else if o.Page == 0 {
 		o.Page = 1
-	}
-
-	if o.PageSize < 0 || o.PageSize > maxPageSize {
-		o.PageSize = defaultPageSize
 	}
 }
