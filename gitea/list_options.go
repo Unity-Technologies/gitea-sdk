@@ -27,8 +27,8 @@ func (o ListOptions) getURLQuery() url.Values {
 	return query
 }
 
-// setDefaults set default pagination options if none or wrong are set
-// if .Page -1 is set to -1, it will disable pagination
+// setDefaults applies default pagination options.
+// If .Page is set to -1, it will disable pagination.
 // WARNING: This function is not idempotent, make sure to never call this method twice!
 func (o *ListOptions) setDefaults() {
 	if o.Page < 0 {
