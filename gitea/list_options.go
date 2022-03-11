@@ -15,7 +15,7 @@ type ListOptions struct {
 	// Page numbering starts at 1.
 	Page int
 	// The default value depends on the server config DEFAULT_PAGING_NUM
-	// The highest  valid value depends on the server config MAX_RESPONSE_ITEMS
+	// The highest valid value depends on the server config MAX_RESPONSE_ITEMS
 	PageSize int
 }
 
@@ -29,7 +29,7 @@ func (o ListOptions) getURLQuery() url.Values {
 
 // setDefaults set default pagination options if none or wrong are set
 // if .Page -1 is set to -1, it will disable pagination
-// WARNING: This function is not idempotent, ake sure to never call this method twice!
+// WARNING: This function is not idempotent, make sure to never call this method twice!
 func (o *ListOptions) setDefaults() {
 	if o.Page < 0 {
 		o.Page, o.PageSize = 0, 0
