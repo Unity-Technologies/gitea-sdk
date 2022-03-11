@@ -11,7 +11,11 @@ import (
 
 // ListOptions options for using Gitea's API pagination
 type ListOptions struct {
-	Page     int
+	// Setting Page to -1 disables pagination on endpoints that support it.
+	// Page numbering starts at 1.
+	Page int
+	// The default value depends on the server config DEFAULT_PAGING_NUM
+	// The highest  valid value depends on the server config MAX_RESPONSE_ITEMS
 	PageSize int
 }
 
@@ -24,7 +28,8 @@ func (o ListOptions) getURLQuery() url.Values {
 }
 
 // setDefaults set default pagination options if none or wrong are set
-// if you set -1 as page it will set all to 0
+// if .Page -1 is set to -1, it will disable pagination
+// WARNING: This function is not idempotent, ake sure to never call this method twice!
 func (o *ListOptions) setDefaults() {
 	if o.Page < 0 {
 		o.Page, o.PageSize = 0, 0
