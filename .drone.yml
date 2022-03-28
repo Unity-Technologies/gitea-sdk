@@ -14,7 +14,6 @@ steps:
 - name: gitea
   image: gitea/gitea:dev
   detach: true
-  user: git
   commands:
   - mkdir -p /tmp/conf/
   - mkdir -p /tmp/data/
@@ -23,7 +22,7 @@ steps:
   - echo "INSTALL_LOCK   = true" >> /tmp/conf/app.ini
   - echo "SECRET_KEY     = 2crAW4UANgvLipDS6U5obRcFosjSJHQANll6MNfX7P0G3se3fKcCwwK3szPyGcbo" >> /tmp/conf/app.ini
   - echo "PASSWORD_COMPLEXITY = off" >> /tmp/conf/app.ini
-  - echo "RUN_USER = git" >> /tmp/conf/app.ini
+  - echo "I_AM_BEING_UNSAFE_RUNNING_AS_ROOT = true" >> /tmp/conf/app.ini
   - echo "[database]" >> /tmp/conf/app.ini
   - echo "DB_TYPE = sqlite3" >> /tmp/conf/app.ini
   - echo "[repository]" >> /tmp/conf/app.ini
