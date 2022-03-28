@@ -51,6 +51,13 @@ func TestRelease(t *testing.T) {
 	r2, _, err = c.GetReleaseByTag(repo.Owner.UserName, repo.Name, r.TagName)
 	assert.NoError(t, err)
 	assert.EqualValues(t, r, r2)
+	// ListRelease without pre-releases
+	tr := true
+	rl, _, err = c.ListReleases(repo.Owner.UserName, repo.Name, ListReleasesOptions{
+		IsPreRelease: &tr,
+	})
+	assert.NoError(t, err)
+	assert.Len(t, rl, 0) // created release is a pre-release
 	// test fallback
 	r2, _, err = c.fallbackGetReleaseByTag(repo.Owner.UserName, repo.Name, r.TagName)
 	assert.NoError(t, err)

@@ -47,7 +47,7 @@ func (opt *ListReleasesOptions) QueryEncode() string {
 		query.Add("draft", fmt.Sprintf("%t", *opt.IsDraft))
 	}
 	if opt.IsPreRelease != nil {
-		query.Add("draft", fmt.Sprintf("%t", *opt.IsPreRelease))
+		query.Add("pre-release", fmt.Sprintf("%t", *opt.IsPreRelease))
 	}
 
 	return query.Encode()
