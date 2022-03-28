@@ -33,7 +33,7 @@ func TestUserSettings(t *testing.T) {
 	assert.NotNil(t, userConf)
 	assert.EqualValues(t, UserSettings{
 		FullName:     "Admin User on Test",
-		Theme:        "gitea",
+		Theme:        "auto",
 		Language:     "de_de",
 		HideEmail:    true,
 		HideActivity: false,

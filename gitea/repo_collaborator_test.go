@@ -42,7 +42,7 @@ func TestRepoCollaborator(t *testing.T) {
 	reviewers, _, err := c.GetReviewers(repo.Owner.UserName, repo.Name)
 	assert.NoError(t, err)
 	assert.Len(t, reviewers, 2)
-	assert.EqualValues(t, []string{"ping", "pong"}, userToStringSlice(reviewers))
+	assert.EqualValues(t, []string{"ping", "pong", "test01"}, userToStringSlice(reviewers))
 
 	assignees, _, err := c.GetAssignees(repo.Owner.UserName, repo.Name)
 	assert.NoError(t, err)

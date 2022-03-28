@@ -127,7 +127,7 @@ func TestNotifications(t *testing.T) {
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusPinned, NotifyStatusUnread}})
 	assert.NoError(t, err)
 	if assert.Len(t, nList, 2) {
-		assert.EqualValues(t, NotifySubjectClosed, nList[0].Subject.State)
-		assert.EqualValues(t, NotifySubjectClosed, nList[1].Subject.State)
+		assert.EqualValues(t, NotifySubjectOpen, nList[0].Subject.State)
+		assert.EqualValues(t, NotifySubjectOpen, nList[1].Subject.State)
 	}
 }
