@@ -37,7 +37,7 @@ steps:
   pull: always
   image: golang:1.16
   environment:
-    GOPROXY: "https://goproxy.cn"
+    GOPROXY: "https://goproxy.io"
     GO111MODULE: "on"
     HTTP_PROXY: ""
     GITEA_SDK_TEST_URL: "http://gitea:3000"
