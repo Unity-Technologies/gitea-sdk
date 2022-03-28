@@ -21,18 +21,19 @@ func TestRepoTransfer(t *testing.T) {
 	assert.NoError(t, err)
 
 	newRepo, _, err := c.TransferRepo(repo.Owner.UserName, repo.Name, TransferRepoOption{NewOwner: org.UserName})
-	assert.NoError(t, err)
+	assert.NoError(t, err) // admin transfer repository will execute immediately but not set as pendding.
 	assert.NotNil(t, newRepo)
+	assert.EqualValues(t, "ToMove", newRepo.Name)
 
 	repo, err = createTestRepo(t, "ToMove", c)
 	assert.NoError(t, err)
 	_, _, err = c.TransferRepo(repo.Owner.UserName, repo.Name, TransferRepoOption{NewOwner: org.UserName})
-	assert.Error(t, err)
+	assert.Error(t, err, err.Error()) // org.UserName/repo.Name has exist
 
 	_, err = c.DeleteRepo(repo.Owner.UserName, repo.Name)
 	assert.NoError(t, err)
 	_, err = c.DeleteRepo(newRepo.Owner.UserName, newRepo.Name)
-	assert.NoError(t, err)
+	assert.Error(t, err)
 	_, err = c.DeleteOrg(org.UserName)
 	assert.NoError(t, err)
 }
