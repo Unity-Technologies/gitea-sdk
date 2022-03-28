@@ -19,7 +19,7 @@ func TestUserSettings(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, userConf)
 	assert.EqualValues(t, UserSettings{
-		Theme:        "gitea",
+		Theme:        "auto",
 		HideEmail:    false,
 		HideActivity: false,
 	}, *userConf)
