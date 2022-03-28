@@ -57,7 +57,7 @@ func TestRelease(t *testing.T) {
 		IsPreRelease: &tr,
 	})
 	assert.NoError(t, err)
-	assert.Len(t, rl, 0) // created release is a pre-release
+	assert.Len(t, rl, 1) // created release is a pre-release
 	// test fallback
 	r2, _, err = c.fallbackGetReleaseByTag(repo.Owner.UserName, repo.Name, r.TagName)
 	assert.NoError(t, err)
