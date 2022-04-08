@@ -76,7 +76,7 @@ func (c *Client) GetTeam(id int64) (*Team, *Response, error) {
 	return t, resp, err
 }
 
-// SearcgTeamsOptions options for searching teams
+// SearchTeamsOptions options for searching teams.
 type SearchTeamsOptions struct {
 	ListOptions
 	Query              string
@@ -93,13 +93,14 @@ func (o SearchTeamsOptions) getURLQuery() url.Values {
 	return query
 }
 
+// TeamSearchResults is the JSON struct that is returned from Team search API.
 type TeamSearchResults struct {
 	OK    bool    `json:"ok"`
 	Error string  `json:"error"`
 	Data  []*Team `json:"data"`
 }
 
-// SearchOrgTeam search for teams in a org.
+// SearchOrgTeams search for teams in a org.
 func (c *Client) SearchOrgTeams(org string, opt *SearchTeamsOptions) ([]*Team, *Response, error) {
 	responseBody := TeamSearchResults{}
 	opt.setDefaults()
