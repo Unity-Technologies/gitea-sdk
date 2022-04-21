@@ -14,7 +14,7 @@ import (
 func TestRepoBranches(t *testing.T) {
 	log.Println("== TestRepoBranches ==")
 	c := newTestClient()
-	var repoName = "branches"
+	repoName := "branches"
 
 	repo := prepareBranchTest(t, c, repoName)
 	if repo == nil {
@@ -25,7 +25,7 @@ func TestRepoBranches(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, bl, 3)
 	assert.EqualValues(t, "feature", bl[0].Name)
-	assert.EqualValues(t, "master", bl[1].Name)
+	assert.EqualValues(t, "main", bl[1].Name)
 	assert.EqualValues(t, "update", bl[2].Name)
 
 	b, _, err := c.GetRepoBranch(repo.Owner.UserName, repo.Name, "update")
@@ -33,7 +33,7 @@ func TestRepoBranches(t *testing.T) {
 	assert.EqualValues(t, bl[2].Commit.ID, b.Commit.ID)
 	assert.EqualValues(t, bl[2].Commit.Added, b.Commit.Added)
 
-	s, _, err := c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "master")
+	s, _, err := c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "main")
 	assert.NoError(t, err)
 	assert.False(t, s)
 	s, _, err = c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "feature")
@@ -59,7 +59,7 @@ func TestRepoBranches(t *testing.T) {
 func TestRepoBranchProtection(t *testing.T) {
 	log.Println("== TestRepoBranchProtection ==")
 	c := newTestClient()
-	var repoName = "BranchProtection"
+	repoName := "BranchProtection"
 
 	repo := prepareBranchTest(t, c, repoName)
 	if repo == nil {
@@ -74,7 +74,7 @@ func TestRepoBranchProtection(t *testing.T) {
 
 	// CreateBranchProtection
 	bp, _, err := c.CreateBranchProtection(repo.Owner.UserName, repo.Name, CreateBranchProtectionOption{
-		BranchName:              "master",
+		BranchName:              "main",
 		EnablePush:              true,
 		EnablePushWhitelist:     true,
 		PushWhitelistUsernames:  []string{"test01"},
@@ -83,7 +83,7 @@ func TestRepoBranchProtection(t *testing.T) {
 		BlockOnOutdatedBranch:   true,
 	})
 	assert.NoError(t, err)
-	assert.EqualValues(t, "master", bp.BranchName)
+	assert.EqualValues(t, "main", bp.BranchName)
 	assert.EqualValues(t, false, bp.EnableStatusCheck)
 	assert.EqualValues(t, true, bp.EnablePush)
 	assert.EqualValues(t, true, bp.EnablePushWhitelist)
@@ -136,18 +136,18 @@ func prepareBranchTest(t *testing.T, c *Client, repoName string) *Repository {
 		return nil
 	}
 
-	masterLicence, _, err := c.GetContents(origRepo.Owner.UserName, origRepo.Name, "master", "README.md")
-	if !assert.NoError(t, err) || !assert.NotNil(t, masterLicence) {
+	mainLicense, _, err := c.GetContents(origRepo.Owner.UserName, origRepo.Name, "main", "README.md")
+	if !assert.NoError(t, err) || !assert.NotNil(t, mainLicense) {
 		return nil
 	}
 
 	updatedFile, _, err := c.UpdateFile(origRepo.Owner.UserName, origRepo.Name, "README.md", UpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "update it",
-			BranchName:    "master",
+			BranchName:    "main",
 			NewBranchName: "update",
 		},
-		SHA:     masterLicence.SHA,
+		SHA:     mainLicense.SHA,
 		Content: "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo=",
 	})
 	if !assert.NoError(t, err) || !assert.NotNil(t, updatedFile) {
@@ -158,7 +158,7 @@ func prepareBranchTest(t *testing.T, c *Client, repoName string) *Repository {
 		Content: "QSBuZXcgRmlsZQo=",
 		FileOptions: FileOptions{
 			Message:       "creat a new file",
-			BranchName:    "master",
+			BranchName:    "main",
 			NewBranchName: "feature",
 		},
 	})
