@@ -23,12 +23,12 @@ func TestTags(t *testing.T) {
 	cTag, resp, err := c.CreateTag(repo.Owner.UserName, repo.Name, CreateTagOption{
 		TagName: "tag1",
 		Message: cTagMSG,
-		Target:  "master",
+		Target:  "main",
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, 201, resp.StatusCode)
 	assert.EqualValues(t, cTagMSG, cTag.Message)
-	assert.EqualValues(t, fmt.Sprintf("%s/test01/TestTags/archive/tag1.zip", c.url), cTag.ZipballURL)
+	assert.EqualValues(t, fmt.Sprintf("%s/%s/TestTags/archive/tag1.zip", c.url, c.username), cTag.ZipballURL)
 
 	tags, _, err := c.ListRepoTags(repo.Owner.UserName, repo.Name, ListRepoTagsOptions{})
 	assert.NoError(t, err)
@@ -44,9 +44,8 @@ func TestTags(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, cTag.Name, aTag.Tag)
 	assert.EqualValues(t, cTag.ID, aTag.SHA)
-	assert.EqualValues(t, fmt.Sprintf("%s/api/v1/repos/test01/TestTags/git/tags/%s", c.url, cTag.ID), aTag.URL)
+	assert.EqualValues(t, fmt.Sprintf("%s/api/v1/repos/%s/TestTags/git/tags/%s", c.url, c.username, cTag.ID), aTag.URL)
 	assert.EqualValues(t, cTag.Message+"\n", aTag.Message)
-	assert.EqualValues(t, false, aTag.Verification.Verified)
 	assert.EqualValues(t, "commit", aTag.Object.Type)
 
 	// DeleteReleaseTag
