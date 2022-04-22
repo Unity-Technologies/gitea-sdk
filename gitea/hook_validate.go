@@ -19,8 +19,11 @@ func VerifyWebhookSignature(secret, expected string, payload []byte) (bool, erro
 	if _, err := hash.Write(payload); err != nil {
 		return false, err
 	}
-	hashSum := hex.EncodeToString(hash.Sum(nil))
-	return hashSum == expected, nil
+	expectedSum, err := hex.DecodeString(expected)
+	if err != nil {
+		return false, err
+	}
+	return hmac.Equal(hash.Sum(nil), expectedSum), nil
 }
 
 // VerifyWebhookSignatureMiddleware is a http.Handler for verifying X-Gitea-Signature on incoming webhooks
