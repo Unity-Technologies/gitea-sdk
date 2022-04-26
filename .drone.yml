@@ -13,6 +13,7 @@ workspace:
 steps:
 - name: gitea
   image: gitea/gitea:dev
+  pull: always
   detach: true
   commands:
   - mkdir -p /tmp/conf/
