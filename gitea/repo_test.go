@@ -20,7 +20,7 @@ func TestCreateRepo(t *testing.T) {
 	user, _, err := c.GetMyUserInfo()
 	assert.NoError(t, err)
 
-	var repoName = "test1"
+	repoName := "test1"
 	_, _, err = c.GetRepo(user.UserName, repoName)
 	if err != nil {
 		repo, _, err := c.CreateRepo(CreateRepoOption{
@@ -138,7 +138,7 @@ func TestGetArchive(t *testing.T) {
 	c := newTestClient()
 	repo, _ := createTestRepo(t, "ToDownload", c)
 	time.Sleep(time.Second / 2)
-	archive, _, err := c.GetArchive(repo.Owner.UserName, repo.Name, "master", ZipArchive)
+	archive, _, err := c.GetArchive(repo.Owner.UserName, repo.Name, "main", ZipArchive)
 	assert.NoError(t, err)
 	assert.True(t, len(archive) > 1500 && len(archive) < 1700)
 }
@@ -148,7 +148,7 @@ func TestGetArchiveReader(t *testing.T) {
 	c := newTestClient()
 	repo, _ := createTestRepo(t, "ToDownload", c)
 	time.Sleep(time.Second / 2)
-	r, _, err := c.GetArchiveReader(repo.Owner.UserName, repo.Name, "master", ZipArchive)
+	r, _, err := c.GetArchiveReader(repo.Owner.UserName, repo.Name, "main", ZipArchive)
 	assert.NoError(t, err)
 	defer r.Close()
 
@@ -177,11 +177,15 @@ func TestGetRepoByID(t *testing.T) {
 func createTestRepo(t *testing.T, name string, c *Client) (*Repository, error) {
 	user, _, uErr := c.GetMyUserInfo()
 	assert.NoError(t, uErr)
-	_, _, err := c.GetRepo(user.UserName, name)
-	if err == nil {
+	repo, _, err := c.GetRepo(user.UserName, name)
+	// We need to check that the received repo is not a
+	// redirected one, it could be the case that gitea redirect us
+	// to a new repo(because it e.g. was transferred or renamed).
+	if err == nil && repo.Owner.UserName == user.UserName {
 		_, _ = c.DeleteRepo(user.UserName, name)
 	}
-	repo, _, err := c.CreateRepo(CreateRepoOption{
+
+	repo, _, err = c.CreateRepo(CreateRepoOption{
 		Name:        name,
 		Description: "A test Repo: " + name,
 		AutoInit:    true,

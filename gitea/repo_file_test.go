@@ -21,7 +21,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, repo)
 
-	raw, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "master", "README.md")
+	raw, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "main", "README.md")
 	assert.NoError(t, err)
 	assert.EqualValues(t, "IyBDaGFuZ2VGaWxlcwoKQSB0ZXN0IFJlcG86IENoYW5nZUZpbGVz", base64.StdEncoding.EncodeToString(raw))
 
@@ -33,7 +33,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 		Content: "ZmlsZUEK",
 	})
 	assert.NoError(t, err)
-	raw, _, _ = c.GetFile(repo.Owner.UserName, repo.Name, "master", testFileName)
+	raw, _, _ = c.GetFile(repo.Owner.UserName, repo.Name, "main", testFileName)
 	assert.EqualValues(t, "ZmlsZUEK", base64.StdEncoding.EncodeToString(raw))
 
 	updatedFile, _, err := c.UpdateFile(repo.Owner.UserName, repo.Name, testFileName, UpdateFileOptions{
@@ -46,7 +46,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, updatedFile)
 
-	file, _, err := c.GetContents(repo.Owner.UserName, repo.Name, "master", testFileName)
+	file, _, err := c.GetContents(repo.Owner.UserName, repo.Name, "main", testFileName)
 	assert.NoError(t, err)
 	assert.EqualValues(t, updatedFile.Content.SHA, file.SHA)
 	assert.EqualValues(t, &updatedFile.Content.Content, &file.Content)
@@ -58,7 +58,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 		SHA: updatedFile.Content.SHA,
 	})
 	assert.NoError(t, err)
-	_, resp, err := c.GetFile(repo.Owner.UserName, repo.Name, "master", testFileName)
+	_, resp, err := c.GetFile(repo.Owner.UserName, repo.Name, "main", testFileName)
 	assert.Error(t, err)
 	assert.EqualValues(t, 404, resp.StatusCode)
 
@@ -69,7 +69,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	updatedFile, _, err = c.UpdateFile(repo.Owner.UserName, repo.Name, "LICENSE", UpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "Overwrite",
-			BranchName:    "master",
+			BranchName:    "main",
 			NewBranchName: "overwrite-a+/&licence",
 		},
 		SHA:     licence.SHA,
