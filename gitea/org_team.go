@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 )
 
 // Team represents a team in an organization
@@ -73,6 +74,44 @@ func (c *Client) GetTeam(id int64) (*Team, *Response, error) {
 	t := new(Team)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/teams/%d", id), nil, nil, t)
 	return t, resp, err
+}
+
+// SearchTeamsOptions options for searching teams.
+type SearchTeamsOptions struct {
+	ListOptions
+	Query              string
+	IncludeDescription bool
+}
+
+func (o SearchTeamsOptions) getURLQuery() url.Values {
+	query := make(url.Values)
+	query.Add("page", fmt.Sprintf("%d", o.Page))
+	query.Add("limit", fmt.Sprintf("%d", o.PageSize))
+	query.Add("q", o.Query)
+	query.Add("include_desc", fmt.Sprintf("%t", o.IncludeDescription))
+
+	return query
+}
+
+// TeamSearchResults is the JSON struct that is returned from Team search API.
+type TeamSearchResults struct {
+	OK    bool    `json:"ok"`
+	Error string  `json:"error"`
+	Data  []*Team `json:"data"`
+}
+
+// SearchOrgTeams search for teams in a org.
+func (c *Client) SearchOrgTeams(org string, opt *SearchTeamsOptions) ([]*Team, *Response, error) {
+	responseBody := TeamSearchResults{}
+	opt.setDefaults()
+	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/orgs/%s/teams/search?%s", org, opt.getURLQuery().Encode()), nil, nil, &responseBody)
+	if err != nil {
+		return nil, resp, err
+	}
+	if !responseBody.OK {
+		return nil, resp, fmt.Errorf("gitea error: %v", responseBody.Error)
+	}
+	return responseBody.Data, resp, err
 }
 
 // CreateTeamOption options for creating a team
