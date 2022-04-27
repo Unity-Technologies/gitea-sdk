@@ -65,6 +65,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	licence, _, err := c.GetContents(repo.Owner.UserName, repo.Name, "", "LICENSE")
 	assert.NoError(t, err)
 	licenceRaw, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "", "LICENSE")
+	assert.NoError(t, err)
 	testContent := "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo="
 	updatedFile, _, err = c.UpdateFile(repo.Owner.UserName, repo.Name, "LICENSE", UpdateFileOptions{
 		FileOptions: FileOptions{

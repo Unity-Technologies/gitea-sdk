@@ -74,6 +74,7 @@ func TestPull(t *testing.T) {
 	// test Update pull
 	pr, _, err := c.GetPullRequest(user.UserName, repoName, pullUpdateFile.Index)
 	assert.NoError(t, err)
+	assert.NotNil(t, pr)
 	assert.False(t, pullUpdateFile.HasMerged)
 	assert.True(t, pullUpdateFile.Mergeable)
 	merged, _, err := c.MergePullRequest(user.UserName, repoName, pullUpdateFile.Index, MergePullRequestOption{

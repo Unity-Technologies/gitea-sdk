@@ -200,7 +200,7 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	if debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return data, &Response{resp}, nil
+	return data, &Response{resp}, err
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
