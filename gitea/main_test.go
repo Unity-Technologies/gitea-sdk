@@ -82,7 +82,7 @@ func downGitea() (string, error) {
 			continue
 		}
 
-		if err = os.Chmod(f.Name(), 700); err != nil {
+		if err = os.Chmod(f.Name(), 0o700); err != nil {
 			return "", err
 		}
 
