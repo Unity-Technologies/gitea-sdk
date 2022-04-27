@@ -12,8 +12,6 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
-	"github.com/hashicorp/go-version"
 )
 
 // PRBranchInfo information about a branch
@@ -218,8 +216,6 @@ type MergePullRequestOption struct {
 	DeleteBranchAfterMerge bool       `json:"delete_branch_after_merge"`
 	ForceMerge             bool       `json:"force_merge"`
 }
-
-var version1_11_5 = version.Must(version.NewVersion("1.11.5"))
 
 // Validate the MergePullRequestOption struct
 func (opt MergePullRequestOption) Validate(c *Client) error {
