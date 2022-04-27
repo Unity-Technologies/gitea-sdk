@@ -35,7 +35,7 @@ func (c *Client) TransferRepo(owner, reponame string, opt TransferRepoOption) (*
 	return repo, resp, err
 }
 
-// AcceptTransferRepo accepts a repo transfer.
+// AcceptRepoTransfer accepts a repo transfer.
 func (c *Client) AcceptRepoTransfer(owner, reponame string) (*Repository, *Response, error) {
 	if err := escapeValidatePathSegments(&owner, &reponame); err != nil {
 		return nil, nil, err
