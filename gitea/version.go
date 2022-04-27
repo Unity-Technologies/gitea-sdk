@@ -12,7 +12,7 @@ import (
 
 // ServerVersion returns the version of the server
 func (c *Client) ServerVersion() (string, *Response, error) {
-	var v = struct {
+	v := struct {
 		Version string `json:"version"`
 	}{}
 	resp, err := c.getParsedResponse("GET", "/version", nil, nil, &v)
@@ -52,7 +52,6 @@ func SetGiteaVersion(v string) ClientOption {
 	return func(c *Client) (err error) {
 		c.getVersionOnce.Do(func() {
 			c.serverVersion, err = version.NewVersion(v)
-			return
 		})
 		return
 	}
