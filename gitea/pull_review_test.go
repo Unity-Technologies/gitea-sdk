@@ -192,7 +192,7 @@ func preparePullReviewTest(t *testing.T, c *Client, repoName string) (*Repositor
 
 	pullSubmitter := createTestUser(t, "pull_submitter", c)
 	write := AccessModeWrite
-	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, pullSubmitter.UserName, &AddCollaboratorOption{
+	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, pullSubmitter.UserName, AddCollaboratorOption{
 		Permission: &write,
 	})
 	assert.NoError(t, err)
@@ -224,7 +224,7 @@ func preparePullReviewTest(t *testing.T, c *Client, repoName string) (*Repositor
 
 	reviewer := createTestUser(t, "pull_reviewer", c)
 	admin := AccessModeAdmin
-	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, pullSubmitter.UserName, &AddCollaboratorOption{
+	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, pullSubmitter.UserName, AddCollaboratorOption{
 		Permission: &admin,
 	})
 	assert.NoError(t, err)
