@@ -12,9 +12,7 @@ import (
 	"github.com/hashicorp/go-version"
 )
 
-var (
-	version1_12_3, _ = version.NewVersion("1.12.3")
-)
+var version1_12_3 = version.Must(version.NewVersion("1.12.3"))
 
 // NotificationThread expose Notification on API
 type NotificationThread struct {

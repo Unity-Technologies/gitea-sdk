@@ -219,7 +219,7 @@ type MergePullRequestOption struct {
 	ForceMerge             bool       `json:"force_merge"`
 }
 
-var version1_11_5, _ = version.NewVersion("1.11.5")
+var version1_11_5 = version.Must(version.NewVersion("1.11.5"))
 
 // Validate the MergePullRequestOption struct
 func (opt MergePullRequestOption) Validate(c *Client) error {
@@ -256,7 +256,6 @@ func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, *Re
 		return false, nil, err
 	}
 	status, resp, err := c.getStatusCode("GET", fmt.Sprintf("/repos/%s/%s/pulls/%d/merge", owner, repo, index), nil, nil)
-
 	if err != nil {
 		return false, resp, err
 	}

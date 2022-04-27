@@ -101,7 +101,10 @@ func runGitea() (*os.Process, error) {
 
 	giteaDir := filepath.Dir(p)
 	cfgDir := filepath.Join(giteaDir, "custom", "conf")
-	os.MkdirAll(cfgDir, os.ModePerm)
+	err = os.MkdirAll(cfgDir, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
 	cfg, err := os.Create(filepath.Join(cfgDir, "app.ini"))
 	if err != nil {
 		log.Fatal(err)
@@ -150,7 +153,9 @@ func TestMain(m *testing.M) {
 			return
 		}
 		defer func() {
-			p.Kill()
+			if err := p.Kill(); err != nil {
+				log.Fatal(err)
+			}
 		}()
 	}
 	log.Printf("testing with %v, %v, %v\n", getGiteaURL(), getGiteaUsername(), getGiteaPassword())

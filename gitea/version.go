@@ -59,11 +59,11 @@ func SetGiteaVersion(v string) ClientOption {
 
 // predefined versions only have to be parsed by library once
 var (
-	version1_11_0, _ = version.NewVersion("1.11.0")
-	version1_12_0, _ = version.NewVersion("1.12.0")
-	version1_13_0, _ = version.NewVersion("1.13.0")
-	version1_14_0, _ = version.NewVersion("1.14.0")
-	version1_15_0, _ = version.NewVersion("1.15.0")
+	version1_11_0 = version.Must(version.NewVersion("1.11.0"))
+	version1_12_0 = version.Must(version.NewVersion("1.12.0"))
+	version1_13_0 = version.Must(version.NewVersion("1.13.0"))
+	version1_14_0 = version.Must(version.NewVersion("1.14.0"))
+	version1_15_0 = version.Must(version.NewVersion("1.15.0"))
 )
 
 // checkServerVersionGreaterThanOrEqual is the canonical way in the SDK to check for versions for API compatibility reasons

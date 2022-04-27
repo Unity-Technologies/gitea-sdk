@@ -287,7 +287,9 @@ func (c *Client) SearchRepos(opt SearchRepoOptions) ([]*Repository, *Response, e
 				// private repos only not supported on gitea <= 1.11.x
 				return nil, nil, err
 			}
-			link.Query().Add("private", "false")
+			newQuery := link.Query()
+			newQuery.Add("private", "false")
+			link.RawQuery = newQuery.Encode()
 		}
 	}
 

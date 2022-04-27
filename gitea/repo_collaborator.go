@@ -66,7 +66,7 @@ const (
 )
 
 // Validate the AddCollaboratorOption struct
-func (opt AddCollaboratorOption) Validate() error {
+func (opt *AddCollaboratorOption) Validate() error {
 	if opt.Permission != nil {
 		if *opt.Permission == AccessModeOwner {
 			*opt.Permission = AccessModeAdmin
@@ -84,14 +84,14 @@ func (opt AddCollaboratorOption) Validate() error {
 }
 
 // AddCollaborator add some user as a collaborator of a repository
-func (c *Client) AddCollaborator(user, repo, collaborator string, opt AddCollaboratorOption) (*Response, error) {
+func (c *Client) AddCollaborator(user, repo, collaborator string, opt *AddCollaboratorOption) (*Response, error) {
 	if err := escapeValidatePathSegments(&user, &repo, &collaborator); err != nil {
 		return nil, err
 	}
 	if err := opt.Validate(); err != nil {
 		return nil, err
 	}
-	body, err := json.Marshal(&opt)
+	body, err := json.Marshal(opt)
 	if err != nil {
 		return nil, err
 	}

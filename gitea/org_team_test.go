@@ -12,7 +12,7 @@ import (
 )
 
 func createTestOrgTeams(t *testing.T, c *Client, org, name string, accessMode AccessMode, units []RepoUnitType) (*Team, error) {
-	team, _, e := c.CreateTeam(org, CreateTeamOption{
+	team, _, e := c.CreateTeam(org, &CreateTeamOption{
 		Name:                    name,
 		Description:             name + "'s team desc",
 		Permission:              accessMode,

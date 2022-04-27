@@ -18,20 +18,24 @@ func TestRepoCollaborator(t *testing.T) {
 	repo, _ := createTestRepo(t, "RepoCollaborators", c)
 	createTestUser(t, "ping", c)
 	createTestUser(t, "pong", c)
-	defer c.AdminDeleteUser("ping")
-	defer c.AdminDeleteUser("pong")
+	defer func() {
+		_, err := c.AdminDeleteUser("ping")
+		assert.NoError(t, err)
+		_, err = c.AdminDeleteUser("pong")
+		assert.NoError(t, err)
+	}()
 
 	collaborators, _, err := c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, collaborators, 0)
 
 	mode := AccessModeAdmin
-	resp, err := c.AddCollaborator(repo.Owner.UserName, repo.Name, "ping", AddCollaboratorOption{Permission: &mode})
+	resp, err := c.AddCollaborator(repo.Owner.UserName, repo.Name, "ping", &AddCollaboratorOption{Permission: &mode})
 	assert.NoError(t, err)
 	assert.EqualValues(t, 204, resp.StatusCode)
 
 	mode = AccessModeRead
-	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, "pong", AddCollaboratorOption{Permission: &mode})
+	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, "pong", &AddCollaboratorOption{Permission: &mode})
 	assert.NoError(t, err)
 
 	collaborators, _, err = c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
