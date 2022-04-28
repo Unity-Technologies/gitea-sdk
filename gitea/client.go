@@ -285,7 +285,6 @@ func statusCodeToErr(resp *Response) (body []byte, err error) {
 
 	// If no error message, at least give status and data
 	return data, fmt.Errorf("%s: %s", resp.Status, string(data))
-
 }
 
 func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {
