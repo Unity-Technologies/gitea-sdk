@@ -12,7 +12,7 @@ import (
 
 // ServerVersion returns the version of the server
 func (c *Client) ServerVersion() (string, *Response, error) {
-	var v = struct {
+	v := struct {
 		Version string `json:"version"`
 	}{}
 	resp, err := c.getParsedResponse("GET", "/version", nil, nil, &v)
@@ -65,6 +65,7 @@ var (
 	version1_13_0, _ = version.NewVersion("1.13.0")
 	version1_14_0, _ = version.NewVersion("1.14.0")
 	version1_15_0, _ = version.NewVersion("1.15.0")
+	version1_16_0, _ = version.NewVersion("1.16.0")
 )
 
 // checkServerVersionGreaterThanOrEqual is the canonical way in the SDK to check for versions for API compatibility reasons
