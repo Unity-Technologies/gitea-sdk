@@ -33,12 +33,12 @@ func TestPullReview(t *testing.T) {
 	}
 
 	c.SetSudo(submitter.UserName)
-	r2, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
+	_, _, err = c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		State: ReviewStateApproved,
 		Body:  "lgtm it myself",
 	})
 	assert.Error(t, err)
-	r2, _, err = c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
+	r2, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		State: ReviewStateComment,
 		Body:  "no seriously please have a look at it",
 	})

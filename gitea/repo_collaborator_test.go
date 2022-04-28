@@ -18,8 +18,12 @@ func TestRepoCollaborator(t *testing.T) {
 	repo, _ := createTestRepo(t, "RepoCollaborators", c)
 	createTestUser(t, "ping", c)
 	createTestUser(t, "pong", c)
-	defer c.AdminDeleteUser("ping")
-	defer c.AdminDeleteUser("pong")
+	defer func() {
+		_, err := c.AdminDeleteUser("ping")
+		assert.NoError(t, err)
+		_, err = c.AdminDeleteUser("pong")
+		assert.NoError(t, err)
+	}()
 
 	collaborators, _, err := c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)

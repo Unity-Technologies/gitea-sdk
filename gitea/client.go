@@ -199,7 +199,7 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	if debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return data, &Response{resp}, nil
+	return data, &Response{resp}, err
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
@@ -285,7 +285,6 @@ func statusCodeToErr(resp *Response) (body []byte, err error) {
 
 	// If no error message, at least give status and data
 	return data, fmt.Errorf("%s: %s", resp.Status, string(data))
-
 }
 
 func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {

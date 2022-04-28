@@ -125,7 +125,7 @@ type CreateTeamOption struct {
 }
 
 // Validate the CreateTeamOption struct
-func (opt CreateTeamOption) Validate() error {
+func (opt *CreateTeamOption) Validate() error {
 	if opt.Permission == AccessModeOwner {
 		opt.Permission = AccessModeAdmin
 	} else if opt.Permission != AccessModeRead && opt.Permission != AccessModeWrite && opt.Permission != AccessModeAdmin {
@@ -148,7 +148,7 @@ func (c *Client) CreateTeam(org string, opt CreateTeamOption) (*Team, *Response,
 	if err := escapeValidatePathSegments(&org); err != nil {
 		return nil, nil, err
 	}
-	if err := opt.Validate(); err != nil {
+	if err := (&opt).Validate(); err != nil {
 		return nil, nil, err
 	}
 	body, err := json.Marshal(&opt)
@@ -171,7 +171,7 @@ type EditTeamOption struct {
 }
 
 // Validate the EditTeamOption struct
-func (opt EditTeamOption) Validate() error {
+func (opt *EditTeamOption) Validate() error {
 	if opt.Permission == AccessModeOwner {
 		opt.Permission = AccessModeAdmin
 	} else if opt.Permission != AccessModeRead && opt.Permission != AccessModeWrite && opt.Permission != AccessModeAdmin {
@@ -191,7 +191,7 @@ func (opt EditTeamOption) Validate() error {
 
 // EditTeam edits a team of an organization
 func (c *Client) EditTeam(id int64, opt EditTeamOption) (*Response, error) {
-	if err := opt.Validate(); err != nil {
+	if err := (&opt).Validate(); err != nil {
 		return nil, err
 	}
 	body, err := json.Marshal(&opt)

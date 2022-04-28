@@ -83,7 +83,7 @@ func (c *Client) GetSingleCommit(user, repo, commitID string) (*Commit, *Respons
 // ListCommitOptions list commit options
 type ListCommitOptions struct {
 	ListOptions
-	//SHA or branch to start listing commits from (usually 'master')
+	// SHA or branch to start listing commits from (usually 'master')
 	SHA string
 }
 

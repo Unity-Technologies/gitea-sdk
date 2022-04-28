@@ -22,29 +22,29 @@ func TestRepoWatch(t *testing.T) {
 	repo2, _ := createTestRepo(t, "TestRepoWatch_2", c)
 	assert.NotEqual(t, repo1, repo2)
 
-	//GetWatchedRepos
+	// GetWatchedRepos
 	wl, _, err := c.GetWatchedRepos("test01")
 	assert.NoError(t, err)
 	assert.NotNil(t, wl)
 	maxcount := len(wl)
 
-	//GetMyWatchedRepos
+	// GetMyWatchedRepos
 	wl, _, err = c.GetMyWatchedRepos()
 	assert.NoError(t, err)
 	assert.Len(t, wl, maxcount)
 
-	//CheckRepoWatch
+	// CheckRepoWatch
 	isWatching, _, err := c.CheckRepoWatch(repo1.Owner.UserName, repo1.Name)
 	assert.NoError(t, err)
 	assert.True(t, isWatching)
 
-	//UnWatchRepo
+	// UnWatchRepo
 	_, err = c.UnWatchRepo(repo1.Owner.UserName, repo1.Name)
 	assert.NoError(t, err)
 	isWatching, _, _ = c.CheckRepoWatch(repo1.Owner.UserName, repo1.Name)
 	assert.False(t, isWatching)
 
-	//WatchRepo
+	// WatchRepo
 	_, err = c.WatchRepo(repo1.Owner.UserName, repo1.Name)
 	assert.NoError(t, err)
 	isWatching, _, _ = c.CheckRepoWatch(repo1.Owner.UserName, repo1.Name)

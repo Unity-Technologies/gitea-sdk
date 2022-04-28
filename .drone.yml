@@ -36,7 +36,7 @@ steps:
 
 - name: testing
   pull: always
-  image: golang:1.16
+  image: golang:1.18
   environment:
     GOPROXY: "https://goproxy.io"
     GO111MODULE: "on"
@@ -48,7 +48,7 @@ steps:
   commands:
   - make clean
   - make vet
-  - make revive
+  - make ci-lint
   - make build
   - curl --noproxy "*" http://gitea:3000/api/v1/version # verify connection to instance
   - make test
