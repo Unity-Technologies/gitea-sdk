@@ -71,7 +71,7 @@ ci-lint:
 	cd gitea/; \
 	$(GO) install github.com/mgechev/revive@latest; \
 	$(GO) install mvdan.cc/gofumpt@latest; \
-	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2; \
+	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.44.2; \
 	revive -config ../.revive.toml .; \
 	if [ $$? -eq 1 ]; then \
 		echo "Doesn't pass revive"; \
