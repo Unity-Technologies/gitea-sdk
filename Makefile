@@ -69,17 +69,20 @@ vet:
 .PHONY: ci-lint
 ci-lint:
 	cd gitea/; \
-	$(GO) run github.com/mgechev/revive@latest -config ../.revive.toml .; \
+	$(GO) install github.com/mgechev/revive@latest; \
+	$(GO) install mvdan.cc/gofumpt@latest; \
+	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2; \
+	revive -config ../.revive.toml .; \
 	if [ $$? -eq 1 ]; then \
 		echo "Doesn't pass revive"; \
 		exit 1; \
 	fi; \
-	diff=$$($(GO) run mvdan.cc/gofumpt@latest -extra -l .); \
+	diff=$$(gofumpt -extra -l .); \
 	if [ -n "$$diff" ]; then \
 		echo "Not gofumpt-ed"; \
 		exit 1; \
 	fi; \
-	$(GO) run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.1 run --timeout 5m; \
+	golangci-lint run --timeout 5m; \
 	if [ $$? -eq 1 ]; then \
 		echo "Doesn't pass golangci-lint"; \
 		exit 1; \
