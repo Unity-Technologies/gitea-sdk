@@ -13,12 +13,13 @@ workspace:
 steps:
 - name: gitea
   image: gitea/gitea:dev
+  pull: always
   detach: true
-  user: gitea
   commands:
   - mkdir -p /tmp/conf/
   - mkdir -p /tmp/data/
-  - echo "[security]" > /tmp/conf/app.ini
+  - echo "I_AM_BEING_UNSAFE_RUNNING_AS_ROOT = true" > /tmp/conf/app.ini
+  - echo "[security]" >> /tmp/conf/app.ini
   - echo "INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1NTg4MzY4ODB9.LoKQyK5TN_0kMJFVHWUW0uDAyoGjDP6Mkup4ps2VJN4" >> /tmp/conf/app.ini
   - echo "INSTALL_LOCK   = true" >> /tmp/conf/app.ini
   - echo "SECRET_KEY     = 2crAW4UANgvLipDS6U5obRcFosjSJHQANll6MNfX7P0G3se3fKcCwwK3szPyGcbo" >> /tmp/conf/app.ini
@@ -35,9 +36,9 @@ steps:
 
 - name: testing
   pull: always
-  image: golang:1.16
+  image: golang:1.18
   environment:
-    GOPROXY: "https://goproxy.cn"
+    GOPROXY: "https://goproxy.io"
     GO111MODULE: "on"
     HTTP_PROXY: ""
     GITEA_SDK_TEST_URL: "http://gitea:3000"
@@ -47,7 +48,7 @@ steps:
   commands:
   - make clean
   - make vet
-  - make revive
+  - make ci-lint
   - make build
   - curl --noproxy "*" http://gitea:3000/api/v1/version # verify connection to instance
   - make test

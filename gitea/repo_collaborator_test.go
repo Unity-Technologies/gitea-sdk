@@ -18,8 +18,12 @@ func TestRepoCollaborator(t *testing.T) {
 	repo, _ := createTestRepo(t, "RepoCollaborators", c)
 	createTestUser(t, "ping", c)
 	createTestUser(t, "pong", c)
-	defer c.AdminDeleteUser("ping")
-	defer c.AdminDeleteUser("pong")
+	defer func() {
+		_, err := c.AdminDeleteUser("ping")
+		assert.NoError(t, err)
+		_, err = c.AdminDeleteUser("pong")
+		assert.NoError(t, err)
+	}()
 
 	collaborators, _, err := c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)
@@ -41,8 +45,8 @@ func TestRepoCollaborator(t *testing.T) {
 
 	reviewers, _, err := c.GetReviewers(repo.Owner.UserName, repo.Name)
 	assert.NoError(t, err)
-	assert.Len(t, reviewers, 2)
-	assert.EqualValues(t, []string{"ping", "pong"}, userToStringSlice(reviewers))
+	assert.Len(t, reviewers, 3)
+	assert.EqualValues(t, []string{"ping", "pong", "test01"}, userToStringSlice(reviewers))
 
 	assignees, _, err := c.GetAssignees(repo.Owner.UserName, repo.Name)
 	assert.NoError(t, err)

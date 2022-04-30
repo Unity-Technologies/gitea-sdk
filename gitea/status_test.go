@@ -17,7 +17,7 @@ func TestCommitStatus(t *testing.T) {
 	user, _, err := c.GetMyUserInfo()
 	assert.NoError(t, err)
 
-	var repoName = "CommitStatuses"
+	repoName := "CommitStatuses"
 	origRepo, err := createTestRepo(t, repoName, c)
 	if !assert.NoError(t, err) {
 		return

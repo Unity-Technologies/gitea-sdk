@@ -8,12 +8,6 @@ import (
 	"fmt"
 	"net/url"
 	"time"
-
-	"github.com/hashicorp/go-version"
-)
-
-var (
-	version1_12_3, _ = version.NewVersion("1.12.3")
 )
 
 // NotificationThread expose Notification on API

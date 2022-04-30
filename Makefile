@@ -54,7 +54,8 @@ clean:
 
 .PHONY: fmt
 fmt:
-	find . -name "*.go" -type f ! -path "./vendor/*" ! -path "./benchmark/*" | xargs gofmt -s -w
+	find . -name "*.go" -type f | xargs gofmt -s -w; \
+	$(GO) run mvdan.cc/gofumpt@latest -extra -w ./gitea
 
 .PHONY: vet
 vet:
@@ -65,16 +66,25 @@ vet:
 	cd gitea && $(GO) build code.gitea.io/gitea-vet
 	cd gitea && $(GO) vet -vettool=gitea-vet $(PACKAGE)
 
-.PHONY: lint
-lint:
-	@echo 'make lint is depricated. Use "make revive" if you want to use the old lint tool, or "make golangci-lint" to run a complete code check.'
-
-.PHONY: revive
-revive:
-	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		$(GO) get -u github.com/mgechev/revive; \
-	fi
-	revive -config .revive.toml -exclude=./vendor/... ./... || exit 1
+.PHONY: ci-lint
+ci-lint:
+	cd gitea/; \
+	$(GO) run github.com/mgechev/revive@latest -config ../.revive.toml .; \
+	if [ $$? -eq 1 ]; then \
+		echo "Doesn't pass revive"; \
+		exit 1; \
+	fi; \
+	diff=$$($(GO) run mvdan.cc/gofumpt@latest -extra -l .); \
+	if [ -n "$$diff" ]; then \
+		echo "Not gofumpt-ed"; \
+		exit 1; \
+	fi; \
+	$(GO) run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.44.2 run --timeout 5m; \
+	if [ $$? -eq 1 ]; then \
+		echo "Doesn't pass golangci-lint"; \
+		exit 1; \
+	fi; \
+	cd -; \
 
 .PHONY: test
 test:
@@ -111,11 +121,3 @@ bench:
 .PHONY: build
 build:
 	cd gitea && $(GO) build
-
-.PHONY: golangci-lint
-golangci-lint:
-	@hash golangci-lint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		export BINARY="golangci-lint"; \
-		curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(GOPATH)/bin v1.22.2; \
-	fi
-	golangci-lint run --timeout 5m

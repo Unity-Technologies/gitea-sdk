@@ -93,6 +93,7 @@ type Repository struct {
 	AvatarURL                 string           `json:"avatar_url"`
 	Internal                  bool             `json:"internal"`
 	MirrorInterval            string           `json:"mirror_interval"`
+	MirrorUpdated             time.Time        `json:"mirror_updated,omitempty"`
 	DefaultMergeStyle         MergeStyle       `json:"default_merge_style"`
 }
 
@@ -286,7 +287,9 @@ func (c *Client) SearchRepos(opt SearchRepoOptions) ([]*Repository, *Response, e
 				// private repos only not supported on gitea <= 1.11.x
 				return nil, nil, err
 			}
-			link.Query().Add("private", "false")
+			newQuery := link.Query()
+			newQuery.Add("private", "false")
+			link.RawQuery = newQuery.Encode()
 		}
 	}
 

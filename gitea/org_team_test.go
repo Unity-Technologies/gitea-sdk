@@ -5,6 +5,7 @@
 package gitea
 
 import (
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,4 +23,34 @@ func createTestOrgTeams(t *testing.T, c *Client, org, name string, accessMode Ac
 	assert.NoError(t, e)
 	assert.NotNil(t, team)
 	return team, e
+}
+
+func TestTeamSearch(t *testing.T) {
+	log.Println("== TestTeamSearch ==")
+	c := newTestClient()
+
+	orgName := "TestTeamsOrg"
+	// prepare for test
+	_, _, err := c.CreateOrg(CreateOrgOption{
+		Name:                      orgName,
+		Visibility:                VisibleTypePublic,
+		RepoAdminChangeTeamAccess: true,
+	})
+	defer func() {
+		_, _ = c.DeleteOrg(orgName)
+	}()
+
+	assert.NoError(t, err)
+
+	if _, err = createTestOrgTeams(t, c, orgName, "Admins", AccessModeAdmin, []RepoUnitType{RepoUnitCode, RepoUnitIssues, RepoUnitPulls, RepoUnitReleases}); err != nil {
+		return
+	}
+
+	teams, _, err := c.SearchOrgTeams(orgName, &SearchTeamsOptions{
+		Query: "Admins",
+	})
+	assert.NoError(t, err)
+	assert.Len(t, teams, 1)
+
+	assert.Equal(t, "Admins", teams[0].Name)
 }

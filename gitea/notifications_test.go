@@ -23,7 +23,7 @@ func TestNotifications(t *testing.T) {
 	assert.NoError(t, err)
 	user2 := createTestUser(t, "notify2", c)
 
-	//create 2 repos
+	// create 2 repos
 	repoA, err := createTestRepo(t, "TestNotifications_A", c)
 	assert.NoError(t, err)
 
@@ -118,16 +118,16 @@ func TestNotifications(t *testing.T) {
 	_, _ = c.DeleteRepo("test01", "Reviews")
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusRead}})
 	assert.NoError(t, err)
-	assert.Len(t, nList, 4)
+	assert.Len(t, nList, 2)
 
-	_, err = c.ReadNotification(nList[2].ID, NotifyStatusPinned)
+	_, err = c.ReadNotification(nList[0].ID, NotifyStatusPinned)
 	assert.NoError(t, err)
-	_, err = c.ReadNotification(nList[3].ID, NotifyStatusUnread)
+	_, err = c.ReadNotification(nList[1].ID, NotifyStatusUnread)
 	assert.NoError(t, err)
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusPinned, NotifyStatusUnread}})
 	assert.NoError(t, err)
 	if assert.Len(t, nList, 2) {
-		assert.EqualValues(t, NotifySubjectClosed, nList[0].Subject.State)
-		assert.EqualValues(t, NotifySubjectClosed, nList[1].Subject.State)
+		assert.EqualValues(t, NotifySubjectOpen, nList[0].Subject.State)
+		assert.EqualValues(t, NotifySubjectOpen, nList[1].Subject.State)
 	}
 }
