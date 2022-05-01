@@ -85,13 +85,18 @@ type ListCommitOptions struct {
 	ListOptions
 	// SHA or branch to start listing commits from (usually 'master')
 	SHA string
+	// Path indicates that only commits that include the path's file/dir should be returned.
+	Path string
 }
 
 // QueryEncode turns options into querystring argument
 func (opt *ListCommitOptions) QueryEncode() string {
-	query := opt.ListOptions.getURLQuery()
+	query := opt.getURLQuery()
 	if opt.SHA != "" {
 		query.Add("sha", opt.SHA)
+	}
+	if opt.Path != "" {
+		query.Add("path", opt.Path)
 	}
 	return query.Encode()
 }
