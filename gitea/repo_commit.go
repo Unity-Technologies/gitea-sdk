@@ -113,3 +113,32 @@ func (c *Client) ListRepoCommits(user, repo string, opt ListCommitOptions) ([]*C
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &commits)
 	return commits, resp, err
 }
+
+type DiffType uint8
+
+const (
+	Diff DiffType = iota
+	Patch
+)
+
+func (t DiffType) String() string {
+	switch t {
+	case Patch:
+		return "patch"
+	default:
+		return "diff"
+	}
+}
+
+// GetCommitDiffOrPatch returns the commit's raw diff or patch.
+func (c *Client) GetCommitDiffOrPatch(user, repo, commitID string, diffType DiffType) ([]byte, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err != nil {
+		return nil, nil, err
+	}
+
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
+		return nil, nil, err
+	}
+
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.%s", user, repo, commitID, diffType), nil, nil)
+}
