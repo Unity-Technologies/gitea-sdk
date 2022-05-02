@@ -114,9 +114,8 @@ func (c *Client) ListRepoCommits(user, repo string, opt ListCommitOptions) ([]*C
 	return commits, resp, err
 }
 
-// GetCommitDiffOrPatch returns the commit's raw diff or patch.
-// If useDiff is true, it will return the diff variant. Otherwise return the patch variant.
-func (c *Client) GetCommitDiffOrPatch(user, repo, commitID string, useDiff bool) ([]byte, *Response, error) {
+// GetCommitDiff returns the commit's raw diff.
+func (c *Client) GetCommitDiff(user, repo, commitID string) ([]byte, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err != nil {
 		return nil, nil, err
 	}
@@ -125,10 +124,18 @@ func (c *Client) GetCommitDiffOrPatch(user, repo, commitID string, useDiff bool)
 		return nil, nil, err
 	}
 
-	diffType := "patch"
-	if useDiff {
-		diffType = "diff"
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.diff", user, repo, commitID), nil, nil)
+}
+
+// GetCommitPatch returns the commit's raw patch.
+func (c *Client) GetCommitPatch(user, repo, commitID string) ([]byte, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err != nil {
+		return nil, nil, err
 	}
 
-	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.%s", user, repo, commitID, diffType), nil, nil)
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
+		return nil, nil, err
+	}
+
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.patch", user, repo, commitID), nil, nil)
 }
