@@ -48,12 +48,12 @@ func TestGetCommitDiffOrPatch(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Test the diff output.
-	diffOutput, _, err := c.GetCommitDiffOrPatch(repo.Owner.UserName, repo.Name, fileResponse.Commit.SHA, Diff)
+	diffOutput, _, err := c.GetCommitDiffOrPatch(repo.Owner.UserName, repo.Name, fileResponse.Commit.SHA, true)
 	assert.NoError(t, err)
 	assert.EqualValues(t, "diff --git a/NOT_A_LICENSE b/NOT_A_LICENSE\nnew file mode 100644\nindex 0000000..f27a20a\n--- /dev/null\n+++ b/NOT_A_LICENSE\n@@ -0,0 +1 @@\n+But is it?\n", string(diffOutput))
 
 	// Test the patch output.
-	patchOutput, _, err := c.GetCommitDiffOrPatch(repo.Owner.UserName, repo.Name, fileResponse.Commit.SHA, Patch)
+	patchOutput, _, err := c.GetCommitDiffOrPatch(repo.Owner.UserName, repo.Name, fileResponse.Commit.SHA, false)
 	assert.NoError(t, err)
 	// Use contains, because we cannot include the first part, because of dates + non-static CommitID..
 	assert.Contains(t, string(patchOutput), "Subject: [PATCH] Ensure people know it's not a license!\n\n---\n NOT_A_LICENSE | 1 +\n 1 file changed, 1 insertion(+)\n create mode 100644 NOT_A_LICENSE\n\ndiff --git a/NOT_A_LICENSE b/NOT_A_LICENSE\nnew file mode 100644\nindex 0000000..f27a20a\n--- /dev/null\n+++ b/NOT_A_LICENSE\n@@ -0,0 +1 @@\n+But is it?\n")
