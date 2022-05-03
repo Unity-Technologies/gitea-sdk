@@ -173,10 +173,9 @@ func (c *Client) ReadNotification(id int64, status ...NotifyStatus) (*Notificati
 		thread := &NotificationThread{}
 		resp, err := c.getParsedResponse("PATCH", link, nil, nil, thread)
 		return thread, resp, err
-	} else {
-		_, resp, err := c.getResponse("PATCH", link, nil, nil)
-		return nil, resp, err
 	}
+	_, resp, err := c.getResponse("PATCH", link, nil, nil)
+	return nil, resp, err
 }
 
 // ListNotifications list users's notification threads
@@ -210,10 +209,9 @@ func (c *Client) ReadNotifications(opt MarkNotificationOptions) ([]*Notification
 		threads := make([]*NotificationThread, 0, 10)
 		resp, err := c.getParsedResponse("PUT", link.String(), nil, nil, &threads)
 		return threads, resp, err
-	} else {
-		_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
-		return nil, resp, err
 	}
+	_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
+	return nil, resp, err
 }
 
 // ListRepoNotifications list users's notification threads on a specific repo
@@ -253,8 +251,7 @@ func (c *Client) ReadRepoNotifications(owner, repo string, opt MarkNotificationO
 		threads := make([]*NotificationThread, 0, 10)
 		resp, err := c.getParsedResponse("PUT", link.String(), nil, nil, &threads)
 		return threads, resp, err
-	} else {
-		_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
-		return nil, resp, err
 	}
+	_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
+	return nil, resp, err
 }
