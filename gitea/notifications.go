@@ -160,16 +160,23 @@ func (c *Client) GetNotification(id int64) (*NotificationThread, *Response, erro
 
 // ReadNotification mark notification thread as read by ID
 // It optionally takes a second argument if status has to be set other than 'read'
-func (c *Client) ReadNotification(id int64, status ...NotifyStatus) (*Response, error) {
+// The relevant notification will be returned  as the first parameter when the Gitea server is 1.16.0 or higher.
+func (c *Client) ReadNotification(id int64, status ...NotifyStatus) (*NotificationThread, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	link := fmt.Sprintf("/notifications/threads/%d", id)
 	if len(status) != 0 {
 		link += fmt.Sprintf("?to-status=%s", status[0])
 	}
-	_, resp, err := c.getResponse("PATCH", link, nil, nil)
-	return resp, err
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err == nil {
+		thread := &NotificationThread{}
+		resp, err := c.getParsedResponse("PATCH", link, nil, nil, thread)
+		return thread, resp, err
+	} else {
+		_, resp, err := c.getResponse("PATCH", link, nil, nil)
+		return nil, resp, err
+	}
 }
 
 // ListNotifications list users's notification threads
@@ -188,17 +195,25 @@ func (c *Client) ListNotifications(opt ListNotificationOptions) ([]*Notification
 }
 
 // ReadNotifications mark notification threads as read
-func (c *Client) ReadNotifications(opt MarkNotificationOptions) (*Response, error) {
+// The relevant notifications will only be returned as the first parameter when the Gitea server is 1.16.0 or higher.
+func (c *Client) ReadNotifications(opt MarkNotificationOptions) ([]*NotificationThread, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := opt.Validate(c); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	link, _ := url.Parse("/notifications")
 	link.RawQuery = opt.QueryEncode()
-	_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
-	return resp, err
+
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err == nil {
+		threads := make([]*NotificationThread, 0, 10)
+		resp, err := c.getParsedResponse("PUT", link.String(), nil, nil, &threads)
+		return threads, resp, err
+	} else {
+		_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
+		return nil, resp, err
+	}
 }
 
 // ListRepoNotifications list users's notification threads on a specific repo
