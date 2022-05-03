@@ -220,18 +220,26 @@ func (c *Client) ListRepoNotifications(owner, repo string, opt ListNotificationO
 }
 
 // ReadRepoNotifications mark notification threads as read on a specific repo
-func (c *Client) ReadRepoNotifications(owner, repo string, opt MarkNotificationOptions) (*Response, error) {
+// The relevant notifications will only be returned as the first parameter when the Gitea server is 1.16.0 or higher.
+func (c *Client) ReadRepoNotifications(owner, repo string, opt MarkNotificationOptions) ([]*NotificationThread, *Response, error) {
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := opt.Validate(c); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/notifications", owner, repo))
 	link.RawQuery = opt.QueryEncode()
-	_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
-	return resp, err
+
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err == nil {
+		threads := make([]*NotificationThread, 0, 10)
+		resp, err := c.getParsedResponse("PUT", link.String(), nil, nil, &threads)
+		return threads, resp, err
+	} else {
+		_, resp, err := c.getResponse("PUT", link.String(), nil, nil)
+		return nil, resp, err
+	}
 }
