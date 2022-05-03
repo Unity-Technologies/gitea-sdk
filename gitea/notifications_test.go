@@ -80,7 +80,7 @@ func TestNotifications(t *testing.T) {
 	// ReadRepoNotifications
 	notifications, _, err = c.ReadRepoNotifications(repoA.Owner.UserName, repoA.Name, MarkNotificationOptions{})
 	assert.NoError(t, err)
-	assert.Len(t, notifications, 2)
+	assert.Len(t, notifications, 1)
 
 	// GetThread
 	n, _, err := c.GetNotification(nList[0].ID)
