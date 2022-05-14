@@ -160,7 +160,7 @@ func (c *Client) GetNotification(id int64) (*NotificationThread, *Response, erro
 
 // ReadNotification mark notification thread as read by ID
 // It optionally takes a second argument if status has to be set other than 'read'
-// The relevant notification will be returned  as the first parameter when the Gitea server is 1.16.0 or higher.
+// The relevant notification will be returned as the first parameter when the Gitea server is 1.16.0 or higher.
 func (c *Client) ReadNotification(id int64, status ...NotifyStatus) (*NotificationThread, *Response, error) {
 	if err := c.checkServerVersionGreaterThanOrEqual(version1_12_0); err != nil {
 		return nil, nil, err
