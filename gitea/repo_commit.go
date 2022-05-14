@@ -124,7 +124,7 @@ func (c *Client) GetCommitDiff(user, repo, commitID string) ([]byte, *Response, 
 		return nil, nil, err
 	}
 
-	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.diff", user, repo, commitID), nil, nil)
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.%s", user, repo, commitID, pullRequestDiffTypeDiff), nil, nil)
 }
 
 // GetCommitPatch returns the commit's raw patch.
@@ -137,5 +137,5 @@ func (c *Client) GetCommitPatch(user, repo, commitID string) ([]byte, *Response,
 		return nil, nil, err
 	}
 
-	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.patch", user, repo, commitID), nil, nil)
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.%s", user, repo, commitID, pullRequestDiffTypePatch), nil, nil)
 }
