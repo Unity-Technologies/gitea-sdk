@@ -35,8 +35,9 @@ func TestNotifications(t *testing.T) {
 	assert.NoError(t, err)
 
 	c.sudo = user2.UserName
-	_, err = c.ReadNotifications(MarkNotificationOptions{})
+	notifications, _, err := c.ReadNotifications(MarkNotificationOptions{})
 	assert.NoError(t, err)
+	assert.Len(t, notifications, 0)
 	count, _, err := c.CheckNotifications()
 	assert.EqualValues(t, 0, count)
 	assert.NoError(t, err)
@@ -77,8 +78,9 @@ func TestNotifications(t *testing.T) {
 	assert.Len(t, nList, 1)
 	assert.EqualValues(t, "A Issue", nList[0].Subject.Title)
 	// ReadRepoNotifications
-	_, err = c.ReadRepoNotifications(repoA.Owner.UserName, repoA.Name, MarkNotificationOptions{})
+	notifications, _, err = c.ReadRepoNotifications(repoA.Owner.UserName, repoA.Name, MarkNotificationOptions{})
 	assert.NoError(t, err)
+	assert.Len(t, notifications, 1)
 
 	// GetThread
 	n, _, err := c.GetNotification(nList[0].ID)
@@ -87,8 +89,9 @@ func TestNotifications(t *testing.T) {
 	assert.EqualValues(t, "A Issue", n.Subject.Title)
 
 	// ReadNotifications
-	_, err = c.ReadNotifications(MarkNotificationOptions{})
+	notifications, _, err = c.ReadNotifications(MarkNotificationOptions{})
 	assert.NoError(t, err)
+	assert.Len(t, notifications, 1)
 	nList, _, err = c.ListNotifications(ListNotificationOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 0)
@@ -108,21 +111,26 @@ func TestNotifications(t *testing.T) {
 	assert.EqualValues(t, 1, count)
 	if assert.Len(t, nList, 1) {
 		assert.EqualValues(t, NotifySubjectClosed, nList[0].Subject.State)
-		_, err = c.ReadNotification(nList[0].ID)
+		notification, _, err := c.ReadNotification(nList[0].ID)
 		assert.NoError(t, err)
+		assert.EqualValues(t, notification.ID, nList[0].ID)
 	}
 
 	c.sudo = ""
-	_, err = c.ReadNotifications(MarkNotificationOptions{})
+	notifications, _, err = c.ReadNotifications(MarkNotificationOptions{})
 	assert.NoError(t, err)
+	assert.Len(t, notifications, 2)
 	_, _ = c.DeleteRepo("test01", "Reviews")
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusRead}})
 	assert.NoError(t, err)
 	assert.Len(t, nList, 2)
 
-	_, err = c.ReadNotification(nList[0].ID, NotifyStatusPinned)
+	notification, _, err := c.ReadNotification(nList[0].ID, NotifyStatusPinned)
+	assert.EqualValues(t, notification.ID, nList[0].ID)
 	assert.NoError(t, err)
-	_, err = c.ReadNotification(nList[1].ID, NotifyStatusUnread)
+
+	notification, _, err = c.ReadNotification(nList[1].ID, NotifyStatusUnread)
+	assert.EqualValues(t, notification.ID, nList[1].ID)
 	assert.NoError(t, err)
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusPinned, NotifyStatusUnread}})
 	assert.NoError(t, err)
