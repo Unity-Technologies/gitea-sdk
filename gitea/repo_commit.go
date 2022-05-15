@@ -113,3 +113,29 @@ func (c *Client) ListRepoCommits(user, repo string, opt ListCommitOptions) ([]*C
 	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &commits)
 	return commits, resp, err
 }
+
+// GetCommitDiff returns the commit's raw diff.
+func (c *Client) GetCommitDiff(user, repo, commitID string) ([]byte, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err != nil {
+		return nil, nil, err
+	}
+
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
+		return nil, nil, err
+	}
+
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.%s", user, repo, commitID, pullRequestDiffTypeDiff), nil, nil)
+}
+
+// GetCommitPatch returns the commit's raw patch.
+func (c *Client) GetCommitPatch(user, repo, commitID string) ([]byte, *Response, error) {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_16_0); err != nil {
+		return nil, nil, err
+	}
+
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
+		return nil, nil, err
+	}
+
+	return c.getResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s.%s", user, repo, commitID, pullRequestDiffTypePatch), nil, nil)
+}
