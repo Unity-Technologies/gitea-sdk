@@ -15,7 +15,7 @@ func TestPullReview(t *testing.T) {
 	log.Println("== TestPullReview ==")
 	c := newTestClient()
 
-	var repoName = "Reviews"
+	repoName := "Reviews"
 	repo, pull, submitter, reviewer, success := preparePullReviewTest(t, c, repoName)
 	if !success {
 		return
@@ -33,12 +33,12 @@ func TestPullReview(t *testing.T) {
 	}
 
 	c.SetSudo(submitter.UserName)
-	r2, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
+	_, _, err = c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		State: ReviewStateApproved,
 		Body:  "lgtm it myself",
 	})
 	assert.Error(t, err)
-	r2, _, err = c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
+	r2, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		State: ReviewStateComment,
 		Body:  "no seriously please have a look at it",
 	})
@@ -49,11 +49,12 @@ func TestPullReview(t *testing.T) {
 	r3, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		State: ReviewStateApproved,
 		Body:  "lgtm",
-		Comments: []CreatePullReviewComment{{
-			Path:       "WOW-file",
-			Body:       "no better name - really?",
-			NewLineNum: 1,
-		},
+		Comments: []CreatePullReviewComment{
+			{
+				Path:       "WOW-file",
+				Body:       "no better name - really?",
+				NewLineNum: 1,
+			},
 		},
 	})
 	assert.NoError(t, err)
@@ -87,22 +88,24 @@ func TestPullReview(t *testing.T) {
 	c.SetSudo("")
 	r4, resp, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		Body: "...",
-		Comments: []CreatePullReviewComment{{
-			Path:       "WOW-file",
-			Body:       "its ok",
-			NewLineNum: 1,
-		},
+		Comments: []CreatePullReviewComment{
+			{
+				Path:       "WOW-file",
+				Body:       "its ok",
+				NewLineNum: 1,
+			},
 		},
 	})
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	r5, _, err := c.CreatePullReview(repo.Owner.UserName, repo.Name, pull.Index, CreatePullReviewOptions{
 		Body: "...",
-		Comments: []CreatePullReviewComment{{
-			Path:       "WOW-file",
-			Body:       "hehe and here it is",
-			NewLineNum: 3,
-		},
+		Comments: []CreatePullReviewComment{
+			{
+				Path:       "WOW-file",
+				Body:       "hehe and here it is",
+				NewLineNum: 3,
+			},
 		},
 	})
 	assert.NoError(t, err)
@@ -200,7 +203,7 @@ func preparePullReviewTest(t *testing.T, c *Client, repoName string) (*Repositor
 		Content: "QSBuZXcgRmlsZQoKYW5kIHNvbWUgbGluZXMK",
 		FileOptions: FileOptions{
 			Message:       "creat a new file",
-			BranchName:    "master",
+			BranchName:    "main",
 			NewBranchName: "new_file",
 		},
 	})
@@ -210,7 +213,7 @@ func preparePullReviewTest(t *testing.T, c *Client, repoName string) (*Repositor
 	}
 
 	pull, _, err := c.CreatePullRequest(c.username, repoName, CreatePullRequestOption{
-		Base:  "master",
+		Base:  "main",
 		Head:  "new_file",
 		Title: "Creat a NewFile",
 	})

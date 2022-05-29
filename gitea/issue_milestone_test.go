@@ -18,7 +18,7 @@ func TestMilestones(t *testing.T) {
 
 	repo, _ := createTestRepo(t, "TestMilestones", c)
 	now := time.Now()
-	future := time.Unix(1896134400, 0) //2030-02-01
+	future := time.Unix(1896134400, 0) // 2030-02-01
 	closed := "closed"
 	sClosed := StateClosed
 
@@ -59,7 +59,7 @@ func TestMilestones(t *testing.T) {
 	m, _, err := c.resolveMilestoneByName(repo.Owner.UserName, repo.Name, "V3.0")
 	assert.NoError(t, err)
 	assert.EqualValues(t, ml[0].ID, m.ID)
-	m, _, err = c.resolveMilestoneByName(repo.Owner.UserName, repo.Name, "NoEvidenceOfExist")
+	_, _, err = c.resolveMilestoneByName(repo.Owner.UserName, repo.Name, "NoEvidenceOfExist")
 	assert.Error(t, err)
 	assert.EqualValues(t, "milestone 'NoEvidenceOfExist' do not exist", err.Error())
 

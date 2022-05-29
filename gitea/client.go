@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -209,7 +208,7 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	if debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return data, &Response{resp}, nil
+	return data, &Response{resp}, err
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
@@ -285,27 +284,23 @@ func statusCodeToErr(resp *Response) (body []byte, err error) {
 		return nil, fmt.Errorf("body read on HTTP error %d: %v", resp.StatusCode, err)
 	}
 
-	switch resp.StatusCode {
-	case 403:
-		return data, errors.New("403 Forbidden")
-	case 404:
-		return data, errors.New("404 Not Found")
-	case 409:
-		return data, errors.New("409 Conflict")
-	case 422:
-		return data, fmt.Errorf("422 Unprocessable Entity: %s", string(data))
-	}
-
-	path := resp.Request.URL.Path
-	method := resp.Request.Method
-	header := resp.Request.Header
+	// Try to unmarshal and get an error message
 	errMap := make(map[string]interface{})
 	if err = json.Unmarshal(data, &errMap); err != nil {
 		// when the JSON can't be parsed, data was probably empty or a
 		// plain string, so we try to return a helpful error anyway
+		path := resp.Request.URL.Path
+		method := resp.Request.Method
+		header := resp.Request.Header
 		return data, fmt.Errorf("Unknown API Error: %d\nRequest: '%s' with '%s' method '%s' header and '%s' body", resp.StatusCode, path, method, header, string(data))
 	}
-	return data, errors.New(errMap["message"].(string))
+
+	if msg, ok := errMap["message"]; ok {
+		return data, fmt.Errorf("%v", msg)
+	}
+
+	// If no error message, at least give status and data
+	return data, fmt.Errorf("%s: %s", resp.Status, string(data))
 }
 
 func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {

@@ -26,7 +26,7 @@ func TestRelease(t *testing.T) {
 	// CreateRelease
 	r, _, err := c.CreateRelease(repo.Owner.UserName, repo.Name, CreateReleaseOption{
 		TagName:      "awesome",
-		Target:       "master",
+		Target:       "main",
 		Title:        "Release 1",
 		Note:         "yes it's awesome",
 		IsDraft:      true,
@@ -38,7 +38,7 @@ func TestRelease(t *testing.T) {
 	assert.EqualValues(t, true, r.IsDraft)
 	assert.EqualValues(t, "Release 1", r.Title)
 	assert.EqualValues(t, fmt.Sprintf("%s/api/v1/repos/%s/releases/%d", c.url, repo.FullName, r.ID), r.URL)
-	assert.EqualValues(t, "master", r.Target)
+	assert.EqualValues(t, "main", r.Target)
 	assert.EqualValues(t, "yes it's awesome", r.Note)
 	assert.EqualValues(t, c.username, r.Publisher.UserName)
 	rl, _, _ = c.ListReleases(repo.Owner.UserName, repo.Name, ListReleasesOptions{})
@@ -51,6 +51,13 @@ func TestRelease(t *testing.T) {
 	r2, _, err = c.GetReleaseByTag(repo.Owner.UserName, repo.Name, r.TagName)
 	assert.NoError(t, err)
 	assert.EqualValues(t, r, r2)
+	// ListRelease without pre-releases
+	tr := true
+	rl, _, err = c.ListReleases(repo.Owner.UserName, repo.Name, ListReleasesOptions{
+		IsPreRelease: &tr,
+	})
+	assert.NoError(t, err)
+	assert.Len(t, rl, 1) // created release is a pre-release
 	// test fallback
 	r2, _, err = c.fallbackGetReleaseByTag(repo.Owner.UserName, repo.Name, r.TagName)
 	assert.NoError(t, err)
@@ -78,7 +85,7 @@ func TestRelease(t *testing.T) {
 	// CreateRelease
 	_, _, err = c.CreateRelease(repo.Owner.UserName, repo.Name, CreateReleaseOption{
 		TagName: "aNewReleaseTag",
-		Target:  "master",
+		Target:  "main",
 		Title:   "Title of aNewReleaseTag",
 	})
 	assert.NoError(t, err)
