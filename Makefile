@@ -67,23 +67,23 @@ vet:
 	cd gitea && $(GO) vet -vettool=gitea-vet $(PACKAGE)
 
 .PHONY: ci-lint
-ci-lint:
-	cd gitea/; \
-	$(GO) run github.com/mgechev/revive@latest -config ../.revive.toml .; \
+ci-lint: tool-golangci tool-gofumpt tool-revive
+	@cd gitea/; echo -n "revive ..."; \
+	revive -config ../.revive.toml .; \
 	if [ $$? -eq 1 ]; then \
-		echo "Doesn't pass revive"; \
+		echo; echo "Doesn't pass revive"; \
 		exit 1; \
-	fi; \
-	diff=$$($(GO) run mvdan.cc/gofumpt@latest -extra -l .); \
+	fi; echo " done"; echo -n "gofumpt ...";\
+	diff=$$(gofumpt -extra -l .); \
 	if [ -n "$$diff" ]; then \
-		echo "Not gofumpt-ed"; \
+		echo; echo "Not gofumpt-ed"; \
 		exit 1; \
-	fi; \
-	$(GO) run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.44.2 run --timeout 5m; \
+	fi; echo " done"; echo -n "golangci-lint ...";\
+	golangci-lint run --timeout 5m; \
 	if [ $$? -eq 1 ]; then \
-		echo "Doesn't pass golangci-lint"; \
+		echo; echo "Doesn't pass golangci-lint"; \
 		exit 1; \
-	fi; \
+	fi; echo " done"; \
 	cd -; \
 
 .PHONY: test
@@ -121,3 +121,18 @@ bench:
 .PHONY: build
 build:
 	cd gitea && $(GO) build
+
+tool-golangci:
+	@hash golangci-lint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
+	fi
+
+tool-gofumpt:
+	@hash gofumpt > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+	$(GO) install mvdan.cc/gofumpt@latest; \
+	fi
+
+tool-revive:
+	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+	$(GO) install github.com/mgechev/revive@latest; \
+	fi
