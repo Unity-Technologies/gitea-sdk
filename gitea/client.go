@@ -113,11 +113,22 @@ func SetBasicAuth(username, password string) ClientOption {
 }
 
 // UseSSHCert is an option for NewClient to enable SSH certificate authentication via HTTPSign
-func UseSSHCert() func(client *Client) {
-	return func(client *Client) {
+func UseSSHCert(principal string) ClientOption {
+	return func(client *Client) error {
 		client.mutex.Lock()
-		client.httpsigner = NewHTTPSign()
+		client.httpsigner = NewHTTPSignWithCert(principal)
 		client.mutex.Unlock()
+		return nil
+	}
+}
+
+// UseSSHPubkey is an option for NewClient to enable SSH pubkey authentication via HTTPSign
+func UseSSHPubkey(fingerprint string) ClientOption {
+	return func(client *Client) error {
+		client.mutex.Lock()
+		client.httpsigner = NewHTTPSignWithPubkey(fingerprint)
+		client.mutex.Unlock()
+		return nil
 	}
 }
 
@@ -248,7 +259,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 		req.Header[k] = v
 	}
 
-	if c.httpsigner != nil {
+	if err := c.checkServerVersionGreaterThanOrEqual(version1_17_0); err == nil && c.httpsigner != nil {
 		err = c.SignRequest(req)
 		if err != nil {
 			return nil, err

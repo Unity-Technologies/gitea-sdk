@@ -20,12 +20,38 @@ import (
 // HTTPSign contains the signer used for signing requests
 type HTTPSign struct {
 	ssh.Signer
+	cert bool
+}
+
+type HTTPSignConfig struct {
+	fingerprint string
+	principal   string
+	pubkey      bool
+	cert        bool
+}
+
+// NewHTTPSignWithPubkey can be used to create a HTTPSign with a public key
+// if no fingerprint is specified it returns the first public key found
+func NewHTTPSignWithPubkey(fingerprint string) *HTTPSign {
+	return newHTTPSign(&HTTPSignConfig{
+		fingerprint: fingerprint,
+		pubkey:      true,
+	})
+}
+
+// NewHTTPSignWithCert can be used to create a HTTPSign with a certificate
+// if no principal is specified it returns the first certificate found
+func NewHTTPSignWithCert(principal string) *HTTPSign {
+	return newHTTPSign(&HTTPSignConfig{
+		principal: principal,
+		cert:      true,
+	})
 }
 
 // NewHTTPSign returns a new HTTPSign
 // For now this only works with a ssh agent.
-// It will try to find a valid certificate in the loaded keys and use it for signing.
-func NewHTTPSign() *HTTPSign {
+// Depending on the configuration it will either use a certificate or a public key
+func newHTTPSign(config *HTTPSignConfig) *HTTPSign {
 	agent, err := getAgent()
 	if err != nil {
 		return nil
@@ -40,13 +66,25 @@ func NewHTTPSign() *HTTPSign {
 		return nil
 	}
 
-	signer := findCertSigner(signers)
-	if signer == nil {
-		return nil
+	var signer ssh.Signer
+
+	if config.cert {
+		signer = findCertSigner(signers, config.principal)
+		if signer == nil {
+			return nil
+		}
+	}
+
+	if config.pubkey {
+		signer = findPubkeySigner(signers, config.fingerprint)
+		if signer == nil {
+			return nil
+		}
 	}
 
 	return &HTTPSign{
 		Signer: signer,
+		cert:   config.cert,
 	}
 }
 
@@ -56,13 +94,15 @@ func (c *Client) SignRequest(r *http.Request) error {
 
 	headersToSign := []string{httpsig.RequestTarget, "(created)", "(expires)"}
 
-	// add our certificate to the headers to sign
-	pubkey, _ := ssh.ParsePublicKey(c.httpsigner.Signer.PublicKey().Marshal())
-	if cert, ok := pubkey.(*ssh.Certificate); ok {
-		certString := base64.RawStdEncoding.EncodeToString(cert.Marshal())
-		r.Header.Add("x-ssh-certificate", certString)
+	if c.httpsigner.cert {
+		// add our certificate to the headers to sign
+		pubkey, _ := ssh.ParsePublicKey(c.httpsigner.Signer.PublicKey().Marshal())
+		if cert, ok := pubkey.(*ssh.Certificate); ok {
+			certString := base64.RawStdEncoding.EncodeToString(cert.Marshal())
+			r.Header.Add("x-ssh-certificate", certString)
 
-		headersToSign = append(headersToSign, "x-ssh-certificate")
+			headersToSign = append(headersToSign, "x-ssh-certificate")
+		}
 	}
 
 	// if we have a body, the Digest header will be added and we'll include this also in
@@ -87,8 +127,13 @@ func (c *Client) SignRequest(r *http.Request) error {
 		return fmt.Errorf("httpsig.NewSSHSigner failed: %s", err)
 	}
 
-	// sign the request, the keyid is irrelevant, we don't use it
-	err = signer.SignRequest("gitea", r, contents)
+	// sign the request, use the fingerprint if we don't have a certificate
+	keyId := "gitea"
+	if !c.httpsigner.cert {
+		keyId = ssh.FingerprintSHA256(c.httpsigner.Signer.PublicKey())
+	}
+
+	err = signer.SignRequest(keyId, r, contents)
 	if err != nil {
 		return fmt.Errorf("httpsig.Signrequest failed: %s", err)
 	}
@@ -97,7 +142,8 @@ func (c *Client) SignRequest(r *http.Request) error {
 }
 
 // findCertSigner returns the Signer containing a valid certificate
-func findCertSigner(sshsigners []ssh.Signer) ssh.Signer {
+// if no principal is specified it returns the first certificate found
+func findCertSigner(sshsigners []ssh.Signer, principal string) ssh.Signer {
 	for _, s := range sshsigners {
 		// Check if the key is a certificate
 		if !strings.Contains(s.PublicKey().Type(), "cert-v01@openssh.com") {
@@ -115,7 +161,36 @@ func findCertSigner(sshsigners []ssh.Signer) ssh.Signer {
 			continue
 		}
 
-		return s
+		if principal == "" {
+			return s
+		}
+
+		for _, p := range cert.ValidPrincipals {
+			if p == principal {
+				return s
+			}
+		}
+	}
+
+	return nil
+}
+
+// findPubkeySigner returns the Signer containing a valid public key
+// if no fingerprint is specified it returns the first public key found
+func findPubkeySigner(sshsigners []ssh.Signer, fingerprint string) ssh.Signer {
+	for _, s := range sshsigners {
+		// Check if the key is a certificate
+		if strings.Contains(s.PublicKey().Type(), "cert-v01@openssh.com") {
+			continue
+		}
+
+		if fingerprint == "" {
+			return s
+		}
+
+		if ssh.FingerprintSHA256(s.PublicKey()) == fingerprint {
+			return s
+		}
 	}
 
 	return nil
