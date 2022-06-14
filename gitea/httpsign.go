@@ -23,6 +23,7 @@ type HTTPSign struct {
 	cert bool
 }
 
+// HTTPSignConfig contains the configuration for creating a HTTPSign
 type HTTPSignConfig struct {
 	fingerprint string
 	principal   string
@@ -128,12 +129,12 @@ func (c *Client) SignRequest(r *http.Request) error {
 	}
 
 	// sign the request, use the fingerprint if we don't have a certificate
-	keyId := "gitea"
+	keyID := "gitea"
 	if !c.httpsigner.cert {
-		keyId = ssh.FingerprintSHA256(c.httpsigner.Signer.PublicKey())
+		keyID = ssh.FingerprintSHA256(c.httpsigner.Signer.PublicKey())
 	}
 
-	err = signer.SignRequest(keyId, r, contents)
+	err = signer.SignRequest(keyID, r, contents)
 	if err != nil {
 		return fmt.Errorf("httpsig.Signrequest failed: %s", err)
 	}
