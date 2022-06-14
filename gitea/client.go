@@ -69,6 +69,13 @@ func NewClient(url string, options ...ClientOption) (*Client, error) {
 	if err := client.checkServerVersionGreaterThanOrEqual(version1_11_0); err != nil {
 		return nil, err
 	}
+	// we need version 1.17.0 or higher to support the new API
+	if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
+		if client.httpsigner != nil {
+			return nil, err
+		}
+	}
+
 	return client, nil
 }
 
@@ -259,7 +266,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 		req.Header[k] = v
 	}
 
-	if err := c.checkServerVersionGreaterThanOrEqual(version1_17_0); err == nil && c.httpsigner != nil {
+	if c.httpsigner != nil {
 		err = c.SignRequest(req)
 		if err != nil {
 			return nil, err
