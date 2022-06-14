@@ -189,6 +189,10 @@ func findPubkeySigner(sshsigners []ssh.Signer, fingerprint string) ssh.Signer {
 			return s
 		}
 
+		if strings.TrimSpace(string(ssh.MarshalAuthorizedKey(s.PublicKey()))) == fingerprint {
+			return s
+		}
+
 		if ssh.FingerprintSHA256(s.PublicKey()) == fingerprint {
 			return s
 		}
