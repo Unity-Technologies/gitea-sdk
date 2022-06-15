@@ -53,7 +53,7 @@ func NewHTTPSignWithCert(principal string) *HTTPSign {
 // For now this only works with a ssh agent.
 // Depending on the configuration it will either use a certificate or a public key
 func newHTTPSign(config *HTTPSignConfig) *HTTPSign {
-	agent, err := getAgent()
+	agent, err := GetAgent()
 	if err != nil {
 		return nil
 	}

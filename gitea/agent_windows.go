@@ -17,7 +17,7 @@ func hasAgent() bool {
 }
 
 // getAgent returns a ssh agent
-func getAgent() (agent.Agent, error) {
+func GetAgent() (agent.Agent, error) {
 	if !hasAgent() {
 		return nil, fmt.Errorf("no pageant available")
 	}
