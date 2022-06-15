@@ -69,12 +69,6 @@ func NewClient(url string, options ...ClientOption) (*Client, error) {
 	if err := client.checkServerVersionGreaterThanOrEqual(version1_11_0); err != nil {
 		return nil, err
 	}
-	// we need version 1.17.0 or higher to support the new API
-	if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
-		if client.httpsigner != nil {
-			return nil, err
-		}
-	}
 
 	return client, nil
 }
@@ -122,6 +116,10 @@ func SetBasicAuth(username, password string) ClientOption {
 // UseSSHCert is an option for NewClient to enable SSH certificate authentication via HTTPSign
 func UseSSHCert(principal string) ClientOption {
 	return func(client *Client) error {
+		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
+			return err
+		}
+
 		client.mutex.Lock()
 		client.httpsigner = NewHTTPSignWithCert(principal)
 		client.mutex.Unlock()
@@ -132,6 +130,10 @@ func UseSSHCert(principal string) ClientOption {
 // UseSSHPubkey is an option for NewClient to enable SSH pubkey authentication via HTTPSign
 func UseSSHPubkey(fingerprint string) ClientOption {
 	return func(client *Client) error {
+		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
+			return err
+		}
+
 		client.mutex.Lock()
 		client.httpsigner = NewHTTPSignWithPubkey(fingerprint)
 		client.mutex.Unlock()
