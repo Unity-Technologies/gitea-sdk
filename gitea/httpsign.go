@@ -29,23 +29,26 @@ type HTTPSignConfig struct {
 	principal   string
 	pubkey      bool
 	cert        bool
+	sshKey      string
 }
 
 // NewHTTPSignWithPubkey can be used to create a HTTPSign with a public key
 // if no fingerprint is specified it returns the first public key found
-func NewHTTPSignWithPubkey(fingerprint string) *HTTPSign {
+func NewHTTPSignWithPubkey(fingerprint, sshKey string) *HTTPSign {
 	return newHTTPSign(&HTTPSignConfig{
 		fingerprint: fingerprint,
 		pubkey:      true,
+		sshKey:      sshKey,
 	})
 }
 
 // NewHTTPSignWithCert can be used to create a HTTPSign with a certificate
 // if no principal is specified it returns the first certificate found
-func NewHTTPSignWithCert(principal string) *HTTPSign {
+func NewHTTPSignWithCert(principal, sshKey string) *HTTPSign {
 	return newHTTPSign(&HTTPSignConfig{
 		principal: principal,
 		cert:      true,
+		sshKey:    sshKey,
 	})
 }
 
@@ -53,33 +56,45 @@ func NewHTTPSignWithCert(principal string) *HTTPSign {
 // For now this only works with a ssh agent.
 // Depending on the configuration it will either use a certificate or a public key
 func newHTTPSign(config *HTTPSignConfig) *HTTPSign {
-	agent, err := GetAgent()
-	if err != nil {
-		return nil
-	}
-
-	signers, err := agent.Signers()
-	if err != nil {
-		return nil
-	}
-
-	if len(signers) == 0 {
-		return nil
-	}
-
 	var signer ssh.Signer
 
-	if config.cert {
-		signer = findCertSigner(signers, config.principal)
-		if signer == nil {
+	if config.sshKey != "" {
+		priv, err := ioutil.ReadFile(config.sshKey)
+		if err != nil {
 			return nil
 		}
-	}
 
-	if config.pubkey {
-		signer = findPubkeySigner(signers, config.fingerprint)
-		if signer == nil {
+		signer, err = ssh.ParsePrivateKey(priv)
+		if err != nil {
 			return nil
+		}
+	} else {
+		agent, err := GetAgent()
+		if err != nil {
+			return nil
+		}
+
+		signers, err := agent.Signers()
+		if err != nil {
+			return nil
+		}
+
+		if len(signers) == 0 {
+			return nil
+		}
+
+		if config.cert {
+			signer = findCertSigner(signers, config.principal)
+			if signer == nil {
+				return nil
+			}
+		}
+
+		if config.pubkey {
+			signer = findPubkeySigner(signers, config.fingerprint)
+			if signer == nil {
+				return nil
+			}
 		}
 	}
 

@@ -114,28 +114,34 @@ func SetBasicAuth(username, password string) ClientOption {
 }
 
 // UseSSHCert is an option for NewClient to enable SSH certificate authentication via HTTPSign
-func UseSSHCert(principal string) ClientOption {
+func UseSSHCert(principal, sshKey string) ClientOption {
 	return func(client *Client) error {
 		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
 			return err
 		}
 
 		client.mutex.Lock()
-		client.httpsigner = NewHTTPSignWithCert(principal)
+		client.httpsigner = NewHTTPSignWithCert(principal, sshKey)
+		if client.httpsigner.Signer == nil {
+			return fmt.Errorf("invalid fingerprint or ssh key")
+		}
 		client.mutex.Unlock()
 		return nil
 	}
 }
 
 // UseSSHPubkey is an option for NewClient to enable SSH pubkey authentication via HTTPSign
-func UseSSHPubkey(fingerprint string) ClientOption {
+func UseSSHPubkey(fingerprint, sshKey string) ClientOption {
 	return func(client *Client) error {
 		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
 			return err
 		}
 
 		client.mutex.Lock()
-		client.httpsigner = NewHTTPSignWithPubkey(fingerprint)
+		client.httpsigner = NewHTTPSignWithPubkey(fingerprint, sshKey)
+		if client.httpsigner.Signer == nil {
+			return fmt.Errorf("invalid fingerprint or ssh key")
+		}
 		client.mutex.Unlock()
 		return nil
 	}
