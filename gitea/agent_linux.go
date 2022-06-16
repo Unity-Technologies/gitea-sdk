@@ -21,7 +21,7 @@ func hasAgent() bool {
 	return true
 }
 
-// getAgent returns a ssh agent
+// GetAgent returns a ssh agent
 func GetAgent() (agent.Agent, error) {
 	if !hasAgent() {
 		return nil, fmt.Errorf("no ssh agent available")
