@@ -68,6 +68,28 @@ func newHTTPSign(config *HTTPSignConfig) *HTTPSign {
 		if err != nil {
 			return nil
 		}
+
+		if config.cert {
+			certbytes, err := ioutil.ReadFile(config.sshKey + "-cert.pub")
+			if err != nil {
+				return nil
+			}
+
+			pub, _, _, _, err := ssh.ParseAuthorizedKey(certbytes)
+			if err != nil {
+				return nil
+			}
+
+			cert, ok := pub.(*ssh.Certificate)
+			if !ok {
+				return nil
+			}
+
+			signer, err = ssh.NewCertSigner(cert, signer)
+			if err != nil {
+				return nil
+			}
+		}
 	} else {
 		agent, err := GetAgent()
 		if err != nil {
