@@ -121,11 +121,13 @@ func UseSSHCert(principal, sshKey string) ClientOption {
 		}
 
 		client.mutex.Lock()
+		defer client.mutex.Unlock()
+
 		client.httpsigner = NewHTTPSignWithCert(principal, sshKey)
 		if client.httpsigner.Signer == nil {
 			return fmt.Errorf("invalid fingerprint or ssh key")
 		}
-		client.mutex.Unlock()
+
 		return nil
 	}
 }
@@ -138,11 +140,13 @@ func UseSSHPubkey(fingerprint, sshKey string) ClientOption {
 		}
 
 		client.mutex.Lock()
+		defer client.mutex.Unlock()
+
 		client.httpsigner = NewHTTPSignWithPubkey(fingerprint, sshKey)
 		if client.httpsigner.Signer == nil {
 			return fmt.Errorf("invalid fingerprint or ssh key")
 		}
-		client.mutex.Unlock()
+
 		return nil
 	}
 }

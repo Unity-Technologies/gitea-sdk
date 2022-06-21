@@ -8,8 +8,9 @@ import (
 	"crypto"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -53,13 +54,13 @@ func NewHTTPSignWithCert(principal, sshKey string) *HTTPSign {
 }
 
 // NewHTTPSign returns a new HTTPSign
-// For now this only works with a ssh agent.
+// It will check the ssh-agent or a local file is config.sshKey is set.
 // Depending on the configuration it will either use a certificate or a public key
 func newHTTPSign(config *HTTPSignConfig) *HTTPSign {
 	var signer ssh.Signer
 
 	if config.sshKey != "" {
-		priv, err := ioutil.ReadFile(config.sshKey)
+		priv, err := os.ReadFile(config.sshKey)
 		if err != nil {
 			return nil
 		}
@@ -70,7 +71,7 @@ func newHTTPSign(config *HTTPSignConfig) *HTTPSign {
 		}
 
 		if config.cert {
-			certbytes, err := ioutil.ReadFile(config.sshKey + "-cert.pub")
+			certbytes, err := os.ReadFile(config.sshKey + "-cert.pub")
 			if err != nil {
 				return nil
 			}
@@ -91,6 +92,7 @@ func newHTTPSign(config *HTTPSignConfig) *HTTPSign {
 			}
 		}
 	} else {
+		// if no sshKey is specified, check if we have a ssh-agent and use it
 		agent, err := GetAgent()
 		if err != nil {
 			return nil
@@ -151,7 +153,7 @@ func (c *Client) SignRequest(r *http.Request) error {
 			return fmt.Errorf("getBody() failed: %s", err)
 		}
 
-		contents, err = ioutil.ReadAll(body)
+		contents, err = io.ReadAll(body)
 		if err != nil {
 			return fmt.Errorf("failed reading body: %s", err)
 		}
