@@ -142,6 +142,8 @@ func (c *Client) SignRequest(r *http.Request) error {
 			r.Header.Add("x-ssh-certificate", certString)
 
 			headersToSign = append(headersToSign, "x-ssh-certificate")
+		} else {
+			return fmt.Errorf("no ssh certificate found")
 		}
 	}
 
