@@ -36,12 +36,12 @@ type HTTPSignConfig struct {
 
 // NewHTTPSignWithPubkey can be used to create a HTTPSign with a public key
 // if no fingerprint is specified it returns the first public key found
-func NewHTTPSignWithPubkey(fingerprint, sshKey, password string) (*HTTPSign, error) {
+func NewHTTPSignWithPubkey(fingerprint, sshKey, passphrase string) (*HTTPSign, error) {
 	return newHTTPSign(&HTTPSignConfig{
 		fingerprint: fingerprint,
 		pubkey:      true,
 		sshKey:      sshKey,
-		passphrase:  password,
+		passphrase:  passphrase,
 	})
 }
 
