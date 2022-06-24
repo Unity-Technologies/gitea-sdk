@@ -114,7 +114,10 @@ func SetBasicAuth(username, password string) ClientOption {
 }
 
 // UseSSHCert is an option for NewClient to enable SSH certificate authentication via HTTPSign
-func UseSSHCert(principal, sshKey string) ClientOption {
+// If you want to auth against the ssh-agent you'll need to set a principal, if you want to
+// use a file on disk you'll need to specify sshKey.
+// If you have an encrypted sshKey you'll need to also set the passphrase.
+func UseSSHCert(principal, sshKey, passhphrase string) ClientOption {
 	return func(client *Client) error {
 		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
 			return err
@@ -124,7 +127,7 @@ func UseSSHCert(principal, sshKey string) ClientOption {
 		defer client.mutex.Unlock()
 
 		var err error
-		client.httpsigner, err = NewHTTPSignWithCert(principal, sshKey)
+		client.httpsigner, err = NewHTTPSignWithCert(principal, sshKey, passhphrase)
 		if err != nil {
 			return err
 		}
@@ -134,7 +137,10 @@ func UseSSHCert(principal, sshKey string) ClientOption {
 }
 
 // UseSSHPubkey is an option for NewClient to enable SSH pubkey authentication via HTTPSign
-func UseSSHPubkey(fingerprint, sshKey string) ClientOption {
+// If you want to auth against the ssh-agent you'll need to set a fingerprint, if you want to
+// use a file on disk you'll need to specify sshKey.
+// If you have an encrypted sshKey you'll need to also set the passphrase.
+func UseSSHPubkey(fingerprint, sshKey, passphrase string) ClientOption {
 	return func(client *Client) error {
 		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
 			return err
@@ -144,7 +150,7 @@ func UseSSHPubkey(fingerprint, sshKey string) ClientOption {
 		defer client.mutex.Unlock()
 
 		var err error
-		client.httpsigner, err = NewHTTPSignWithPubkey(fingerprint, sshKey)
+		client.httpsigner, err = NewHTTPSignWithPubkey(fingerprint, sshKey, passphrase)
 		if err != nil {
 			return err
 		}

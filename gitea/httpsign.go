@@ -31,25 +31,28 @@ type HTTPSignConfig struct {
 	pubkey      bool
 	cert        bool
 	sshKey      string
+	passphrase  string
 }
 
 // NewHTTPSignWithPubkey can be used to create a HTTPSign with a public key
 // if no fingerprint is specified it returns the first public key found
-func NewHTTPSignWithPubkey(fingerprint, sshKey string) (*HTTPSign, error) {
+func NewHTTPSignWithPubkey(fingerprint, sshKey, password string) (*HTTPSign, error) {
 	return newHTTPSign(&HTTPSignConfig{
 		fingerprint: fingerprint,
 		pubkey:      true,
 		sshKey:      sshKey,
+		passphrase:  password,
 	})
 }
 
 // NewHTTPSignWithCert can be used to create a HTTPSign with a certificate
 // if no principal is specified it returns the first certificate found
-func NewHTTPSignWithCert(principal, sshKey string) (*HTTPSign, error) {
+func NewHTTPSignWithCert(principal, sshKey, passphrase string) (*HTTPSign, error) {
 	return newHTTPSign(&HTTPSignConfig{
-		principal: principal,
-		cert:      true,
-		sshKey:    sshKey,
+		principal:  principal,
+		cert:       true,
+		sshKey:     sshKey,
+		passphrase: passphrase,
 	})
 }
 
@@ -65,9 +68,16 @@ func newHTTPSign(config *HTTPSignConfig) (*HTTPSign, error) {
 			return nil, err
 		}
 
-		signer, err = ssh.ParsePrivateKey(priv)
-		if err != nil {
-			return nil, err
+		if config.passphrase == "" {
+			signer, err = ssh.ParsePrivateKey(priv)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			signer, err = ssh.ParsePrivateKeyWithPassphrase(priv, []byte(config.passphrase))
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		if config.cert {
