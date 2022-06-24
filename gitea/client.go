@@ -117,7 +117,7 @@ func SetBasicAuth(username, password string) ClientOption {
 // If you want to auth against the ssh-agent you'll need to set a principal, if you want to
 // use a file on disk you'll need to specify sshKey.
 // If you have an encrypted sshKey you'll need to also set the passphrase.
-func UseSSHCert(principal, sshKey, passhphrase string) ClientOption {
+func UseSSHCert(principal, sshKey, passphrase string) ClientOption {
 	return func(client *Client) error {
 		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
 			return err
@@ -127,7 +127,7 @@ func UseSSHCert(principal, sshKey, passhphrase string) ClientOption {
 		defer client.mutex.Unlock()
 
 		var err error
-		client.httpsigner, err = NewHTTPSignWithCert(principal, sshKey, passhphrase)
+		client.httpsigner, err = NewHTTPSignWithCert(principal, sshKey, passphrase)
 		if err != nil {
 			return err
 		}
