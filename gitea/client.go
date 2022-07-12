@@ -29,17 +29,17 @@ func Version() string {
 
 // Client represents a thread-safe Gitea API client.
 type Client struct {
-	url         string
-	accessToken string
-	username    string
-	password    string
-	otp         string
-	sudo        string
-	debug       bool
-	client      *http.Client
-	ctx         context.Context
-	mutex       sync.RWMutex
-
+	url            string
+	accessToken    string
+	username       string
+	password       string
+	otp            string
+	sudo           string
+	debug          bool
+	httpsigner     *HTTPSign
+	client         *http.Client
+	ctx            context.Context
+	mutex          sync.RWMutex
 	serverVersion  *version.Version
 	getVersionOnce sync.Once
 	ignoreVersion  bool // only set by SetGiteaVersion so don't need a mutex lock
@@ -69,6 +69,7 @@ func NewClient(url string, options ...ClientOption) (*Client, error) {
 	if err := client.checkServerVersionGreaterThanOrEqual(version1_11_0); err != nil {
 		return nil, err
 	}
+
 	return client, nil
 }
 
@@ -108,6 +109,52 @@ func SetToken(token string) ClientOption {
 func SetBasicAuth(username, password string) ClientOption {
 	return func(client *Client) error {
 		client.SetBasicAuth(username, password)
+		return nil
+	}
+}
+
+// UseSSHCert is an option for NewClient to enable SSH certificate authentication via HTTPSign
+// If you want to auth against the ssh-agent you'll need to set a principal, if you want to
+// use a file on disk you'll need to specify sshKey.
+// If you have an encrypted sshKey you'll need to also set the passphrase.
+func UseSSHCert(principal, sshKey, passphrase string) ClientOption {
+	return func(client *Client) error {
+		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
+			return err
+		}
+
+		client.mutex.Lock()
+		defer client.mutex.Unlock()
+
+		var err error
+		client.httpsigner, err = NewHTTPSignWithCert(principal, sshKey, passphrase)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
+// UseSSHPubkey is an option for NewClient to enable SSH pubkey authentication via HTTPSign
+// If you want to auth against the ssh-agent you'll need to set a fingerprint, if you want to
+// use a file on disk you'll need to specify sshKey.
+// If you have an encrypted sshKey you'll need to also set the passphrase.
+func UseSSHPubkey(fingerprint, sshKey, passphrase string) ClientOption {
+	return func(client *Client) error {
+		if err := client.checkServerVersionGreaterThanOrEqual(version1_17_0); err != nil {
+			return err
+		}
+
+		client.mutex.Lock()
+		defer client.mutex.Unlock()
+
+		var err error
+		client.httpsigner, err = NewHTTPSignWithPubkey(fingerprint, sshKey, passphrase)
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}
 }
@@ -237,6 +284,13 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 
 	for k, v := range header {
 		req.Header[k] = v
+	}
+
+	if c.httpsigner != nil {
+		err = c.SignRequest(req)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := client.Do(req)

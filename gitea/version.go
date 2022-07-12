@@ -67,6 +67,7 @@ var (
 	version1_14_0 = version.Must(version.NewVersion("1.14.0"))
 	version1_15_0 = version.Must(version.NewVersion("1.15.0"))
 	version1_16_0 = version.Must(version.NewVersion("1.16.0"))
+	version1_17_0 = version.Must(version.NewVersion("1.17.0"))
 )
 
 // checkServerVersionGreaterThanOrEqual is the canonical way in the SDK to check for versions for API compatibility reasons
