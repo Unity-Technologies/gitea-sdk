@@ -35,6 +35,11 @@ func TestOrgMembership(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, check)
 
+	perm, _, err := c.GetOrgPermissions(newOrg.UserName, user.UserName)
+	assert.NoError(t, err)
+	assert.NotNil(t, perm)
+	assert.True(t, perm.IsOwner)
+
 	_, err = c.SetPublicOrgMembership(newOrg.UserName, user.UserName, true)
 	assert.NoError(t, err)
 	check, _, err = c.CheckPublicOrgMembership(newOrg.UserName, user.UserName)
