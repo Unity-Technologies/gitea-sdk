@@ -341,10 +341,25 @@ func statusCodeToErr(resp *Response) (body []byte, err error) {
 	return data, fmt.Errorf("%s: %s", resp.Status, string(data))
 }
 
+func (c *Client) getResponseReader(method, path string, header http.Header, body io.Reader) (io.ReadCloser, *Response, error) {
+	resp, err := c.doRequest(method, path, header, body)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	// check for errors
+	data, err := statusCodeToErr(resp)
+	if err != nil {
+		return io.NopCloser(bytes.NewReader(data)), resp, err
+	}
+
+	return resp.Body, resp, nil
+}
+
 func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {
 	resp, err := c.doRequest(method, path, header, body)
 	if err != nil {
-		return nil, nil, err
+		return nil, resp, err
 	}
 	defer resp.Body.Close()
 
