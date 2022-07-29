@@ -123,18 +123,17 @@ type FileDeleteResponse struct {
 // e.g.: ref -> master, filepath -> README.md (no leading slash)
 func (c *Client) GetFile(owner, repo, ref, filepath string, resolveLFS ...bool) ([]byte, *Response, error) {
 	reader, resp, err := c.GetFileReader(owner, repo, ref, filepath, resolveLFS...)
-	if err != nil {
-		return nil, nil, err
+	if reader == nil {
+		return nil, resp, err
 	}
 	defer reader.Close()
 
-	// success (2XX), read body
-	data, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, resp, err
+	data, err2 := ioutil.ReadAll(reader)
+	if err2 != nil {
+		return nil, resp, err2
 	}
 
-	return data, resp, nil
+	return data, resp, err
 }
 
 // GetFileReader return reader for download a file of repository, ref can be branch/tag/commit.

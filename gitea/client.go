@@ -344,7 +344,7 @@ func statusCodeToErr(resp *Response) (body []byte, err error) {
 func (c *Client) getResponseReader(method, path string, header http.Header, body io.Reader) (io.ReadCloser, *Response, error) {
 	resp, err := c.doRequest(method, path, header, body)
 	if err != nil {
-		return nil, nil, err
+		return nil, resp, err
 	}
 
 	// check for errors
@@ -359,7 +359,7 @@ func (c *Client) getResponseReader(method, path string, header http.Header, body
 func (c *Client) getResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {
 	resp, err := c.doRequest(method, path, header, body)
 	if err != nil {
-		return nil, nil, err
+		return nil, resp, err
 	}
 	defer resp.Body.Close()
 
