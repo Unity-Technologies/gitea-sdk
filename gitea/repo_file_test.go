@@ -60,6 +60,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	assert.NoError(t, err)
 	_, resp, err := c.GetFile(repo.Owner.UserName, repo.Name, "main", testFileName)
 	assert.Error(t, err)
+	assert.EqualValues(t, "The target couldn't be found.", err.Error())
 	assert.EqualValues(t, 404, resp.StatusCode)
 
 	licence, _, err := c.GetContents(repo.Owner.UserName, repo.Name, "", "LICENSE")
