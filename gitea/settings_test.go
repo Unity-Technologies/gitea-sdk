@@ -39,7 +39,7 @@ func TestGetGlobalSettings(t *testing.T) {
 
 	attachSettings, _, err := c.GetGlobalAttachmentSettings()
 	assert.NoError(t, err)
-	if assert.True(t, len(attachSettings.AllowedTypes) > 100) {
+	if assert.NotEmpty(t, attachSettings.AllowedTypes) {
 		attachSettings.AllowedTypes = ""
 	}
 	assert.EqualValues(t, &GlobalAttachmentSettings{
