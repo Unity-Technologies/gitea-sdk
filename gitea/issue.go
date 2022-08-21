@@ -289,6 +289,17 @@ func (c *Client) EditIssue(owner, repo string, index int64, opt EditIssueOption)
 	return issue, resp, err
 }
 
+// DeleteIssue delete a issue from a repository
+func (c *Client) DeleteIssue(user, repo string, id int64) (*Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo); err != nil {
+		return nil, err
+	}
+	_, resp, err := c.getResponse("DELETE",
+		fmt.Sprintf("/repos/%s/%s/issues/%d", user, repo, id),
+		nil, nil)
+	return resp, err
+}
+
 func (c *Client) issueBackwardsCompatibility(issue *Issue) {
 	if c.checkServerVersionGreaterThanOrEqual(version1_12_0) != nil {
 		c.mutex.RLock()
