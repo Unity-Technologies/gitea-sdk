@@ -57,7 +57,7 @@ func TestRepoMigrateAndLanguages(t *testing.T) {
 	repoG, _, err := c.GetRepo(repoM.Owner.UserName, repoM.Name)
 	assert.NoError(t, err)
 	assert.EqualValues(t, repoM.ID, repoG.ID)
-	assert.EqualValues(t, "master", repoG.DefaultBranch)
+	assert.EqualValues(t, "main", repoG.DefaultBranch)
 	assert.True(t, repoG.Mirror)
 	assert.False(t, repoG.Empty)
 	assert.EqualValues(t, 1, repoG.Watchers)
