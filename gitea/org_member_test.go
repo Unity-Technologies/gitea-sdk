@@ -12,7 +12,6 @@ import (
 )
 
 /*
-*
 // DeleteOrgMembership remove a member from an organization
 func (c *Client) DeleteOrgMembership(org, user string) error {}
 */
