@@ -50,7 +50,7 @@ func TestTeamSearch(t *testing.T) {
 		Query: "Admins",
 	})
 	assert.NoError(t, err)
-	assert.Len(t, teams, 1)
-
-	assert.Equal(t, "Admins", teams[0].Name)
+	if assert.Len(t, teams, 1) {
+		assert.Equal(t, "Admins", teams[0].Name)
+	}
 }

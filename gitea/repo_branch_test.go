@@ -6,6 +6,7 @@ package gitea
 
 import (
 	"log"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -25,7 +26,9 @@ func TestRepoBranches(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, bl, 3)
 
-	// FIXME: order of returned branches is not deterministic!
+	sort.Slice(bl, func(i, j int) bool {
+		return bl[i].Name < bl[j].Name
+	})
 	assert.EqualValues(t, "feature", bl[0].Name)
 	assert.EqualValues(t, "main", bl[1].Name)
 	assert.EqualValues(t, "update", bl[2].Name)
