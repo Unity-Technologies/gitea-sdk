@@ -164,15 +164,17 @@ func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOpti
 
 // EditPullRequestOption options when modify pull request
 type EditPullRequestOption struct {
-	Title     string     `json:"title"`
-	Body      string     `json:"body"`
-	Base      string     `json:"base"`
-	Assignee  string     `json:"assignee"`
-	Assignees []string   `json:"assignees"`
-	Milestone int64      `json:"milestone"`
-	Labels    []int64    `json:"labels"`
-	State     *StateType `json:"state"`
-	Deadline  *time.Time `json:"due_date"`
+	Title               string     `json:"title"`
+	Body                string     `json:"body"`
+	Base                string     `json:"base"`
+	Assignee            string     `json:"assignee"`
+	Assignees           []string   `json:"assignees"`
+	Milestone           int64      `json:"milestone"`
+	Labels              []int64    `json:"labels"`
+	State               *StateType `json:"state"`
+	Deadline            *time.Time `json:"due_date"`
+	RemoveDeadline      *bool      `json:"unset_due_date"`
+	AllowMaintainerEdit *bool      `json:"allow_maintainer_edit"`
 }
 
 // Validate the EditPullRequestOption struct
