@@ -22,6 +22,7 @@ func TestIssue(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	editIssues(t, c)
 	listIssues(t, c)
+	deleteIssue(t, c)
 }
 
 func createIssue(t *testing.T, c *Client) {
@@ -45,6 +46,18 @@ func createIssue(t *testing.T, c *Client) {
 	createTestIssue(t, c, repo.Name, "Do it soon!", "is important!", []string{user.UserName}, &nowTime, mile.ID, []int64{label1.ID, label2.ID}, false, false)
 	createTestIssue(t, c, repo.Name, "Job Done", "you never know", nil, nil, mile.ID, []int64{label2.ID}, true, false)
 	createTestIssue(t, c, repo.Name, "", "you never know", nil, nil, mile.ID, nil, true, true)
+}
+
+func deleteIssue(t *testing.T, c *Client) {
+	log.Println("== TestDeleteIssues ==")
+
+	user, _, err := c.GetMyUserInfo()
+	assert.NoError(t, err)
+	repo, _ := createTestRepo(t, "IssueTestsRepo", c)
+
+	issue := createTestIssue(t, c, repo.Name, "Deleteable Issue", "", nil, nil, 0, nil, false, false)
+	_, err = c.DeleteIssue(user.UserName, repo.Name, issue.Index)
+	assert.NoError(t, err)
 }
 
 func editIssues(t *testing.T, c *Client) {
@@ -104,7 +117,7 @@ func listIssues(t *testing.T, c *Client) {
 	assert.Len(t, issues, 3)
 }
 
-func createTestIssue(t *testing.T, c *Client, repoName, title, body string, assignees []string, deadline *time.Time, milestone int64, labels []int64, closed, shouldFail bool) {
+func createTestIssue(t *testing.T, c *Client, repoName, title, body string, assignees []string, deadline *time.Time, milestone int64, labels []int64, closed, shouldFail bool) *Issue {
 	user, _, err := c.GetMyUserInfo()
 	assert.NoError(t, err)
 	issue, _, e := c.CreateIssue(user.UserName, repoName, CreateIssueOption{
@@ -118,7 +131,7 @@ func createTestIssue(t *testing.T, c *Client, repoName, title, body string, assi
 	})
 	if shouldFail {
 		assert.Error(t, e)
-		return
+		return nil
 	}
 	assert.NoError(t, e)
 	assert.NotEmpty(t, issue)
@@ -137,4 +150,5 @@ func createTestIssue(t *testing.T, c *Client, repoName, title, body string, assi
 	} else {
 		assert.Empty(t, issue.Closed)
 	}
+	return issue
 }
