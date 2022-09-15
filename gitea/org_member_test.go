@@ -11,11 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-/**
+/*
+*
 // DeleteOrgMembership remove a member from an organization
 func (c *Client) DeleteOrgMembership(org, user string) error {}
-
-
 */
 func TestOrgMembership(t *testing.T) {
 	log.Println("== TestOrgMembership ==")

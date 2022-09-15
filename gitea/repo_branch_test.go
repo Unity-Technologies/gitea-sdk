@@ -24,6 +24,8 @@ func TestRepoBranches(t *testing.T) {
 	bl, _, err := c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bl, 3)
+
+	// FIXME: order of returned branches is not deterministic!
 	assert.EqualValues(t, "feature", bl[0].Name)
 	assert.EqualValues(t, "main", bl[1].Name)
 	assert.EqualValues(t, "update", bl[2].Name)
