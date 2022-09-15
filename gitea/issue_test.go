@@ -56,7 +56,7 @@ func deleteIssue(t *testing.T, c *Client) {
 	repo, _ := createTestRepo(t, "IssueTestsRepo", c)
 
 	issue := createTestIssue(t, c, repo.Name, "Deleteable Issue", "", nil, nil, 0, nil, false, false)
-	_, err = c.DeleteIssue(user.UserName, repo.Name, issue.ID)
+	_, err = c.DeleteIssue(user.UserName, repo.Name, issue.Index)
 	assert.NoError(t, err)
 }
 
