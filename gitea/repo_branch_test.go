@@ -6,6 +6,7 @@ package gitea
 
 import (
 	"log"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,6 +25,10 @@ func TestRepoBranches(t *testing.T) {
 	bl, _, err := c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bl, 3)
+
+	sort.Slice(bl, func(i, j int) bool {
+		return bl[i].Name < bl[j].Name
+	})
 	assert.EqualValues(t, "feature", bl[0].Name)
 	assert.EqualValues(t, "main", bl[1].Name)
 	assert.EqualValues(t, "update", bl[2].Name)
