@@ -43,11 +43,12 @@ type PullRequest struct {
 	DiffURL  string `json:"diff_url"`
 	PatchURL string `json:"patch_url"`
 
-	Mergeable      bool       `json:"mergeable"`
-	HasMerged      bool       `json:"merged"`
-	Merged         *time.Time `json:"merged_at"`
-	MergedCommitID *string    `json:"merge_commit_sha"`
-	MergedBy       *User      `json:"merged_by"`
+	Mergeable           bool       `json:"mergeable"`
+	HasMerged           bool       `json:"merged"`
+	Merged              *time.Time `json:"merged_at"`
+	MergedCommitID      *string    `json:"merge_commit_sha"`
+	MergedBy            *User      `json:"merged_by"`
+	AllowMaintainerEdit bool       `json:"allow_maintainer_edit"`
 
 	Base      *PRBranchInfo `json:"base"`
 	Head      *PRBranchInfo `json:"head"`
