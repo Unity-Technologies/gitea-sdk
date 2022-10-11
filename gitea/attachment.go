@@ -110,6 +110,7 @@ func (c *Client) DeleteReleaseAttachment(user, repo string, release, id int64) (
 	return resp, err
 }
 
+// DownloadReleaseAttachment Download an Attachment of the Release by UUID
 func (c *Client) DownloadReleaseAttachment(UUID string) ([]byte, *Response, error) {
 	if err := escapeValidatePathSegments(&UUID); err != nil {
 		return nil, nil, err
