@@ -109,3 +109,10 @@ func (c *Client) DeleteReleaseAttachment(user, repo string, release, id int64) (
 	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, id), nil, nil)
 	return resp, err
 }
+
+func (c *Client) DownloadReleaseAttachment(UUID string) ([]byte, *Response, error) {
+	if err := escapeValidatePathSegments(&UUID); err != nil {
+		return nil, nil, err
+	}
+	return c.getRawResponse(http.MethodGet, fmt.Sprintf("/attachments/%s", UUID), nil, nil)
+}
