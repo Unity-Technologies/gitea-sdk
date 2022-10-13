@@ -72,6 +72,7 @@ func TestPull(t *testing.T) {
 	}
 
 	files, _, err := c.ListPullRequestFiles(c.username, repoName, pullUpdateFile.Index, ListPullRequestFilesOptions{})
+	assert.NoError(t, err)
 	assert.Len(t, files, 1)
 	file := files[0]
 	assert.EqualValues(t, "LICENSE", file.Filename)
