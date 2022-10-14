@@ -450,26 +450,19 @@ func (c *Client) getStatusCode(method, path string, header http.Header, body io.
 	return resp.StatusCode, resp, nil
 }
 
-func (c *Client) getRawResponse(method, path string, header http.Header, body io.Reader) ([]byte, *Response, error) {
+func (c *Client) getRawResponse(method, path string, header http.Header, body io.Reader) (io.ReadCloser, *Response, error) {
 	resp, err := c.doRawRequest(method, path, header, body)
 	if err != nil {
 		return nil, resp, err
 	}
-	defer resp.Body.Close()
 
 	// check for errors
 	data, err := statusCodeToErr(resp)
 	if err != nil {
-		return data, resp, err
+		return io.NopCloser(bytes.NewReader(data)), resp, err
 	}
 
-	// success (2XX), read body
-	data, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return data, resp, nil
+	return resp.Body, resp, nil
 }
 
 // pathEscapeSegments escapes segments of a path while not escaping forward slash
