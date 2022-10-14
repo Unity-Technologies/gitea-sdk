@@ -63,14 +63,14 @@ type PullRequest struct {
 // ChangedFile is a changed file in a diff
 type ChangedFile struct {
 	Filename         string `json:"filename"`
-	PreviousFilename string `json:"previous_filename,omitempty"`
+	PreviousFilename string `json:"previous_filename"`
 	Status           string `json:"status"`
 	Additions        int    `json:"additions"`
 	Deletions        int    `json:"deletions"`
 	Changes          int    `json:"changes"`
-	HTMLURL          string `json:"html_url,omitempty"`
-	ContentsURL      string `json:"contents_url,omitempty"`
-	RawURL           string `json:"raw_url,omitempty"`
+	HTMLURL          string `json:"html_url"`
+	ContentsURL      string `json:"contents_url"`
+	RawURL           string `json:"raw_url"`
 }
 
 // ListPullRequestsOptions options for listing pull requests
