@@ -115,5 +115,5 @@ func (c *Client) DownloadReleaseAttachment(UUID string) (io.ReadCloser, *Respons
 	if err := escapeValidatePathSegments(&UUID); err != nil {
 		return nil, nil, err
 	}
-	return c.getRawResponse(http.MethodGet, fmt.Sprintf("/attachments/%s", UUID), nil, nil)
+	return c.getWebResponseReader(http.MethodGet, fmt.Sprintf("/attachments/%s", UUID), nil)
 }

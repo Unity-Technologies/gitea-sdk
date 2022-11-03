@@ -221,7 +221,7 @@ func SetDebugMode() ClientOption {
 	}
 }
 
-func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *Response, error) {
+func (c *Client) doWebRequest(method, path string, body io.Reader) (*Response, error) {
 	c.mutex.RLock()
 	debug := c.debug
 	if debug {
@@ -232,21 +232,42 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	client := c.client // client ref can change from this point on so safe it
 	c.mutex.RUnlock()
 
-	if err != nil {
-		return nil, nil, err
-	}
-
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
-	if debug {
-		fmt.Printf("Response: %v\n\n", resp)
+	return &Response{resp}, err
+}
+
+func (c *Client) getWebResponseReader(method, path string, body io.Reader) (io.ReadCloser, *Response, error) {
+	resp, err := c.doWebRequest(method, path, body)
+	if err != nil {
+		return nil, resp, err
 	}
-	return data, &Response{resp}, err
+
+	// check for errors
+	data, err := statusCodeToErr(resp)
+	if err != nil {
+		return io.NopCloser(bytes.NewReader(data)), resp, err
+	}
+
+	return resp.Body, resp, nil
+}
+
+func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *Response, error) {
+	rd, resp, err := c.getWebResponseReader(method, path, body)
+	defer func() {
+		if rd != nil {
+			rd.Close()
+		}
+	}()
+	if err != nil || rd == nil {
+		return nil, resp, err
+	}
+
+	data, err := ioutil.ReadAll(rd)
+	return data, resp, err
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
@@ -262,60 +283,6 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+"/api/v1"+path, header, bodyStr)
 	}
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+"/api/v1"+path, body)
-	if err != nil {
-		c.mutex.RUnlock()
-		return nil, err
-	}
-	if len(c.accessToken) != 0 {
-		req.Header.Set("Authorization", "token "+c.accessToken)
-	}
-	if len(c.otp) != 0 {
-		req.Header.Set("X-GITEA-OTP", c.otp)
-	}
-	if len(c.username) != 0 {
-		req.SetBasicAuth(c.username, c.password)
-	}
-	if len(c.sudo) != 0 {
-		req.Header.Set("Sudo", c.sudo)
-	}
-
-	client := c.client // client ref can change from this point on so safe it
-	c.mutex.RUnlock()
-
-	for k, v := range header {
-		req.Header[k] = v
-	}
-
-	if c.httpsigner != nil {
-		err = c.SignRequest(req)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	if debug {
-		fmt.Printf("Response: %v\n\n", resp)
-	}
-	return &Response{resp}, nil
-}
-
-func (c *Client) doRawRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
-	c.mutex.RLock()
-	debug := c.debug
-	if debug {
-		var bodyStr string
-		if body != nil {
-			bs, _ := ioutil.ReadAll(body)
-			body = bytes.NewReader(bs)
-			bodyStr = string(bs)
-		}
-		fmt.Printf("%s: %s\nHeader: %v\nBody: %s\n", method, c.url+path, header, bodyStr)
-	}
-	req, err := http.NewRequestWithContext(c.ctx, method, c.url+path, body)
 	if err != nil {
 		c.mutex.RUnlock()
 		return nil, err
@@ -448,21 +415,6 @@ func (c *Client) getStatusCode(method, path string, header http.Header, body io.
 	defer resp.Body.Close()
 
 	return resp.StatusCode, resp, nil
-}
-
-func (c *Client) getRawResponse(method, path string, header http.Header, body io.Reader) (io.ReadCloser, *Response, error) {
-	resp, err := c.doRawRequest(method, path, header, body)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	// check for errors
-	data, err := statusCodeToErr(resp)
-	if err != nil {
-		return io.NopCloser(bytes.NewReader(data)), resp, err
-	}
-
-	return resp.Body, resp, nil
 }
 
 // pathEscapeSegments escapes segments of a path while not escaping forward slash
