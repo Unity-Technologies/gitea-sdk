@@ -223,11 +223,17 @@ func SetDebugMode() ClientOption {
 
 func (c *Client) doWebRequest(method, path string, body io.Reader) (*Response, error) {
 	c.mutex.RLock()
+
 	debug := c.debug
 	if debug {
 		fmt.Printf("%s: %s\nBody: %v\n", method, c.url+path, body)
 	}
+
 	req, err := http.NewRequestWithContext(c.ctx, method, c.url+path, body)
+	if err != nil {
+		c.mutex.RUnlock()
+		return nil, err
+	}
 
 	client := c.client // client ref can change from this point on so safe it
 	c.mutex.RUnlock()
