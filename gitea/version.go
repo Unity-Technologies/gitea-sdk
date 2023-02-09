@@ -6,6 +6,7 @@ package gitea
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/go-version"
 )
@@ -97,6 +98,11 @@ func (c *Client) loadServerVersion() (err error) {
 			return
 		}
 		if c.serverVersion, err = version.NewVersion(raw); err != nil {
+			if strings.TrimSpace(raw) != "" {
+				// Version was something, just not recognized
+				// Default to lowest version for safety
+				c.serverVersion = version1_11_0
+			}
 			return
 		}
 	})
