@@ -43,11 +43,12 @@ type PullRequest struct {
 	DiffURL  string `json:"diff_url"`
 	PatchURL string `json:"patch_url"`
 
-	Mergeable      bool       `json:"mergeable"`
-	HasMerged      bool       `json:"merged"`
-	Merged         *time.Time `json:"merged_at"`
-	MergedCommitID *string    `json:"merge_commit_sha"`
-	MergedBy       *User      `json:"merged_by"`
+	Mergeable           bool       `json:"mergeable"`
+	HasMerged           bool       `json:"merged"`
+	Merged              *time.Time `json:"merged_at"`
+	MergedCommitID      *string    `json:"merge_commit_sha"`
+	MergedBy            *User      `json:"merged_by"`
+	AllowMaintainerEdit bool       `json:"allow_maintainer_edit"`
 
 	Base      *PRBranchInfo `json:"base"`
 	Head      *PRBranchInfo `json:"head"`
@@ -57,6 +58,19 @@ type PullRequest struct {
 	Created  *time.Time `json:"created_at"`
 	Updated  *time.Time `json:"updated_at"`
 	Closed   *time.Time `json:"closed_at"`
+}
+
+// ChangedFile is a changed file in a diff
+type ChangedFile struct {
+	Filename         string `json:"filename"`
+	PreviousFilename string `json:"previous_filename"`
+	Status           string `json:"status"`
+	Additions        int    `json:"additions"`
+	Deletions        int    `json:"deletions"`
+	Changes          int    `json:"changes"`
+	HTMLURL          string `json:"html_url"`
+	ContentsURL      string `json:"contents_url"`
+	RawURL           string `json:"raw_url"`
 }
 
 // ListPullRequestsOptions options for listing pull requests
@@ -346,4 +360,22 @@ func fixPullHeadSha(client *Client, pr *PullRequest) error {
 		pr.Head.Sha = refs[0].Object.SHA
 	}
 	return nil
+}
+
+// ListPullRequestFilesOptions options for listing pull request files
+type ListPullRequestFilesOptions struct {
+	ListOptions
+}
+
+// ListPullRequestFiles list changed files for a pull request
+func (c *Client) ListPullRequestFiles(owner, repo string, index int64, opt ListPullRequestFilesOptions) ([]*ChangedFile, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls/%d/files", owner, repo, index))
+	opt.setDefaults()
+	files := make([]*ChangedFile, 0, opt.PageSize)
+	link.RawQuery = opt.getURLQuery().Encode()
+	resp, err := c.getParsedResponse("GET", link.String(), nil, nil, &files)
+	return files, resp, err
 }
