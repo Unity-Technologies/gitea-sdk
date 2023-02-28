@@ -11,7 +11,7 @@ PACKAGE := code.gitea.io/sdk/gitea
 GOFUMPT_PACKAGE ?= mvdan.cc/gofumpt@v0.4.0
 GOLANGCI_LINT_PACKAGE ?= github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.0
 
-GITEA_VERSION := 1.16
+GITEA_VERSION := 1.18
 GITEA_DL := https://dl.gitea.io/gitea/$(GITEA_VERSION)/gitea-$(GITEA_VERSION)-
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
