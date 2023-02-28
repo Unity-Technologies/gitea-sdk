@@ -62,7 +62,7 @@ vet:
 	# Default vet
 	cd gitea && $(GO) vet $(PACKAGE)
 	# Custom vet
-	cd gitea && $(GO) get code.gitea.io/gitea-vet
+	cd gitea && $(GO) get code.gitea.io/gitea-vet@v0.2.1
 	cd gitea && $(GO) build code.gitea.io/gitea-vet
 	cd gitea && $(GO) vet -vettool=gitea-vet $(PACKAGE)
 
