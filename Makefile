@@ -8,6 +8,9 @@ GITEA_SDK_TEST_PASSWORD ?= test01
 
 PACKAGE := code.gitea.io/sdk/gitea
 
+GOFUMPT_PACKAGE ?= mvdan.cc/gofumpt@v0.4.0
+GOLANGCI_LINT_PACKAGE ?= github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.0
+
 GITEA_DL := https://dl.gitea.io/gitea/main/gitea-main-
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -55,7 +58,7 @@ clean:
 .PHONY: fmt
 fmt:
 	find . -name "*.go" -type f | xargs gofmt -s -w; \
-	$(GO) run mvdan.cc/gofumpt@latest -extra -w ./gitea
+	$(GO) run $(GOFUMPT_PACKAGE) -extra -w ./gitea
 
 .PHONY: vet
 vet:
@@ -67,19 +70,14 @@ vet:
 	cd gitea && $(GO) vet -vettool=gitea-vet $(PACKAGE)
 
 .PHONY: ci-lint
-ci-lint: tool-golangci tool-gofumpt tool-revive
-	@cd gitea/; echo -n "revive ..."; \
-	revive -config ../.revive.toml .; \
-	if [ $$? -eq 1 ]; then \
-		echo; echo "Doesn't pass revive"; \
-		exit 1; \
-	fi; echo " done"; echo -n "gofumpt ...";\
-	diff=$$(gofumpt -extra -l .); \
+ci-lint: 
+	@cd gitea/; echo -n "gofumpt ...";\
+	diff=$$($(GO) run $(GOFUMPT_PACKAGE) -extra -l .); \
 	if [ -n "$$diff" ]; then \
 		echo; echo "Not gofumpt-ed"; \
 		exit 1; \
 	fi; echo " done"; echo -n "golangci-lint ...";\
-	golangci-lint run --timeout 5m; \
+	$(GO) run $(GOLANGCI_LINT_PACKAGE) run --timeout 5m; \
 	if [ $$? -eq 1 ]; then \
 		echo; echo "Doesn't pass golangci-lint"; \
 		exit 1; \
@@ -122,17 +120,3 @@ bench:
 build:
 	cd gitea && $(GO) build
 
-tool-golangci:
-	@hash golangci-lint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-	$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
-	fi
-
-tool-gofumpt:
-	@hash gofumpt > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-	$(GO) install mvdan.cc/gofumpt@latest; \
-	fi
-
-tool-revive:
-	@hash revive > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-	$(GO) install github.com/mgechev/revive@latest; \
-	fi
