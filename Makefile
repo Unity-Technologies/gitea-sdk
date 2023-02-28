@@ -10,6 +10,7 @@ PACKAGE := code.gitea.io/sdk/gitea
 
 GOFUMPT_PACKAGE ?= mvdan.cc/gofumpt@v0.4.0
 GOLANGCI_LINT_PACKAGE ?= github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.0
+GITEA_VET_PACKAGE ?= code.gitea.io/gitea-vet@v0.2.1
 
 GITEA_VERSION := 1.18
 GITEA_DL := https://dl.gitea.io/gitea/$(GITEA_VERSION)/gitea-$(GITEA_VERSION)-
@@ -66,7 +67,7 @@ vet:
 	# Default vet
 	cd gitea && $(GO) vet $(PACKAGE)
 	# Custom vet
-	cd gitea && $(GO) get code.gitea.io/gitea-vet@v0.2.1
+	cd gitea && $(GO) get $(GITEA_VET_PACKAGE)
 	cd gitea && $(GO) build code.gitea.io/gitea-vet
 	cd gitea && $(GO) vet -vettool=gitea-vet $(PACKAGE)
 
