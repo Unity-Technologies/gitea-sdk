@@ -16,6 +16,13 @@ type ListCollaboratorsOptions struct {
 	ListOptions
 }
 
+// CollaboratorPermissionResult result type for CollaboratorPermission
+type CollaboratorPermissionResult struct {
+	Permission AccessMode `json:"permission"`
+	Role       string     `json:"role_name"`
+	User       *User      `json:"user"`
+}
+
 // ListCollaborators list a repository's collaborators
 func (c *Client) ListCollaborators(user, repo string, opt ListCollaboratorsOptions) ([]*User, *Response, error) {
 	if err := escapeValidatePathSegments(&user, &repo); err != nil {
@@ -42,6 +49,26 @@ func (c *Client) IsCollaborator(user, repo, collaborator string) (bool, *Respons
 		return true, resp, nil
 	}
 	return false, resp, nil
+}
+
+// CollaboratorPermission gets collaborator permission of a repository
+func (c *Client) CollaboratorPermission(user, repo, collaborator string) (*CollaboratorPermissionResult, *Response, error) {
+	if err := escapeValidatePathSegments(&user, &repo, &collaborator); err != nil {
+		return nil, nil, err
+	}
+	rv := new(CollaboratorPermissionResult)
+	resp, err := c.getParsedResponse("GET",
+		fmt.Sprintf("/repos/%s/%s/collaborators/%s/permission", user, repo, collaborator),
+		nil,
+		nil,
+		rv)
+	if err != nil {
+		return nil, resp, err
+	}
+	if resp.StatusCode != 200 {
+		rv = nil
+	}
+	return rv, resp, nil
 }
 
 // AddCollaboratorOption options when adding a user as a collaborator of a repository
