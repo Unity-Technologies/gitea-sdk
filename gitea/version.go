@@ -5,6 +5,7 @@
 package gitea
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -60,15 +61,16 @@ func SetGiteaVersion(v string) ClientOption {
 
 // predefined versions only have to be parsed by library once
 var (
-	version1_11_0 = version.Must(version.NewVersion("1.11.0"))
-	version1_11_5 = version.Must(version.NewVersion("1.11.5"))
-	version1_12_0 = version.Must(version.NewVersion("1.12.0"))
-	version1_12_3 = version.Must(version.NewVersion("1.12.3"))
-	version1_13_0 = version.Must(version.NewVersion("1.13.0"))
-	version1_14_0 = version.Must(version.NewVersion("1.14.0"))
-	version1_15_0 = version.Must(version.NewVersion("1.15.0"))
-	version1_16_0 = version.Must(version.NewVersion("1.16.0"))
-	version1_17_0 = version.Must(version.NewVersion("1.17.0"))
+	version1_11_0     = version.Must(version.NewVersion("1.11.0"))
+	version1_11_5     = version.Must(version.NewVersion("1.11.5"))
+	version1_12_0     = version.Must(version.NewVersion("1.12.0"))
+	version1_12_3     = version.Must(version.NewVersion("1.12.3"))
+	version1_13_0     = version.Must(version.NewVersion("1.13.0"))
+	version1_14_0     = version.Must(version.NewVersion("1.14.0"))
+	version1_15_0     = version.Must(version.NewVersion("1.15.0"))
+	version1_16_0     = version.Must(version.NewVersion("1.16.0"))
+	version1_17_0     = version.Must(version.NewVersion("1.17.0"))
+	ErrUnknownVersion = errors.New("unknown version; setting to 1.11.0 for compatibility")
 )
 
 // checkServerVersionGreaterThanOrEqual is the canonical way in the SDK to check for versions for API compatibility reasons
@@ -102,6 +104,7 @@ func (c *Client) loadServerVersion() (err error) {
 				// Version was something, just not recognized
 				// Default to lowest version for safety
 				c.serverVersion = version1_11_0
+				err = ErrUnknownVersion
 			}
 			return
 		}
