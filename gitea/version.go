@@ -5,7 +5,6 @@
 package gitea
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
