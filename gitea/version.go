@@ -6,6 +6,7 @@ package gitea
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/go-version"
 )
@@ -70,6 +71,16 @@ var (
 	version1_17_0 = version.Must(version.NewVersion("1.17.0"))
 )
 
+// ErrUnknownVersion is an unknown version from the API
+type ErrUnknownVersion struct {
+	raw string
+}
+
+// Error fulfills error
+func (e ErrUnknownVersion) Error() string {
+	return fmt.Sprintf("unknown version: %s", e.raw)
+}
+
 // checkServerVersionGreaterThanOrEqual is the canonical way in the SDK to check for versions for API compatibility reasons
 func (c *Client) checkServerVersionGreaterThanOrEqual(v *version.Version) error {
 	if c.ignoreVersion {
@@ -97,6 +108,11 @@ func (c *Client) loadServerVersion() (err error) {
 			return
 		}
 		if c.serverVersion, err = version.NewVersion(raw); err != nil {
+			if strings.TrimSpace(raw) != "" {
+				// Version was something, just not recognized
+				c.serverVersion = version1_11_0
+				err = ErrUnknownVersion{raw: raw}
+			}
 			return
 		}
 	})
