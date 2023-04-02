@@ -34,9 +34,21 @@ func TestRepoCollaborator(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, 204, resp.StatusCode)
 
+	permissonPing, resp, err := c.CollaboratorPermission(repo.Owner.UserName, repo.Name, "ping")
+	assert.NoError(t, err)
+	assert.EqualValues(t, 200, resp.StatusCode)
+	assert.EqualValues(t, AccessModeAdmin, permissonPing.Permission)
+	assert.EqualValues(t, "ping", permissonPing.User.UserName)
+
 	mode = AccessModeRead
 	_, err = c.AddCollaborator(repo.Owner.UserName, repo.Name, "pong", AddCollaboratorOption{Permission: &mode})
 	assert.NoError(t, err)
+
+	permissonPong, resp, err := c.CollaboratorPermission(repo.Owner.UserName, repo.Name, "pong")
+	assert.NoError(t, err)
+	assert.EqualValues(t, 200, resp.StatusCode)
+	assert.EqualValues(t, AccessModeRead, permissonPong.Permission)
+	assert.EqualValues(t, "pong", permissonPong.User.UserName)
 
 	collaborators, _, err = c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)
@@ -60,4 +72,9 @@ func TestRepoCollaborator(t *testing.T) {
 	collaborators, _, err = c.ListCollaborators(repo.Owner.UserName, repo.Name, ListCollaboratorsOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, collaborators, 1)
+
+	permissonNotExists, resp, err := c.CollaboratorPermission(repo.Owner.UserName, repo.Name, "user_that_not_exists")
+	assert.Error(t, err)
+	assert.EqualValues(t, 404, resp.StatusCode)
+	assert.Nil(t, permissonNotExists)
 }
