@@ -81,6 +81,12 @@ func (e ErrUnknownVersion) Error() string {
 	return fmt.Sprintf("unknown version: %s", e.raw)
 }
 
+func (_ ErrUnknownVersion) Is(target error) bool {
+	_, ok1 := target.(*ErrUnknownVersion)
+	_, ok2 := target.(ErrUnknownVersion)
+	return ok1 || ok2
+}
+
 // checkServerVersionGreaterThanOrEqual is the canonical way in the SDK to check for versions for API compatibility reasons
 func (c *Client) checkServerVersionGreaterThanOrEqual(v *version.Version) error {
 	if c.ignoreVersion {
@@ -111,7 +117,7 @@ func (c *Client) loadServerVersion() (err error) {
 			if strings.TrimSpace(raw) != "" {
 				// Version was something, just not recognized
 				c.serverVersion = version1_11_0
-				err = ErrUnknownVersion{raw: raw}
+				err = &ErrUnknownVersion{raw: raw}
 			}
 			return
 		}
