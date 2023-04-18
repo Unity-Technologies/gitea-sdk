@@ -15,10 +15,11 @@ import (
 
 // AccessToken represents an API access token.
 type AccessToken struct {
-	ID             int64  `json:"id"`
-	Name           string `json:"name"`
-	Token          string `json:"sha1"`
-	TokenLastEight string `json:"token_last_eight"`
+	ID             int64    `json:"id"`
+	Name           string   `json:"name"`
+	Token          string   `json:"sha1"`
+	TokenLastEight string   `json:"token_last_eight"`
+	Scopes         []string `json:"scopes"`
 }
 
 // ListAccessTokensOptions options for listing a users's access tokens
