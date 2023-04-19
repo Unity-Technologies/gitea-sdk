@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -67,6 +68,9 @@ func NewClient(url string, options ...ClientOption) (*Client, error) {
 		}
 	}
 	if err := client.checkServerVersionGreaterThanOrEqual(version1_11_0); err != nil {
+		if errors.Is(err, &ErrUnknownVersion{}) {
+			return client, err
+		}
 		return nil, err
 	}
 
