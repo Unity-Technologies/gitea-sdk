@@ -1,8 +1,8 @@
 package gitea
 
 import (
-	"time"
 	"fmt"
+	"time"
 )
 
 // Package represents a package
@@ -15,7 +15,7 @@ type Package struct {
 	Repository *string `json:"repository"`
 	// the package's creator
 	Creator User `json:"creator"`
-	// the type of package: 
+	// the type of package:
 	Type string `json:"type"`
 	// the name of the package
 	Name string `json:"name"`
@@ -40,7 +40,6 @@ type PackageFile struct {
 	SHA256 string `json:"sha256"`
 	// the md5 hash
 	SHA512 string `json:"sha512"`
-
 }
 
 // ListOwnerPackagesOptions options for listing packages
@@ -50,6 +49,9 @@ type ListOwnerPackagesOptions struct {
 
 // List all the packages owned by a given owner (user, organisation)
 func (c *Client) ListOwnerPackages(owner string, opt ListOwnerPackagesOptions) ([]*Package, *Response, error) {
+	if err := escapeValidatePathSegments(&owner); err != nil {
+		return nil, nil, err
+	}
 	opt.setDefaults()
 	packages := make([]*Package, 0, opt.PageSize)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/packages/%s?%s", owner, opt.getURLQuery().Encode()), nil, nil, &packages)
@@ -58,13 +60,19 @@ func (c *Client) ListOwnerPackages(owner string, opt ListOwnerPackagesOptions) (
 
 // List the versions of a given package
 func (c *Client) GetPackageByVersion(owner, packageType, name, version string) (*Package, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &packageType, &name, &version); err != nil {
+		return nil, nil, err
+	}
 	foundPackage := new(Package)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/packages/%s/%s/%s/%s", owner, packageType, name, version), nil, nil, foundPackage)
 	return foundPackage, resp, err
 }
 
 // List the files of a given package
-func (c *Client) GetPackageFilesByVersion(owner, packageType, name, version string) ([]*PackageFile, *Response, error){
+func (c *Client) GetPackageFilesByVersion(owner, packageType, name, version string) ([]*PackageFile, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &packageType, &name, &version); err != nil {
+		return nil, nil, err
+	}
 	packageFiles := make([]*PackageFile, 0)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/packages/%s/%s/%s/%s/files", owner, packageType, name, version), nil, nil, &packageFiles)
 	return packageFiles, resp, err
