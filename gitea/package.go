@@ -22,7 +22,7 @@ type Package struct {
 	// the version of the package
 	Version string `json:"version"`
 	// the date the package was uploaded
-	CreatedAt time.Time `json:"created_At"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 // PackageFile represents a file from a package

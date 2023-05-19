@@ -43,6 +43,9 @@ const (
 	RepoUnitReleases RepoUnitType = "repo.releases"
 	// RepoUnitProjects represent projects of a repository
 	RepoUnitProjects RepoUnitType = "repo.projects"
+	//RepoUnitPackages represents packages of a repository
+	RepoUnitPackages  RepoUnitType = "repo.packages"
+
 )
 
 // ListTeamsOptions options for listing teams
