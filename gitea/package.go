@@ -25,6 +25,7 @@ type Package struct {
 	CreatedAt time.Time `json:"created_At"`
 }
 
+// PackageFile represents a file from a package
 type PackageFile struct {
 	// the file's ID
 	ID int64 `json:"id"`
