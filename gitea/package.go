@@ -43,13 +43,13 @@ type PackageFile struct {
 	SHA512 string `json:"sha512"`
 }
 
-// ListOwnerPackagesOptions options for listing packages
-type ListOwnerPackagesOptions struct {
+// ListPackagesOptions options for listing packages
+type ListPackagesOptions struct {
 	ListOptions
 }
 
-// List all the packages owned by a given owner (user, organisation)
-func (c *Client) ListOwnerPackages(owner string, opt ListOwnerPackagesOptions) ([]*Package, *Response, error) {
+// ListPackages lists all the packages owned by a given owner (user, organisation)
+func (c *Client) ListPackages(owner string, opt ListPackagesOptions) ([]*Package, *Response, error) {
 	if err := escapeValidatePathSegments(&owner); err != nil {
 		return nil, nil, err
 	}
@@ -59,8 +59,8 @@ func (c *Client) ListOwnerPackages(owner string, opt ListOwnerPackagesOptions) (
 	return packages, resp, err
 }
 
-// List the versions of a given package
-func (c *Client) GetPackageByVersion(owner, packageType, name, version string) (*Package, *Response, error) {
+// GetPackage gets the details of a specific package
+func (c *Client) GetPackage(owner, packageType, name, version string) (*Package, *Response, error) {
 	if err := escapeValidatePathSegments(&owner, &packageType, &name, &version); err != nil {
 		return nil, nil, err
 	}
@@ -69,8 +69,8 @@ func (c *Client) GetPackageByVersion(owner, packageType, name, version string) (
 	return foundPackage, resp, err
 }
 
-// List the files of a given package
-func (c *Client) GetPackageFilesByVersion(owner, packageType, name, version string) ([]*PackageFile, *Response, error) {
+// ListPackageFiles lists the files within a package
+func (c *Client) ListPackageFiles(owner, packageType, name, version string) ([]*PackageFile, *Response, error) {
 	if err := escapeValidatePathSegments(&owner, &packageType, &name, &version); err != nil {
 		return nil, nil, err
 	}
