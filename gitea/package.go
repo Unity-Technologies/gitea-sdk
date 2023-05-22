@@ -59,7 +59,7 @@ func (c *Client) ListPackages(owner string, opt ListPackagesOptions) ([]*Package
 	return packages, resp, err
 }
 
-// GetPackage gets the details of a specific package
+// GetPackage gets the details of a specific package version
 func (c *Client) GetPackage(owner, packageType, name, version string) (*Package, *Response, error) {
 	if err := escapeValidatePathSegments(&owner, &packageType, &name, &version); err != nil {
 		return nil, nil, err
@@ -67,6 +67,15 @@ func (c *Client) GetPackage(owner, packageType, name, version string) (*Package,
 	foundPackage := new(Package)
 	resp, err := c.getParsedResponse("GET", fmt.Sprintf("/packages/%s/%s/%s/%s", owner, packageType, name, version), nil, nil, foundPackage)
 	return foundPackage, resp, err
+}
+
+// DeletePackage deletes a specific package version
+func (c *Client) DeletePackage(owner, packageType, name, version string) (*Response, error) {
+	if err := escapeValidatePathSegments(&owner, &packageType, &name, &version); err != nil {
+		return nil, err
+	}
+	_, resp, err := c.getResponse("DELETE", fmt.Sprintf("/packages/%s/%s/%s/%s", owner, packageType, name, version), nil, nil)
+	return resp, err
 }
 
 // ListPackageFiles lists the files within a package
