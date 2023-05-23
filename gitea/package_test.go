@@ -48,7 +48,8 @@ func createTestPackage(t *testing.T, c *Client) error {
 func TestListPackages(t *testing.T) {
 	log.Println("== TestListPackages ==")
 	c := newTestClient()
-	createTestPackage(t, c)
+	err := createTestPackage(t, c)
+	assert.NoError(t, err)
 
 	packagesList, _, err := c.ListPackages("PackageOrg", ListPackagesOptions{
 		ListOptions{
@@ -63,7 +64,8 @@ func TestListPackages(t *testing.T) {
 func TestGetPackage(t *testing.T) {
 	log.Println("== TestGetPackage ==")
 	c := newTestClient()
-	createTestPackage(t, c)
+	err := createTestPackage(t, c)
+	assert.NoError(t, err)
 
 	pkg, _, err := c.GetPackage("PackageOrg", "generic", "MyPackage", "v1")
 	assert.NoError(t, err)
@@ -71,15 +73,15 @@ func TestGetPackage(t *testing.T) {
 	assert.True(t, pkg.Name == "MyPackage")
 	assert.True(t, pkg.Version == "v1")
 	assert.NotEmpty(t, pkg.CreatedAt)
-
 }
 
 func TestDeletePackage(t *testing.T) {
 	log.Println("== TestDeletePackage ==")
 	c := newTestClient()
-	createTestPackage(t, c)
+	err := createTestPackage(t, c)
+	assert.NoError(t, err)
 
-	_, err := c.DeletePackage("PackageOrg", "generic", "MyPackage", "v1")
+	_, err = c.DeletePackage("PackageOrg", "generic", "MyPackage", "v1")
 	assert.NoError(t, err)
 
 	// no packages should be listed following deletion
@@ -96,7 +98,8 @@ func TestDeletePackage(t *testing.T) {
 func TestListPackageFiles(t *testing.T) {
 	log.Println("== TestListPackageFiles ==")
 	c := newTestClient()
-	createTestPackage(t, c)
+	err := createTestPackage(t, c)
+	assert.NoError(t, err)
 
 	packageFiles, _, err := c.ListPackageFiles("PackageOrg", "generic", "MyPackage", "v1")
 	assert.NoError(t, err)
