@@ -33,13 +33,13 @@ type PackageFile struct {
 	Size int64 `json:"size"`
 	// the name of the file
 	Name string `json:"name"`
-	// the md5 hash
+	// the md5 hash of the file
 	MD5 string `json:"md5"`
-	// the md5 hash
+	// the sha1 hash of the file
 	SHA1 string `json:"sha1"`
-	// the md5 hash
+	// the sha256 hash of the file
 	SHA256 string `json:"sha256"`
-	// the md5 hash
+	// the sha512 hash of the file
 	SHA512 string `json:"sha512"`
 }
 
