@@ -67,9 +67,12 @@ func (c *Client) ListRepoTrackedTimes(owner, repo string, opt ListTrackedTimesOp
 }
 
 // GetMyTrackedTimes list tracked times of the current user
-func (c *Client) GetMyTrackedTimes() ([]*TrackedTime, *Response, error) {
-	times := make([]*TrackedTime, 0, 10)
-	resp, err := c.getParsedResponse("GET", "/user/times", jsonHeader, nil, &times)
+func (c *Client) GetMyTrackedTimes(opt ListTrackedTimesOptions) ([]*TrackedTime, *Response, error) {
+	link, _ := url.Parse("/user/times")
+	opt.setDefaults()
+	link.RawQuery = opt.QueryEncode()
+	times := make([]*TrackedTime, 0, opt.PageSize)
+	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &times)
 	return times, resp, err
 }
 
