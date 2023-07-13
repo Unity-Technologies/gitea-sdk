@@ -23,7 +23,7 @@ func TestOauth2(t *testing.T) {
 		confidentialClient *bool
 	}
 	boolTrue := true
-	boolFalse := true
+	boolFalse := false
 
 	testCases := []test{
 		{"ConfidentialClient unset should fallback to false", nil},
