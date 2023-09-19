@@ -66,6 +66,18 @@ func (c *Client) ListReleases(owner, repo string, opt ListReleasesOptions) ([]*R
 	return releases, resp, err
 }
 
+// GetLatestRelease get the latest release of a repository
+func (c *Client) GetLatestRelease(owner, repo string) (*Release, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	r := new(Release)
+	resp, err := c.getParsedResponse("GET",
+		fmt.Sprintf("/repos/%s/%s/releases/latest", owner, repo),
+		jsonHeader, nil, &r)
+	return r, resp, err
+}
+
 // GetRelease get a release of a repository by id
 func (c *Client) GetRelease(owner, repo string, id int64) (*Release, *Response, error) {
 	if err := escapeValidatePathSegments(&owner, &repo); err != nil {

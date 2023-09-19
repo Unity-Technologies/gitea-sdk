@@ -48,9 +48,13 @@ func TestRelease(t *testing.T) {
 	r2, _, err := c.GetRelease(repo.Owner.UserName, repo.Name, r.ID)
 	assert.NoError(t, err)
 	assert.EqualValues(t, r, r2)
+
+
+	// GetReleaseByTag
 	r2, _, err = c.GetReleaseByTag(repo.Owner.UserName, repo.Name, r.TagName)
 	assert.NoError(t, err)
 	assert.EqualValues(t, r, r2)
+
 	// ListRelease without pre-releases
 	tr := true
 	rl, _, err = c.ListReleases(repo.Owner.UserName, repo.Name, ListReleasesOptions{
@@ -83,12 +87,17 @@ func TestRelease(t *testing.T) {
 	assert.Len(t, rl, 0)
 
 	// CreateRelease
-	_, _, err = c.CreateRelease(repo.Owner.UserName, repo.Name, CreateReleaseOption{
+	r, _, err = c.CreateRelease(repo.Owner.UserName, repo.Name, CreateReleaseOption{
 		TagName: "aNewReleaseTag",
 		Target:  "main",
 		Title:   "Title of aNewReleaseTag",
 	})
 	assert.NoError(t, err)
+
+	// GetLatestRelease
+	r2, _, err = c.GetLatestRelease(repo.Owner.UserName, repo.Name)
+	assert.NoError(t, err)
+	assert.EqualValues(t, r, r2)
 
 	// DeleteReleaseByTag
 	_, err = c.DeleteReleaseByTag(repo.Owner.UserName, repo.Name, "aNewReleaseTag")
