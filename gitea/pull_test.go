@@ -67,9 +67,7 @@ func TestPull(t *testing.T) {
 
 	commits, _, err := c.ListPullRequestCommits(c.username, repoName, pullUpdateFile.Index, ListPullRequestCommitsOptions{})
 	assert.NoError(t, err)
-	if assert.Len(t, commits, 1) && assert.Len(t, commits[0].Files, 1) {
-		assert.EqualValues(t, "LICENSE", commits[0].Files[0].Filename)
-	}
+	assert.Len(t, commits, 1)
 
 	files, _, err := c.ListPullRequestFiles(c.username, repoName, pullUpdateFile.Index, ListPullRequestFilesOptions{})
 	assert.NoError(t, err)

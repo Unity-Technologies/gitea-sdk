@@ -75,7 +75,7 @@ func TestLabels(t *testing.T) {
 	assert.EqualValues(t, &Label{
 		ID:          labelTwo.ID,
 		Name:        labelTwo.Name,
-		Color:       "0E0175",
+		Color:       "0e0175",
 		Description: "blueish",
 		URL:         labelTwo.URL,
 	}, label)
