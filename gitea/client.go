@@ -36,6 +36,7 @@ type Client struct {
 	password       string
 	otp            string
 	sudo           string
+	userAgent      string
 	debug          bool
 	httpsigner     *HTTPSign
 	client         *http.Client
@@ -215,6 +216,21 @@ func (c *Client) SetSudo(sudo string) {
 	c.mutex.Unlock()
 }
 
+// SetUserAgent is an option for NewClient to set user-agent header
+func SetUserAgent(userAgent string) ClientOption {
+	return func(client *Client) error {
+		client.SetUserAgent(userAgent)
+		return nil
+	}
+}
+
+// SetUserAgent sets the user-agent to send with every request.
+func (c *Client) SetUserAgent(userAgent string) {
+	c.mutex.Lock()
+	c.userAgent = userAgent
+	c.mutex.Unlock()
+}
+
 // SetDebugMode is an option for NewClient to enable debug mode
 func SetDebugMode() ClientOption {
 	return func(client *Client) error {
@@ -281,6 +297,9 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	}
 	if len(c.sudo) != 0 {
 		req.Header.Set("Sudo", c.sudo)
+	}
+	if len(c.userAgent) != 0 {
+		req.Header.Set("User-Agent", c.userAgent)
 	}
 
 	client := c.client // client ref can change from this point on so safe it
