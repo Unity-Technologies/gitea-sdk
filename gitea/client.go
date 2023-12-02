@@ -12,9 +12,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -50,6 +50,11 @@ type Client struct {
 // Response represents the gitea response
 type Response struct {
 	*http.Response
+
+	FirstPage int
+	PrevPage  int
+	NextPage  int
+	LastPage  int
 }
 
 // ClientOption are functions used to init a new client
@@ -241,6 +246,57 @@ func SetDebugMode() ClientOption {
 	}
 }
 
+func newResponse(r *http.Response) *Response {
+	response := &Response{Response: r}
+	response.parseLinkHeader()
+
+	return response
+}
+
+func (r *Response) parseLinkHeader() {
+	link := r.Header.Get("Link")
+	if link == "" {
+		return
+	}
+
+	links := strings.Split(link, ",")
+	for _, l := range links {
+		u, param, ok := strings.Cut(l, ";")
+		if !ok {
+			continue
+		}
+		u = strings.Trim(u, " <>")
+
+		key, value, ok := strings.Cut(strings.TrimSpace(param), "=")
+		if !ok || key != "rel" {
+			continue
+		}
+
+		value = strings.Trim(value, "\"")
+
+		parsed, err := url.Parse(u)
+		if err != nil {
+			continue
+		}
+
+		page := parsed.Query().Get("page")
+		if page == "" {
+			continue
+		}
+
+		switch value {
+		case "first":
+			r.FirstPage, _ = strconv.Atoi(page)
+		case "prev":
+			r.PrevPage, _ = strconv.Atoi(page)
+		case "next":
+			r.NextPage, _ = strconv.Atoi(page)
+		case "last":
+			r.LastPage, _ = strconv.Atoi(page)
+		}
+	}
+}
+
 func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *Response, error) {
 	c.mutex.RLock()
 	debug := c.debug
@@ -262,11 +318,12 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	}
 
 	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return data, &Response{resp}, err
+
+	return data, newResponse(resp), err
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
@@ -275,7 +332,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	if debug {
 		var bodyStr string
 		if body != nil {
-			bs, _ := ioutil.ReadAll(body)
+			bs, _ := io.ReadAll(body)
 			body = bytes.NewReader(bs)
 			bodyStr = string(bs)
 		}
@@ -323,7 +380,8 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	if debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return &Response{resp}, nil
+
+	return newResponse(resp), nil
 }
 
 // Converts a response for a HTTP status code indicating an error condition
@@ -340,7 +398,7 @@ func statusCodeToErr(resp *Response) (body []byte, err error) {
 	// error: body will be read for details
 	//
 	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("body read on HTTP error %d: %v", resp.StatusCode, err)
 	}
@@ -393,7 +451,7 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 	}
 
 	// success (2XX), read body
-	data, err = ioutil.ReadAll(resp.Body)
+	data, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, resp, err
 	}
