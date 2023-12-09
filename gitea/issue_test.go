@@ -62,7 +62,7 @@ func deleteIssue(t *testing.T, c *Client) {
 
 func editIssues(t *testing.T, c *Client) {
 	log.Println("== TestEditIssues ==")
-	il, _, err := c.ListIssues(ListIssueOption{KeyWord: "soon"})
+	il, _, err := c.ListIssues(ListIssueOption{KeyWord: "soon!"})
 	assert.NoError(t, err)
 	issue, _, err := c.GetIssue(il[0].Poster.UserName, il[0].Repository.Name, il[0].Index)
 	assert.NoError(t, err)

@@ -46,7 +46,7 @@ func TestNotifications(t *testing.T) {
 	assert.NoError(t, err)
 	issue, _, err := c.CreateIssue(repoB.Owner.UserName, repoB.Name, CreateIssueOption{Title: "B Issue", Closed: false})
 	assert.NoError(t, err)
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second * 5)
 
 	// CheckNotifications of user2
 	c.sudo = user2.UserName
@@ -101,7 +101,7 @@ func TestNotifications(t *testing.T) {
 	c.sudo = ""
 	_, _, err = c.EditIssue(repoB.Owner.UserName, repoB.Name, issue.Index, EditIssueOption{State: &iState})
 	assert.NoError(t, err)
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Second * 5)
 
 	c.sudo = user2.UserName
 	nList, _, err = c.ListNotifications(ListNotificationOptions{})
@@ -120,18 +120,17 @@ func TestNotifications(t *testing.T) {
 	notifications, _, err = c.ReadNotifications(MarkNotificationOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, notifications, 2)
-	_, _ = c.DeleteRepo("test01", "Reviews")
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusRead}})
 	assert.NoError(t, err)
-	assert.Len(t, nList, 2)
+	if assert.Len(t, nList, 2) {
+		notification, _, err := c.ReadNotification(nList[0].ID, NotifyStatusPinned)
+		assert.EqualValues(t, notification.ID, nList[0].ID)
+		assert.NoError(t, err)
 
-	notification, _, err := c.ReadNotification(nList[0].ID, NotifyStatusPinned)
-	assert.EqualValues(t, notification.ID, nList[0].ID)
-	assert.NoError(t, err)
-
-	notification, _, err = c.ReadNotification(nList[1].ID, NotifyStatusUnread)
-	assert.EqualValues(t, notification.ID, nList[1].ID)
-	assert.NoError(t, err)
+		notification, _, err = c.ReadNotification(nList[1].ID, NotifyStatusUnread)
+		assert.EqualValues(t, notification.ID, nList[1].ID)
+		assert.NoError(t, err)
+	}
 	nList, _, err = c.ListNotifications(ListNotificationOptions{Status: []NotifyStatus{NotifyStatusPinned, NotifyStatusUnread}})
 	assert.NoError(t, err)
 	if assert.Len(t, nList, 2) {
