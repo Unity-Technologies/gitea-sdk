@@ -44,7 +44,7 @@ func TestGetGlobalSettings(t *testing.T) {
 	}
 	assert.EqualValues(t, &GlobalAttachmentSettings{
 		Enabled:  true,
-		MaxSize:  4,
+		MaxSize:  2048,
 		MaxFiles: 5,
 	}, attachSettings)
 }
