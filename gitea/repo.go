@@ -334,8 +334,8 @@ func (opt CreateRepoOption) Validate(c *Client) error {
 	if len(opt.Name) > 100 {
 		return fmt.Errorf("name has more than 100 chars")
 	}
-	if len(opt.Description) > 255 {
-		return fmt.Errorf("description has more than 255 chars")
+	if len(opt.Description) > 2048 {
+		return fmt.Errorf("description has more than 2048 chars")
 	}
 	if len(opt.DefaultBranch) > 100 {
 		return fmt.Errorf("default branch name has more than 100 chars")
