@@ -6,8 +6,8 @@ package gitea
 
 import (
 	"log"
-	"sort"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -21,22 +21,23 @@ func TestRepoBranches(t *testing.T) {
 	if repo == nil {
 		return
 	}
-
+	time.Sleep(1 * time.Second)
 	bl, _, err := c.ListRepoBranches(repo.Owner.UserName, repo.Name, ListRepoBranchesOptions{})
 	assert.NoError(t, err)
 	assert.Len(t, bl, 3)
 
-	sort.Slice(bl, func(i, j int) bool {
-		return bl[i].Name < bl[j].Name
-	})
-	assert.EqualValues(t, "feature", bl[0].Name)
-	assert.EqualValues(t, "main", bl[1].Name)
-	assert.EqualValues(t, "update", bl[2].Name)
+	branchNames := make([]string, len(bl))
+	branches := make(map[string]Branch, len(bl))
+	for index, branch := range bl {
+		branchNames[index] = branch.Name
+		branches[branch.Name] = *branch
+	}
+	assert.ElementsMatch(t, []string{"feature", "main", "update"}, branchNames)
 
 	b, _, err := c.GetRepoBranch(repo.Owner.UserName, repo.Name, "update")
 	assert.NoError(t, err)
-	assert.EqualValues(t, bl[2].Commit.ID, b.Commit.ID)
-	assert.EqualValues(t, bl[2].Commit.Added, b.Commit.Added)
+	assert.EqualValues(t, branches["update"].Commit.ID, b.Commit.ID)
+	assert.EqualValues(t, branches["update"].Commit.Added, b.Commit.Added)
 
 	s, _, err := c.DeleteRepoBranch(repo.Owner.UserName, repo.Name, "main")
 	assert.NoError(t, err)
