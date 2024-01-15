@@ -76,6 +76,11 @@ func TestRelease(t *testing.T) {
 	assert.EqualValues(t, false, r2.IsPrerelease)
 	assert.EqualValues(t, r.Note, r2.Note)
 
+	// GetLatestRelease
+	r3, _, err := c.GetLatestRelease(repo.Owner.UserName, repo.Name)
+	assert.NoError(t, err)
+	assert.EqualValues(t, r2, r3)
+
 	// DeleteRelease
 	_, err = c.DeleteRelease(repo.Owner.UserName, repo.Name, r.ID)
 	assert.NoError(t, err)
