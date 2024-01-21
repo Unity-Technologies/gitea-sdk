@@ -77,14 +77,13 @@ type ErrUnknownVersion struct {
 }
 
 // Error fulfills error
-func (e ErrUnknownVersion) Error() string {
+func (e *ErrUnknownVersion) Error() string {
 	return fmt.Sprintf("unknown version: %s", e.raw)
 }
 
-func (_ ErrUnknownVersion) Is(target error) bool {
-	_, ok1 := target.(*ErrUnknownVersion)
-	_, ok2 := target.(ErrUnknownVersion)
-	return ok1 || ok2
+func (*ErrUnknownVersion) Is(target error) bool {
+	_, ok := target.(*ErrUnknownVersion)
+	return ok
 }
 
 // checkServerVersionGreaterThanOrEqual is the canonical way in the SDK to check for versions for API compatibility reasons
