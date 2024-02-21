@@ -1,6 +1,6 @@
 module code.gitea.io/sdk/gitea
 
-go 1.21.5
+go 1.18
 
 require (
 	github.com/davidmz/go-pageant v1.0.2
