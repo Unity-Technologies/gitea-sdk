@@ -147,7 +147,7 @@ func prepareBranchTest(t *testing.T, c *Client, repoName string) *Repository {
 		return nil
 	}
 
-	updatedFile, _, err := c.UpdateFile(origRepo.Owner.UserName, origRepo.Name, "README.md", UpdateFileOptions{
+	updatedFile, _, err := c.CreateOrUpdateFile(origRepo.Owner.UserName, origRepo.Name, "README.md", CreateOrUpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "update it",
 			BranchName:    "main",
@@ -160,7 +160,7 @@ func prepareBranchTest(t *testing.T, c *Client, repoName string) *Repository {
 		return nil
 	}
 
-	newFile, _, err := c.CreateFile(origRepo.Owner.UserName, origRepo.Name, "WOW-file", CreateFileOptions{
+	newFile, _, err := c.CreateOrUpdateFile(origRepo.Owner.UserName, origRepo.Name, "WOW-file", CreateOrUpdateFileOptions{
 		Content: "QSBuZXcgRmlsZQo=",
 		FileOptions: FileOptions{
 			Message:       "creat a new file",

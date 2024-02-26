@@ -199,7 +199,7 @@ func preparePullReviewTest(t *testing.T, c *Client, repoName string) (*Repositor
 
 	c.SetSudo("pull_submitter")
 
-	newFile, _, err := c.CreateFile(repo.Owner.UserName, repo.Name, "WOW-file", CreateFileOptions{
+	newFile, _, err := c.CreateOrUpdateFile(repo.Owner.UserName, repo.Name, "WOW-file", CreateOrUpdateFileOptions{
 		Content: "QSBuZXcgRmlsZQoKYW5kIHNvbWUgbGluZXMK",
 		FileOptions: FileOptions{
 			Message:       "creat a new file",

@@ -26,7 +26,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	assert.EqualValues(t, "IyBDaGFuZ2VGaWxlcwoKQSB0ZXN0IFJlcG86IENoYW5nZUZpbGVz", base64.StdEncoding.EncodeToString(raw))
 
 	testFileName := "A+#&ä"
-	newFile, _, err := c.CreateFile(repo.Owner.UserName, repo.Name, testFileName, CreateFileOptions{
+	newFile, _, err := c.CreateOrUpdateFile(repo.Owner.UserName, repo.Name, testFileName, CreateOrUpdateFileOptions{
 		FileOptions: FileOptions{
 			Message: "create file " + testFileName,
 		},
@@ -36,7 +36,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	raw, _, _ = c.GetFile(repo.Owner.UserName, repo.Name, "main", testFileName)
 	assert.EqualValues(t, "ZmlsZUEK", base64.StdEncoding.EncodeToString(raw))
 
-	updatedFile, _, err := c.UpdateFile(repo.Owner.UserName, repo.Name, testFileName, UpdateFileOptions{
+	updatedFile, _, err := c.CreateOrUpdateFile(repo.Owner.UserName, repo.Name, testFileName, CreateOrUpdateFileOptions{
 		FileOptions: FileOptions{
 			Message: "add a new line",
 		},
@@ -68,7 +68,7 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	licenceRaw, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "", "LICENSE")
 	assert.NoError(t, err)
 	testContent := "Tk9USElORyBJUyBIRVJFIEFOWU1PUkUKSUYgWU9VIExJS0UgVE8gRklORCBTT01FVEhJTkcKV0FJVCBGT1IgVEhFIEZVVFVSRQo="
-	updatedFile, _, err = c.UpdateFile(repo.Owner.UserName, repo.Name, "LICENSE", UpdateFileOptions{
+	updatedFile, _, err = c.CreateOrUpdateFile(repo.Owner.UserName, repo.Name, "LICENSE", CreateOrUpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "Overwrite",
 			BranchName:    "main",
@@ -115,4 +115,29 @@ func TestFileCreateUpdateGet(t *testing.T) {
 	}
 	assert.Nil(t, file)
 	assert.EqualValues(t, 200, resp.StatusCode)
+}
+
+func TestFileDeprecatedCreate(t *testing.T) {
+	log.Println("== TestFileDeprecatedCreate ==")
+	c := newTestClient()
+
+	repo, err := createTestRepo(t, "ChangeFiles", c)
+	assert.NoError(t, err)
+	assert.NotNil(t, repo)
+
+	raw, _, err := c.GetFile(repo.Owner.UserName, repo.Name, "main", "README.md")
+	assert.NoError(t, err)
+	assert.EqualValues(t, "IyBDaGFuZ2VGaWxlcwoKQSB0ZXN0IFJlcG86IENoYW5nZUZpbGVz", base64.StdEncoding.EncodeToString(raw))
+
+	testFileName := "A+#&ä"
+	_, _, err = c.CreateOrUpdateFile(repo.Owner.UserName, repo.Name, testFileName, CreateOrUpdateFileOptions{
+		FileOptions: FileOptions{
+			Message: "create file " + testFileName,
+		},
+		Content: "ZmlsZUEK",
+	})
+	assert.NoError(t, err)
+	raw, _, _ = c.GetFile(repo.Owner.UserName, repo.Name, "main", testFileName)
+	assert.EqualValues(t, "ZmlsZUEK", base64.StdEncoding.EncodeToString(raw))
+
 }

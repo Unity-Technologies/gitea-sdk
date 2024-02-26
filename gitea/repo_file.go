@@ -31,6 +31,7 @@ type FileOptions struct {
 }
 
 // CreateFileOptions options for creating files
+// Deprecated: Use CreateOrUpdateFileOptions instead
 // Note: `author` and `committer` are optional (if only one is given, it will be used for the other, otherwise the authenticated user will be used)
 type CreateFileOptions struct {
 	FileOptions
@@ -48,12 +49,12 @@ type DeleteFileOptions struct {
 	SHA string `json:"sha"`
 }
 
-// UpdateFileOptions options for updating files
+// CreateOrUpdateFileOptions options for creating or updating files
 // Note: `author` and `committer` are optional (if only one is given, it will be used for the other, otherwise the authenticated user will be used)
-type UpdateFileOptions struct {
+type CreateOrUpdateFileOptions struct {
 	FileOptions
 	// sha is the SHA for the file that already exists
-	// required: true
+	// required only for updating files
 	SHA string `json:"sha"`
 	// content must be base64 encoded
 	// required: true
@@ -197,6 +198,7 @@ func (c *Client) getDirOrFileContents(owner, repo, ref, filepath string) ([]byte
 }
 
 // CreateFile create a file in a repository
+// Deprecated: use CreateOrUpdateFile instead
 func (c *Client) CreateFile(owner, repo, filepath string, opt CreateFileOptions) (*FileResponse, *Response, error) {
 	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
@@ -216,8 +218,8 @@ func (c *Client) CreateFile(owner, repo, filepath string, opt CreateFileOptions)
 	return fr, resp, err
 }
 
-// UpdateFile update a file in a repository
-func (c *Client) UpdateFile(owner, repo, filepath string, opt UpdateFileOptions) (*FileResponse, *Response, error) {
+// CreateOrUpdateFile update a file in a repository
+func (c *Client) CreateOrUpdateFile(owner, repo, filepath string, opt CreateOrUpdateFileOptions) (*FileResponse, *Response, error) {
 	var err error
 	if opt.BranchName, err = c.setDefaultBranchForOldVersions(owner, repo, opt.BranchName); err != nil {
 		return nil, nil, err

@@ -35,7 +35,7 @@ func TestGetCommitDiffOrPatch(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Add a new simple small commit to the repository.
-	fileResponse, _, err := c.CreateFile(repo.Owner.UserName, repo.Name, "NOT_A_LICENSE", CreateFileOptions{
+	fileResponse, _, err := c.CreateOrUpdateFile(repo.Owner.UserName, repo.Name, "NOT_A_LICENSE", CreateOrUpdateFileOptions{
 		Content: base64.StdEncoding.EncodeToString([]byte("But is it?\n")),
 		FileOptions: FileOptions{
 			Message: "Ensure people know it's not a license!",

@@ -161,7 +161,7 @@ func preparePullTest(t *testing.T, c *Client, repoName, forkOrg string) bool {
 		return false
 	}
 
-	updatedFile, _, err := c.UpdateFile(forkRepo.Owner.UserName, forkRepo.Name, "LICENSE", UpdateFileOptions{
+	updatedFile, _, err := c.CreateOrUpdateFile(forkRepo.Owner.UserName, forkRepo.Name, "LICENSE", CreateOrUpdateFileOptions{
 		FileOptions: FileOptions{
 			Message:       "Overwrite",
 			BranchName:    "main",
@@ -174,7 +174,7 @@ func preparePullTest(t *testing.T, c *Client, repoName, forkOrg string) bool {
 		return false
 	}
 
-	newFile, _, err := c.CreateFile(forkRepo.Owner.UserName, forkRepo.Name, "WOW-file", CreateFileOptions{
+	newFile, _, err := c.CreateOrUpdateFile(forkRepo.Owner.UserName, forkRepo.Name, "WOW-file", CreateOrUpdateFileOptions{
 		Content: "QSBuZXcgRmlsZQo=",
 		FileOptions: FileOptions{
 			Message:       "creat a new file",
@@ -186,7 +186,7 @@ func preparePullTest(t *testing.T, c *Client, repoName, forkOrg string) bool {
 		return false
 	}
 
-	conflictFile1, _, err := c.CreateFile(origRepo.Owner.UserName, origRepo.Name, "bad-file", CreateFileOptions{
+	conflictFile1, _, err := c.CreateOrUpdateFile(origRepo.Owner.UserName, origRepo.Name, "bad-file", CreateOrUpdateFileOptions{
 		Content: "U3RhcnQgQ29uZmxpY3QK",
 		FileOptions: FileOptions{
 			Message:    "Start Conflict",
@@ -197,7 +197,7 @@ func preparePullTest(t *testing.T, c *Client, repoName, forkOrg string) bool {
 		return false
 	}
 
-	conflictFile2, _, err := c.CreateFile(forkRepo.Owner.UserName, forkRepo.Name, "bad-file", CreateFileOptions{
+	conflictFile2, _, err := c.CreateOrUpdateFile(forkRepo.Owner.UserName, forkRepo.Name, "bad-file", CreateOrUpdateFileOptions{
 		Content: "V2lsbEhhdmUgQ29uZmxpY3QK",
 		FileOptions: FileOptions{
 			Message:       "creat a new file witch will conflict",
