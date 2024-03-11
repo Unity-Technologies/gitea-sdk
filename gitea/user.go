@@ -17,6 +17,8 @@ type User struct {
 	ID int64 `json:"id"`
 	// the user's username
 	UserName string `json:"login"`
+	// The login_name of the user (used with non local users)
+	LoginName string `json:"login_name"`
 	// the user's full name
 	FullName string `json:"full_name"`
 	Email    string `json:"email"`
