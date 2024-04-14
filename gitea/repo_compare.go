@@ -23,7 +23,7 @@ func (c *Client) CompareCommits(user, repo, prev, current string) (*Compare, *Re
 
 	basehead := fmt.Sprintf("%s...%s", prev, current)
 
-	var apiResp *Compare
+	apiResp := new(Compare)
 	resp, err := c.getParsedResponse(
 		"GET",
 		fmt.Sprintf("/repos/%s/%s/compare/%s", user, repo, basehead),
