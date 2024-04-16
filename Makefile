@@ -12,7 +12,7 @@ GOFUMPT_PACKAGE ?= mvdan.cc/gofumpt@v0.4.0
 GOLANGCI_LINT_PACKAGE ?= github.com/golangci/golangci-lint/cmd/golangci-lint@v1.51.0
 GITEA_VET_PACKAGE ?= code.gitea.io/gitea-vet@v0.2.1
 
-GITEA_VERSION := 1.21.1
+GITEA_VERSION := 1.21.10
 GITEA_DL := https://dl.gitea.com/gitea/$(GITEA_VERSION)/gitea-$(GITEA_VERSION)-
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -72,7 +72,7 @@ vet:
 	cd gitea && $(GO) vet -vettool=gitea-vet $(PACKAGE)
 
 .PHONY: ci-lint
-ci-lint: 
+ci-lint:
 	@cd gitea/; echo -n "gofumpt ...";\
 	diff=$$($(GO) run $(GOFUMPT_PACKAGE) -extra -l .); \
 	if [ -n "$$diff" ]; then \
