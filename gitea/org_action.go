@@ -14,7 +14,7 @@ type ListOrgActionSecretOption struct {
 	ListOptions
 }
 
-// ListOrgMembership list an organization's secrets
+// ListOrgActionSecret list an organization's secrets
 func (c *Client) ListOrgActionSecret(org string, opt ListOrgActionSecretOption) ([]*Secret, *Response, error) {
 	if err := escapeValidatePathSegments(&org); err != nil {
 		return nil, nil, err
