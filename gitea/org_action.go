@@ -5,7 +5,10 @@
 package gitea
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 )
 
@@ -26,4 +29,54 @@ func (c *Client) ListOrgActionSecret(org string, opt ListOrgActionSecretOption) 
 	link.RawQuery = opt.getURLQuery().Encode()
 	resp, err := c.getParsedResponse("GET", link.String(), jsonHeader, nil, &secrets)
 	return secrets, resp, err
+}
+
+// CreateSecretOption options for creating a secret
+type CreateSecretOption struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
+}
+
+func (opt *CreateSecretOption) Validate() error {
+	if len(opt.Name) == 0 {
+		return fmt.Errorf("name required")
+	}
+	if len(opt.Name) > 30 {
+		return fmt.Errorf("name to long")
+	}
+	if len(opt.Data) == 0 {
+		return fmt.Errorf("data required")
+	}
+	return nil
+}
+
+func (c *Client) CreateOrgActionSecret(org string, opt CreateSecretOption) (*Response, error) {
+	if err := escapeValidatePathSegments(&org); err != nil {
+		return nil, err
+	}
+	if err := (&opt).Validate(); err != nil {
+		return nil, err
+	}
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+
+	status, resp, err := c.getStatusCode("PUT", fmt.Sprintf("/orgs/%s/actions/secrets/%s", org, opt.Name), jsonHeader, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	switch status {
+	case http.StatusCreated:
+		return resp, nil
+	case http.StatusNoContent:
+		return resp, nil
+	case http.StatusNotFound:
+		return resp, fmt.Errorf("forbidden")
+	case http.StatusBadRequest:
+		return resp, fmt.Errorf("bad request")
+	default:
+		return resp, fmt.Errorf("unexpected Status: %d", status)
+	}
 }
