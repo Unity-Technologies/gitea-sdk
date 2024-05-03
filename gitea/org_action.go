@@ -31,12 +31,14 @@ func (c *Client) ListOrgActionSecret(org string, opt ListOrgActionSecretOption) 
 	return secrets, resp, err
 }
 
-// CreateSecretOption options for creating a secret
+// CreateSecretOption represents the options for creating a secret.
 type CreateSecretOption struct {
-	Name string `json:"name"`
-	Data string `json:"data"`
+	Name string `json:"name"` // Name is the name of the secret.
+	Data string `json:"data"` // Data is the data of the secret.
 }
 
+// Validate checks if the CreateSecretOption is valid.
+// It returns an error if any of the validation checks fail.
 func (opt *CreateSecretOption) Validate() error {
 	if len(opt.Name) == 0 {
 		return fmt.Errorf("name required")
@@ -50,6 +52,9 @@ func (opt *CreateSecretOption) Validate() error {
 	return nil
 }
 
+// CreateOrgActionSecret creates a secret for the specified organization in the Gitea Actions.
+// It takes the organization name and the secret options as parameters.
+// The function returns the HTTP response and an error, if any.
 func (c *Client) CreateOrgActionSecret(org string, opt CreateSecretOption) (*Response, error) {
 	if err := escapeValidatePathSegments(&org); err != nil {
 		return nil, err
