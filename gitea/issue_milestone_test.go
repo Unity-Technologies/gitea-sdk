@@ -43,7 +43,7 @@ func TestMilestones(t *testing.T) {
 	// ListRepoMilestones
 	ml, _, err := c.ListRepoMilestones(repo.Owner.UserName, repo.Name, ListMilestoneOption{})
 	assert.NoError(t, err)
-	assert.Len(t, ml, 2)
+	assert.Len(t, ml, 3)
 	ml, _, err = c.ListRepoMilestones(repo.Owner.UserName, repo.Name, ListMilestoneOption{State: StateClosed})
 	assert.NoError(t, err)
 	assert.Len(t, ml, 1)
