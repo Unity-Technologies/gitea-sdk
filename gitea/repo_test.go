@@ -65,7 +65,7 @@ func TestRepoMigrateAndLanguages(t *testing.T) {
 	assert.NotEqual(t, zeroTime, repoG.MirrorUpdated)
 
 	log.Println("== TestRepoLanguages ==")
-	time.Sleep(time.Second)
+	time.Sleep(time.Second * 2)
 	lang, _, err := c.GetRepoLanguages(repoM.Owner.UserName, repoM.Name)
 	assert.NoError(t, err)
 	assert.Len(t, lang, 2)

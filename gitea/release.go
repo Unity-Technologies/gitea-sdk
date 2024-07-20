@@ -78,6 +78,18 @@ func (c *Client) GetRelease(owner, repo string, id int64) (*Release, *Response, 
 	return r, resp, err
 }
 
+// GetLatestRelease get the latest release of a repository
+func (c *Client) GetLatestRelease(owner, repo string) (*Release, *Response, error) {
+	if err := escapeValidatePathSegments(&owner, &repo); err != nil {
+		return nil, nil, err
+	}
+	r := new(Release)
+	resp, err := c.getParsedResponse("GET",
+		fmt.Sprintf("/repos/%s/%s/releases/latest", owner, repo),
+		jsonHeader, nil, &r)
+	return r, resp, err
+}
+
 // GetReleaseByTag get a release of a repository by tag
 func (c *Client) GetReleaseByTag(owner, repo, tag string) (*Release, *Response, error) {
 	if c.checkServerVersionGreaterThanOrEqual(version1_13_0) != nil {
@@ -190,7 +202,7 @@ func (c *Client) fallbackGetReleaseByTag(owner, repo, tag string) (*Release, *Re
 		}
 		if len(rl) == 0 {
 			return nil,
-				&Response{&http.Response{StatusCode: 404}},
+				newResponse(&http.Response{StatusCode: 404}),
 				fmt.Errorf("release with tag '%s' not found", tag)
 		}
 		for _, r := range rl {

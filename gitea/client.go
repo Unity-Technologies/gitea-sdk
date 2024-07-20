@@ -9,11 +9,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -35,6 +36,7 @@ type Client struct {
 	password       string
 	otp            string
 	sudo           string
+	userAgent      string
 	debug          bool
 	httpsigner     *HTTPSign
 	client         *http.Client
@@ -48,6 +50,11 @@ type Client struct {
 // Response represents the gitea response
 type Response struct {
 	*http.Response
+
+	FirstPage int
+	PrevPage  int
+	NextPage  int
+	LastPage  int
 }
 
 // ClientOption are functions used to init a new client
@@ -67,6 +74,9 @@ func NewClient(url string, options ...ClientOption) (*Client, error) {
 		}
 	}
 	if err := client.checkServerVersionGreaterThanOrEqual(version1_11_0); err != nil {
+		if errors.Is(err, &ErrUnknownVersion{}) {
+			return client, err
+		}
 		return nil, err
 	}
 
@@ -211,6 +221,21 @@ func (c *Client) SetSudo(sudo string) {
 	c.mutex.Unlock()
 }
 
+// SetUserAgent is an option for NewClient to set user-agent header
+func SetUserAgent(userAgent string) ClientOption {
+	return func(client *Client) error {
+		client.SetUserAgent(userAgent)
+		return nil
+	}
+}
+
+// SetUserAgent sets the user-agent to send with every request.
+func (c *Client) SetUserAgent(userAgent string) {
+	c.mutex.Lock()
+	c.userAgent = userAgent
+	c.mutex.Unlock()
+}
+
 // SetDebugMode is an option for NewClient to enable debug mode
 func SetDebugMode() ClientOption {
 	return func(client *Client) error {
@@ -218,6 +243,57 @@ func SetDebugMode() ClientOption {
 		client.debug = true
 		client.mutex.Unlock()
 		return nil
+	}
+}
+
+func newResponse(r *http.Response) *Response {
+	response := &Response{Response: r}
+	response.parseLinkHeader()
+
+	return response
+}
+
+func (r *Response) parseLinkHeader() {
+	link := r.Header.Get("Link")
+	if link == "" {
+		return
+	}
+
+	links := strings.Split(link, ",")
+	for _, l := range links {
+		u, param, ok := strings.Cut(l, ";")
+		if !ok {
+			continue
+		}
+		u = strings.Trim(u, " <>")
+
+		key, value, ok := strings.Cut(strings.TrimSpace(param), "=")
+		if !ok || key != "rel" {
+			continue
+		}
+
+		value = strings.Trim(value, "\"")
+
+		parsed, err := url.Parse(u)
+		if err != nil {
+			continue
+		}
+
+		page := parsed.Query().Get("page")
+		if page == "" {
+			continue
+		}
+
+		switch value {
+		case "first":
+			r.FirstPage, _ = strconv.Atoi(page)
+		case "prev":
+			r.PrevPage, _ = strconv.Atoi(page)
+		case "next":
+			r.NextPage, _ = strconv.Atoi(page)
+		case "last":
+			r.LastPage, _ = strconv.Atoi(page)
+		}
 	}
 }
 
@@ -242,11 +318,12 @@ func (c *Client) getWebResponse(method, path string, body io.Reader) ([]byte, *R
 	}
 
 	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return data, &Response{resp}, err
+
+	return data, newResponse(resp), err
 }
 
 func (c *Client) doRequest(method, path string, header http.Header, body io.Reader) (*Response, error) {
@@ -255,7 +332,7 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	if debug {
 		var bodyStr string
 		if body != nil {
-			bs, _ := ioutil.ReadAll(body)
+			bs, _ := io.ReadAll(body)
 			body = bytes.NewReader(bs)
 			bodyStr = string(bs)
 		}
@@ -277,6 +354,9 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	}
 	if len(c.sudo) != 0 {
 		req.Header.Set("Sudo", c.sudo)
+	}
+	if len(c.userAgent) != 0 {
+		req.Header.Set("User-Agent", c.userAgent)
 	}
 
 	client := c.client // client ref can change from this point on so safe it
@@ -300,7 +380,8 @@ func (c *Client) doRequest(method, path string, header http.Header, body io.Read
 	if debug {
 		fmt.Printf("Response: %v\n\n", resp)
 	}
-	return &Response{resp}, nil
+
+	return newResponse(resp), nil
 }
 
 // Converts a response for a HTTP status code indicating an error condition
@@ -317,7 +398,7 @@ func statusCodeToErr(resp *Response) (body []byte, err error) {
 	// error: body will be read for details
 	//
 	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("body read on HTTP error %d: %v", resp.StatusCode, err)
 	}
@@ -369,7 +450,7 @@ func (c *Client) getResponse(method, path string, header http.Header, body io.Re
 	}
 
 	// success (2XX), read body
-	data, err = ioutil.ReadAll(resp.Body)
+	data, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, resp, err
 	}
