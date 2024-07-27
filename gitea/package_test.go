@@ -17,7 +17,7 @@ import (
 )
 
 // create an org with a single package for testing purposes
-func createTestPackage(t *testing.T, c *Client) error {
+func createTestPackage(_ *testing.T, c *Client) error {
 	_, _ = c.DeletePackage("PackageOrg", "generic", "MyPackage", "v1")
 	_, _ = c.DeleteOrg("PackageOrg")
 	_, _, _ = c.CreateOrg(CreateOrgOption{Name: "PackageOrg"})
