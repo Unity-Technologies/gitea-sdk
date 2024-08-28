@@ -15,10 +15,10 @@ jobs:
       GITEA_SDK_TEST_USERNAME: "test01"
       GITEA_SDK_TEST_PASSWORD: "test01"
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: ">=1.20"
+          go-version: ">=1.21"
           check-latest: true
       - run: make clean
       - run: make vet
@@ -28,7 +28,7 @@ jobs:
       - run: make test
     services:
       gitea:
-        image: gitea/gitea:1.21.1
+        image: gitea/gitea:nightly
         cmd:
           - bash
           - -c
