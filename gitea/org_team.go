@@ -138,7 +138,7 @@ func (opt *CreateTeamOption) Validate() error {
 	if len(opt.Name) == 0 {
 		return fmt.Errorf("name required")
 	}
-	if len(opt.Name) > 30 {
+	if len(opt.Name) > 255 {
 		return fmt.Errorf("name to long")
 	}
 	if len(opt.Description) > 255 {
