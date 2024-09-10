@@ -1,4 +1,4 @@
-module github.com/Unity-Technologies/gitea-sdk/gitea
+module code.gitea.io/sdk/gitea
 
 go 1.18
 
